@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
-import "@fontsource/bebas-neue";
-import "@fontsource-variable/space-grotesk";
+import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
   title: "Ned Marketing — Sites, automações e tráfego",
@@ -11,7 +21,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body className={`${bebasNeue.variable} ${spaceGrotesk.variable}`}>{children}</body>
     </html>
   );
 }
