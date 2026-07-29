@@ -19,7 +19,7 @@ body {
   margin: 0;
   background: var(--ink);
   color: white;
-  font-family: "Space Grotesk Variable", sans-serif;
+  font-family: var(--font-body), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 a { color: inherit; text-decoration: none; }
@@ -49,7 +49,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   z-index: 50;
 }
 .brand { display: inline-flex; flex-direction: column; line-height: .75; }
-.brand-main { font-family: "Bebas Neue", sans-serif; font-size: 35px; letter-spacing: .03em; }
+.brand-main { font-family: var(--font-display), sans-serif; font-size: 35px; letter-spacing: .03em; }
 .brand-sub { font-size: 8px; font-weight: 700; letter-spacing: .42em; margin-left: 2px; }
 nav { display: flex; gap: 32px; font-size: 14px; font-weight: 600; }
 nav a { transition: color .2s ease; }
@@ -69,7 +69,7 @@ nav a:hover { color: var(--purple); }
 .hero-copy { max-width: 760px; position: relative; z-index: 2; }
 .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .24em; }
 .eyebrow.purple { color: var(--purple-light); }
-h1, h2 { font-family: "Bebas Neue", sans-serif; font-weight: 400; text-transform: uppercase; margin: 0; }
+h1, h2 { font-family: var(--font-display), sans-serif; font-weight: 400; text-transform: uppercase; margin: 0; }
 h1 { font-size: clamp(4rem, 6.4vw, 6.3rem); line-height: .9; letter-spacing: -.015em; margin-top: 30px; }
 h1 span, h2 span { color: var(--purple); }
 .hero-copy > p { max-width: 650px; color: #44444b; font-size: 18px; line-height: 1.65; margin: 30px 0 0; }
@@ -111,18 +111,18 @@ h1 span, h2 span { color: var(--purple); }
 .step { padding: 30px 24px 24px 0; border-right: 1px solid var(--border-light); min-height: 240px; }
 .step + .step { padding-left: 24px; }
 .step:last-child { border-right: 0; }
-.step-number { color: var(--purple); font-family: "Bebas Neue", sans-serif; font-size: 40px; }
+.step-number { color: var(--purple); font-family: var(--font-display), sans-serif; font-size: 40px; }
 .step h3 { font-size: 20px; margin: 48px 0 14px; }
 .step p { color: var(--muted); line-height: 1.65; font-size: 14px; }
 
 .marketplaces { display: grid; grid-template-columns: 1.05fr .95fr; gap: 80px; align-items: center; }
-.market-copy h2 { font-family: "Bebas Neue", sans-serif; font-size: clamp(3.4rem, 5vw, 5.4rem); line-height: .92; text-transform: uppercase; margin: 24px 0; }
+.market-copy h2 { font-family: var(--font-display), sans-serif; font-size: clamp(3.4rem, 5vw, 5.4rem); line-height: .92; text-transform: uppercase; margin: 24px 0; }
 .market-copy p { color: var(--muted-light); line-height: 1.7; max-width: 650px; }
 .platforms { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
 .platforms span { border: 1px solid var(--border-dark); padding: 10px 14px; font-size: 12px; font-weight: 700; }
 .market-panel { min-height: 420px; display: flex; flex-direction: column; justify-content: center; padding: 48px; border: 1px solid var(--border-dark); background: radial-gradient(circle at center, rgba(112,64,255,.15), transparent 60%), var(--panel); }
 .panel-kicker { color: var(--purple-light); font-size: 10px; letter-spacing: .22em; font-weight: 800; margin-bottom: 26px; }
-.market-panel strong { font-family: "Bebas Neue", sans-serif; font-size: 35px; letter-spacing: .04em; }
+.market-panel strong { font-family: var(--font-display), sans-serif; font-size: 35px; letter-spacing: .04em; }
 .connector { height: 28px; width: 1px; background: var(--purple); margin: 7px 0 7px 8px; }
 
 .cta { text-align: center; padding: 120px 24px; }
