@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import Analytics from "./components/analytics";
+import SiteRuntime from "./components/site-runtime";
 import StructuredData from "./components/structured-data";
 import "./globals.css";
 import "./overrides.css";
+import "./runtime.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
 
@@ -89,6 +91,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="pt-BR">
       <body className={`${bebasNeue.variable} ${spaceGrotesk.variable}`}>
         <StructuredData />
+        <SiteRuntime />
         {children}
         <Analytics />
       </body>
