@@ -1,0 +1,14 @@
+/* Runtime refinements shared by desktop and mobile. */
+.capability-track {
+  animation-duration: var(--marquee-duration, 42s);
+  will-change: transform;
+}
+
+.capability-track span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+#diagnostico {
+  scroll-margin-top: 72px;
+}
