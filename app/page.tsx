@@ -1,13 +1,35 @@
+"use client";
+
 import {
+  ArrowDown,
   ArrowRight,
   BarChart3,
   Bot,
+  Menu,
   MessageCircle,
   MonitorSmartphone,
   ShoppingBag,
+  X,
 } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+} from "framer-motion";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+} from "react";
 
-const whatsappUrl = "https://wa.me/55XXXXXXXXXXX";
+const whatsappNumber = "5511949780458";
+
+const whatsappUrl = (message: string) =>
+  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
 const services = [
   {
@@ -36,141 +58,501 @@ const services = [
   },
 ];
 
-export default function Home() {
+const steps = [
+  ["01", "Diagnóstico", "Entendemos sua operação, oferta, gargalos e objetivo real."],
+  ["02", "Estratégia", "Definimos o sistema, as prioridades e o caminho mais eficiente."],
+  ["03", "Execução", "Construímos, integramos e lançamos com atenção aos detalhes."],
+  ["04", "Otimização", "Acompanhamos dados, corrigimos e buscamos crescimento contínuo."],
+];
+
+const reveal = {
+  hidden: { opacity: 0, y: 42 },
+  visible: { opacity: 1, y: 0 },
+};
+
+function Loader({ visible }: { visible: boolean }) {
   return (
-    <main>
-      <header className="site-header">
-        <a className="brand" href="#inicio" aria-label="Ned Marketing — início">
-          <span className="brand-main">NED</span>
-          <span className="brand-sub">MARKETING</span>
-        </a>
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          className="loader"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.45, delay: 0.18 } }}
+          aria-hidden="true"
+        >
+          <motion.div
+            className="loader-brand"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <span>NED</span>
+            <small>MARKETING</small>
+          </motion.div>
+          <motion.div
+            className="loader-line"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.85, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
-        <nav aria-label="Navegação principal">
-          <a href="#servicos">Serviços</a>
-          <a href="#processo">Processo</a>
-          <a href="#marketplaces">Marketplaces</a>
-        </nav>
+function CustomCursor() {
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const ringX = useSpring(x, { stiffness: 460, damping: 34, mass: 0.18 });
+  const ringY = useSpring(y, { stiffness: 460, damping: 34, mass: 0.18 });
+  const [label, setLabel] = useState("");
+  const [active, setActive] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [light, setLight] = useState(false);
 
-        <a className="header-cta" href={whatsappUrl} target="_blank" rel="noreferrer">
-          Falar com Ned <ArrowRight size={17} />
-        </a>
-      </header>
+  useEffect(() => {
+    const onMove = (event: PointerEvent) => {
+      x.set(event.clientX);
+      y.set(event.clientY);
+      setVisible(true);
 
-      <section className="hero paper" id="inicio">
-        <div className="hero-copy">
-          <span className="eyebrow">ESTRATÉGIA • DESIGN • PERFORMANCE</span>
-          <h1>
-            Não fazemos marketing <span>barulhento.</span>
-            <br />
-            Construímos sistemas que vendem.
-          </h1>
-          <p>
-            Sites, automações, tráfego e marketplaces para empresas que querem crescer com estrutura — e não depender de improviso.
-          </p>
-          <div className="hero-actions">
-            <a className="button button-primary" href={whatsappUrl} target="_blank" rel="noreferrer">
-              Começar um projeto <ArrowRight size={18} />
-            </a>
-            <a className="button button-secondary" href="#servicos">Conhecer serviços</a>
-          </div>
-        </div>
+      const element = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement | null;
+      const interactive = element?.closest<HTMLElement>("[data-cursor]");
+      setLabel(interactive?.dataset.cursor ?? "");
+      setActive(Boolean(interactive));
+      setLight(Boolean(element?.closest('[data-theme="dark"]')));
+    };
 
-        <div className="target" aria-hidden="true">
-          <div className="target-ring ring-one" />
-          <div className="target-ring ring-two" />
-          <div className="target-ring ring-three" />
-          <div className="target-line target-line-x" />
-          <div className="target-line target-line-y" />
-          <span className="target-word word-top">FOCO</span>
-          <span className="target-word word-right">DADOS</span>
-          <span className="target-word word-bottom">RESULTADOS</span>
-          <span className="target-word word-left">PROCESSOS</span>
-          <span className="target-plus">+</span>
-        </div>
-      </section>
+    const onLeave = () => setVisible(false);
 
-      <section className="services dark-section" id="servicos">
-        <div className="section-heading">
-          <span className="eyebrow purple">O QUE CONSTRUÍMOS</span>
-          <h2>Marketing não é postagem.<br />É <span>estrutura.</span></h2>
-          <p>Cada serviço da Ned existe para resolver uma parte real da operação e fazer o negócio avançar.</p>
-        </div>
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.documentElement.addEventListener("mouseleave", onLeave);
 
-        <div className="service-grid">
-          {services.map(({ icon: Icon, number, title, text }) => (
-            <article className="service-card" key={number}>
-              <div className="card-top">
-                <Icon size={30} strokeWidth={1.6} />
-                <span>{number}</span>
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      document.documentElement.removeEventListener("mouseleave", onLeave);
+    };
+  }, [x, y]);
+
+  return (
+    <div
+      className={`custom-cursor${visible ? " is-visible" : ""}${active ? " is-active" : ""}${light ? " is-light" : ""}`}
+      aria-hidden="true"
+    >
+      <motion.span className="cursor-dot" style={{ x, y }} />
+      <motion.span className="cursor-ring" style={{ x: ringX, y: ringY }}>
+        <span>{label}</span>
+      </motion.span>
+    </div>
+  );
+}
+
+function MagneticLink({
+  href,
+  children,
+  className,
+  external = false,
+  cursorLabel = "ABRIR",
+}: {
+  href: string;
+  children: ReactNode;
+  className: string;
+  external?: boolean;
+  cursorLabel?: string;
+}) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 360, damping: 24 });
+  const springY = useSpring(y, { stiffness: 360, damping: 24 });
+
+  const onMove = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    x.set((event.clientX - rect.left - rect.width / 2) * 0.14);
+    y.set((event.clientY - rect.top - rect.height / 2) * 0.2);
+  };
+
+  const reset = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.a
+      className={className}
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      onMouseMove={onMove}
+      onMouseLeave={reset}
+      style={{ x: springX, y: springY }}
+      data-cursor={cursorLabel}
+    >
+      {children}
+    </motion.a>
+  );
+}
+
+function InteractiveTarget() {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const smoothX = useSpring(x, { stiffness: 90, damping: 18 });
+  const smoothY = useSpring(y, { stiffness: 90, damping: 18 });
+
+  const move = (event: ReactMouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    x.set(((event.clientX - rect.left) / rect.width - 0.5) * 26);
+    y.set(((event.clientY - rect.top) / rect.height - 0.5) * 26);
+  };
+
+  const reset = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <div className="target-stage" onMouseMove={move} onMouseLeave={reset} data-cursor="MOVER">
+      <motion.div className="target target-back" style={{ x: smoothX, y: smoothY }} aria-hidden="true">
+        <div className="target-ring ring-one" />
+        <motion.div
+          className="target-ring ring-two"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="target-ring ring-three"
+          style={{ x: smoothX, y: smoothY }}
+          animate={{ scale: [1, 1.045, 1] }}
+          transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div className="target-line target-line-x" />
+        <div className="target-line target-line-y" />
+        <span className="target-word word-top">FOCO</span>
+        <span className="target-word word-right">DADOS</span>
+        <span className="target-word word-bottom">RESULTADOS</span>
+        <span className="target-word word-left">PROCESSOS</span>
+        <span className="target-plus">+</span>
+        <span className="target-index">NED / 001</span>
+      </motion.div>
+    </div>
+  );
+}
+
+export default function Home() {
+  const prefersReducedMotion = useReducedMotion();
+  const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setLoading(false), prefersReducedMotion ? 120 : 1450);
+    return () => window.clearTimeout(timeout);
+  }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 28);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+  const startProjectUrl = whatsappUrl(
+    "Olá, Ned! Conheci o site e quero conversar sobre um projeto para minha empresa.",
+  );
+  const portfolioUrl = whatsappUrl(
+    "Olá, Ned! Quero conhecer os cases e o portfólio da Ned Marketing.",
+  );
+
+  return (
+    <>
+      <Loader visible={loading} />
+      <CustomCursor />
+
+      <main className={loading ? "page-is-loading" : "page-is-ready"}>
+        <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
+          <a className="brand" href="#inicio" aria-label="Ned Marketing — início" data-cursor="TOPO">
+            <span className="brand-main">NED</span>
+            <span className="brand-sub">MARKETING</span>
+          </a>
+
+          <nav aria-label="Navegação principal">
+            <a href="#servicos" data-cursor="VER">Serviços</a>
+            <a href="#processo" data-cursor="VER">Processo</a>
+            <a href="#marketplaces" data-cursor="VER">Marketplaces</a>
+          </nav>
+
+          <MagneticLink className="header-cta" href={startProjectUrl} external cursorLabel="CHAMAR">
+            <span>Falar com Ned</span> <ArrowRight size={17} />
+          </MagneticLink>
+
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((current) => !current)}
+          >
+            {menuOpen ? <X /> : <Menu />}
+          </button>
+        </header>
+
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              className="mobile-menu"
+              initial={{ clipPath: "inset(0 0 100% 0)" }}
+              animate={{ clipPath: "inset(0 0 0% 0)" }}
+              exit={{ clipPath: "inset(0 0 100% 0)" }}
+              transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
+              data-theme="dark"
+            >
+              <span className="mobile-menu-kicker">NAVEGAÇÃO / 001</span>
+              <div className="mobile-menu-links">
+                <a href="#servicos" onClick={closeMenu}>Serviços <span>01</span></a>
+                <a href="#processo" onClick={closeMenu}>Processo <span>02</span></a>
+                <a href="#marketplaces" onClick={closeMenu}>Marketplaces <span>03</span></a>
               </div>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+              <a className="mobile-menu-cta" href={startProjectUrl} target="_blank" rel="noreferrer">
+                Começar um projeto <ArrowRight />
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <section className="process paper" id="processo">
-        <div className="section-heading dark-copy">
-          <span className="eyebrow">COMO TRABALHAMOS</span>
-          <h2>Menos achismo.<br /><span>Mais processo.</span></h2>
-        </div>
-        <div className="steps">
-          {[
-            ["01", "Diagnóstico", "Entendemos sua operação, oferta, gargalos e objetivo real."],
-            ["02", "Estratégia", "Definimos o sistema, as prioridades e o caminho mais eficiente."],
-            ["03", "Execução", "Construímos, integramos e lançamos com atenção aos detalhes."],
-            ["04", "Otimização", "Acompanhamos dados, corrigimos e buscamos crescimento contínuo."],
-          ].map(([number, title, text]) => (
-            <article className="step" key={number}>
-              <span className="step-number">{number}</span>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+        <section className="hero paper" id="inicio" ref={heroRef}>
+          <div className="hero-grid-mark" aria-hidden="true" />
+          <div className="hero-copy">
+            <motion.span
+              className="eyebrow"
+              initial={{ opacity: 0, y: 18 }}
+              animate={!loading ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+              transition={{ duration: 0.55 }}
+            >
+              ESTRATÉGIA • DESIGN • PERFORMANCE
+            </motion.span>
 
-      <section className="marketplaces dark-section" id="marketplaces">
-        <div className="market-copy">
-          <span className="eyebrow purple">MARKETPLACES</span>
-          <h2>Quem vende online precisa de operação. Não só de anúncio.</h2>
-          <p>
-            Organizamos presença, catálogo, criativos, tráfego e processos para transformar marketplaces em um canal de crescimento sustentável.
-          </p>
-          <div className="platforms" aria-label="Plataformas atendidas">
-            <span>Mercado Livre</span><span>Shopee</span><span>Amazon</span><span>TikTok Shop</span>
+            <motion.h1
+              initial={{ opacity: 0, y: 60 }}
+              animate={!loading ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
+              transition={{ duration: 0.85, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Não fazemos marketing <span>barulhento.</span>
+              <br />
+              Construímos sistemas que vendem.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={!loading ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={{ duration: 0.65, delay: 0.22 }}
+            >
+              Sites, automações, tráfego e marketplaces para empresas que querem crescer com estrutura — e não depender de improviso.
+            </motion.p>
+
+            <motion.div
+              className="hero-actions"
+              initial={{ opacity: 0, y: 24 }}
+              animate={!loading ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={{ duration: 0.65, delay: 0.32 }}
+            >
+              <MagneticLink className="button button-primary" href={startProjectUrl} external cursorLabel="CHAMAR">
+                Começar um projeto <ArrowRight size={18} />
+              </MagneticLink>
+              <MagneticLink className="button button-secondary" href="#servicos" cursorLabel="EXPLORAR">
+                Conhecer serviços
+              </MagneticLink>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="hero-visual"
+            initial={{ opacity: 0, scale: 0.88, rotate: -5 }}
+            animate={!loading ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.88, rotate: -5 }}
+            transition={{ duration: 1, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <InteractiveTarget />
+          </motion.div>
+
+          <motion.a
+            className="scroll-indicator"
+            href="#servicos"
+            initial={{ opacity: 0 }}
+            animate={!loading ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ delay: 0.7 }}
+            data-cursor="DESCER"
+          >
+            <span>SCROLL PARA EXPLORAR</span>
+            <motion.span animate={{ y: [0, 7, 0] }} transition={{ duration: 1.8, repeat: Infinity }}>
+              <ArrowDown size={15} />
+            </motion.span>
+          </motion.a>
+        </section>
+
+        <div className="capability-strip" data-theme="dark" aria-label="Áreas de atuação">
+          <div className="capability-track">
+            {["SITES", "AUTOMAÇÕES", "TRÁFEGO", "MARKETPLACES", "ESTRATÉGIA", "DESIGN", "SITES", "AUTOMAÇÕES", "TRÁFEGO", "MARKETPLACES", "ESTRATÉGIA", "DESIGN"].map((item, index) => (
+              <span key={`${item}-${index}`}>{item}<b>+</b></span>
+            ))}
           </div>
         </div>
-        <div className="market-panel">
-          <span className="panel-kicker">OPERAÇÃO CONECTADA</span>
-          <strong>Catálogo</strong>
-          <span className="connector" />
-          <strong>Anúncios</strong>
-          <span className="connector" />
-          <strong>Dados</strong>
-          <span className="connector" />
-          <strong>Escala</strong>
-        </div>
-      </section>
 
-      <section className="cta paper">
-        <span className="eyebrow">CASES E PORTFÓLIO</span>
-        <h2>Quer conhecer nossos projetos e resultados?</h2>
-        <p>Converse diretamente com Ned e receba uma apresentação selecionada para o seu tipo de negócio.</p>
-        <a className="button button-primary" href={whatsappUrl} target="_blank" rel="noreferrer">
-          <MessageCircle size={19} /> Conversar no WhatsApp
-        </a>
-      </section>
+        <section className="services dark-section" id="servicos" data-theme="dark">
+          <motion.div
+            className="section-heading"
+            variants={reveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <span className="eyebrow purple">O QUE CONSTRUÍMOS</span>
+            <h2>Marketing não é postagem.<br />É <span>estrutura.</span></h2>
+            <p>Cada serviço da Ned existe para resolver uma parte real da operação e fazer o negócio avançar.</p>
+          </motion.div>
 
-      <footer>
-        <a className="brand footer-brand" href="#inicio">
-          <span className="brand-main">NED</span>
-          <span className="brand-sub">MARKETING</span>
+          <div className="service-grid">
+            {services.map(({ icon: Icon, number, title, text }, index) => (
+              <motion.article
+                className="service-card"
+                key={number}
+                initial={{ opacity: 0, y: 44 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.65, delay: index * 0.08 }}
+                whileHover={{ y: -8 }}
+                data-cursor="VER"
+              >
+                <div className="card-glow" />
+                <div className="card-top">
+                  <Icon size={30} strokeWidth={1.6} />
+                  <span>{number}</span>
+                </div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <span className="card-arrow"><ArrowRight size={17} /></span>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section className="process paper" id="processo">
+          <motion.div
+            className="section-heading dark-copy"
+            variants={reveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.75 }}
+          >
+            <span className="eyebrow">COMO TRABALHAMOS</span>
+            <h2>Menos achismo.<br /><span>Mais processo.</span></h2>
+          </motion.div>
+
+          <div className="steps">
+            {steps.map(([number, title, text], index) => (
+              <motion.article
+                className="step"
+                key={number}
+                initial={{ opacity: 0, x: -24 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                data-cursor="ETAPA"
+              >
+                <span className="step-number">{number}</span>
+                <span className="step-line" />
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section className="marketplaces dark-section" id="marketplaces" data-theme="dark">
+          <motion.div
+            className="market-copy"
+            initial={{ opacity: 0, x: -48 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="eyebrow purple">MARKETPLACES</span>
+            <h2>Quem vende online precisa de operação. Não só de anúncio.</h2>
+            <p>
+              Organizamos presença, catálogo, criativos, tráfego e processos para transformar marketplaces em um canal de crescimento sustentável.
+            </p>
+            <div className="platforms" aria-label="Plataformas atendidas">
+              <span>Mercado Livre</span><span>Shopee</span><span>Amazon</span><span>TikTok Shop</span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="market-panel"
+            initial={{ opacity: 0, x: 48 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.8, delay: 0.12 }}
+            data-cursor="FLUXO"
+          >
+            <div className="panel-orbit orbit-one" />
+            <div className="panel-orbit orbit-two" />
+            <span className="panel-kicker">OPERAÇÃO CONECTADA</span>
+            {["Catálogo", "Anúncios", "Dados", "Escala"].map((item, index) => (
+              <div className="flow-item" key={item}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item}</strong>
+                {index < 3 && <motion.i animate={{ scaleY: [0.25, 1, 0.25] }} transition={{ duration: 2, repeat: Infinity, delay: index * 0.16 }} />}
+              </div>
+            ))}
+          </motion.div>
+        </section>
+
+        <section className="cta paper">
+          <motion.div
+            initial={{ opacity: 0, y: 46 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="eyebrow">CASES E PORTFÓLIO</span>
+            <h2>Quer conhecer nossos projetos e resultados?</h2>
+            <p>Converse diretamente com Ned e receba uma apresentação selecionada para o seu tipo de negócio.</p>
+            <MagneticLink className="button button-primary" href={portfolioUrl} external cursorLabel="CHAMAR">
+              <MessageCircle size={19} /> Conversar no WhatsApp
+            </MagneticLink>
+          </motion.div>
+        </section>
+
+        <footer data-theme="dark">
+          <a className="brand footer-brand" href="#inicio" data-cursor="TOPO">
+            <span className="brand-main">NED</span>
+            <span className="brand-sub">MARKETING</span>
+          </a>
+          <p>Sites, automações e tráfego para empresas que querem crescer.</p>
+          <span>© {new Date().getFullYear()} Ned Marketing</span>
+        </footer>
+
+        <a
+          className="whatsapp-float"
+          href={startProjectUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Falar com a Ned Marketing pelo WhatsApp"
+          data-cursor="CHAMAR"
+        >
+          <MessageCircle size={21} />
+          <span>Falar com Ned</span>
         </a>
-        <p>Sites, automações e tráfego para empresas que querem crescer.</p>
-        <span>© {new Date().getFullYear()} Ned Marketing</span>
-      </footer>
-    </main>
+      </main>
+    </>
   );
 }
