@@ -1,0 +1,6 @@
+/* Ajustes finos aplicados após o sistema visual principal. */
+
+/* O eixo horizontal continua para a esquerda, mas termina no círculo à direita. */
+.target-line-x {
+  right: 0;
+}
