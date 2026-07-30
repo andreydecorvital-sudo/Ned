@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Space_Grotesk } from "next/font/google";
+import RuntimeLinkConfig from "./runtime-link-config";
 import "./globals.css";
+import "./overrides.css";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
@@ -21,7 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${bebasNeue.variable} ${spaceGrotesk.variable}`}>{children}</body>
+      <body className={`${bebasNeue.variable} ${spaceGrotesk.variable}`}>
+        <RuntimeLinkConfig />
+        {children}
+      </body>
     </html>
   );
 }
