@@ -20,16 +20,23 @@ import {
 } from "framer-motion";
 import {
   useEffect,
-  useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+import DiagnosticForm from "./components/diagnostic-form";
 
-const whatsappNumber = "5511949780458";
+const whatsappNumber = "5511917814612";
 
 const whatsappUrl = (message: string) =>
   `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+const navigation = [
+  { id: "servicos", label: "Serviços" },
+  { id: "processo", label: "Processo" },
+  { id: "marketplaces", label: "Marketplaces" },
+  { id: "diagnostico", label: "Diagnóstico" },
+];
 
 const services = [
   {
@@ -63,6 +70,12 @@ const steps = [
   ["02", "Estratégia", "Definimos o sistema, as prioridades e o caminho mais eficiente."],
   ["03", "Execução", "Construímos, integramos e lançamos com atenção aos detalhes."],
   ["04", "Otimização", "Acompanhamos dados, corrigimos e buscamos crescimento contínuo."],
+];
+
+const manifestoLines = [
+  ["01", "Site bonito sem estratégia", "é decoração."],
+  ["02", "Tráfego sem estrutura", "é desperdício."],
+  ["03", "Automação sem processo", "é confusão em alta velocidade."],
 ];
 
 const reveal = {
@@ -154,12 +167,14 @@ function MagneticLink({
   className,
   external = false,
   cursorLabel = "ABRIR",
+  trackingSource,
 }: {
   href: string;
   children: ReactNode;
   className: string;
   external?: boolean;
   cursorLabel?: string;
+  trackingSource?: string;
 }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -187,6 +202,7 @@ function MagneticLink({
       onMouseLeave={reset}
       style={{ x: springX, y: springY }}
       data-cursor={cursorLabel}
+      data-track={trackingSource}
     >
       {children}
     </motion.a>
@@ -243,10 +259,16 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const heroRef = useRef<HTMLElement>(null);
+  const [activeSection, setActiveSection] = useState("inicio");
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setLoading(false), prefersReducedMotion ? 120 : 1450);
+    const introSeen = window.sessionStorage.getItem("ned-intro-seen");
+    const delay = prefersReducedMotion || introSeen ? 80 : 1450;
+    const timeout = window.setTimeout(() => {
+      setLoading(false);
+      window.sessionStorage.setItem("ned-intro-seen", "true");
+    }, delay);
+
     return () => window.clearTimeout(timeout);
   }, [prefersReducedMotion]);
 
@@ -263,6 +285,29 @@ export default function Home() {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
+
+  useEffect(() => {
+    const sectionIds = ["inicio", "servicos", "processo", "marketplaces", "diagnostico"];
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visibleEntries[0]?.target.id) {
+          setActiveSection(visibleEntries[0].target.id);
+        }
+      },
+      { rootMargin: "-25% 0px -58% 0px", threshold: [0.08, 0.2, 0.45] },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   const closeMenu = () => setMenuOpen(false);
   const startProjectUrl = whatsappUrl(
@@ -285,12 +330,25 @@ export default function Home() {
           </a>
 
           <nav aria-label="Navegação principal">
-            <a href="#servicos" data-cursor="VER">Serviços</a>
-            <a href="#processo" data-cursor="VER">Processo</a>
-            <a href="#marketplaces" data-cursor="VER">Marketplaces</a>
+            {navigation.map((item) => (
+              <a
+                key={item.id}
+                className={activeSection === item.id ? "is-active" : undefined}
+                href={`#${item.id}`}
+                data-cursor="VER"
+              >
+                {item.label}
+              </a>
+            ))}
           </nav>
 
-          <MagneticLink className="header-cta" href={startProjectUrl} external cursorLabel="CHAMAR">
+          <MagneticLink
+            className="header-cta"
+            href={startProjectUrl}
+            external
+            cursorLabel="CHAMAR"
+            trackingSource="header"
+          >
             <span>Falar com Ned</span> <ArrowRight size={17} />
           </MagneticLink>
 
@@ -317,18 +375,31 @@ export default function Home() {
             >
               <span className="mobile-menu-kicker">NAVEGAÇÃO / 001</span>
               <div className="mobile-menu-links">
-                <a href="#servicos" onClick={closeMenu}>Serviços <span>01</span></a>
-                <a href="#processo" onClick={closeMenu}>Processo <span>02</span></a>
-                <a href="#marketplaces" onClick={closeMenu}>Marketplaces <span>03</span></a>
+                {navigation.map((item, index) => (
+                  <a
+                    key={item.id}
+                    className={activeSection === item.id ? "is-active" : undefined}
+                    href={`#${item.id}`}
+                    onClick={closeMenu}
+                  >
+                    {item.label} <span>{String(index + 1).padStart(2, "0")}</span>
+                  </a>
+                ))}
               </div>
-              <a className="mobile-menu-cta" href={startProjectUrl} target="_blank" rel="noreferrer">
+              <a
+                className="mobile-menu-cta"
+                href={startProjectUrl}
+                target="_blank"
+                rel="noreferrer"
+                data-track="menu_mobile"
+              >
                 Começar um projeto <ArrowRight />
               </a>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <section className="hero paper" id="inicio" ref={heroRef}>
+        <section className="hero paper" id="inicio">
           <div className="hero-grid-mark" aria-hidden="true" />
           <div className="hero-copy">
             <motion.span
@@ -364,7 +435,13 @@ export default function Home() {
               animate={!loading ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               transition={{ duration: 0.65, delay: 0.32 }}
             >
-              <MagneticLink className="button button-primary" href={startProjectUrl} external cursorLabel="CHAMAR">
+              <MagneticLink
+                className="button button-primary"
+                href={startProjectUrl}
+                external
+                cursorLabel="CHAMAR"
+                trackingSource="hero"
+              >
                 Começar um projeto <ArrowRight size={18} />
               </MagneticLink>
               <MagneticLink className="button button-secondary" href="#servicos" cursorLabel="EXPLORAR">
@@ -444,6 +521,30 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="manifesto" data-theme="dark" aria-labelledby="manifesto-title">
+          <div className="manifesto-intro">
+            <span className="eyebrow purple">MANIFESTO NED</span>
+            <h2 id="manifesto-title">O problema nunca foi falta de barulho.</h2>
+            <p>O problema é investir sem estratégia, executar sem processo e esperar resultado no improviso.</p>
+          </div>
+
+          <div className="manifesto-lines">
+            {manifestoLines.map(([number, statement, conclusion], index) => (
+              <motion.article
+                key={number}
+                initial={{ opacity: 0, y: 34 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.65, delay: index * 0.1 }}
+                data-cursor="LER"
+              >
+                <span>{number}</span>
+                <p>{statement} <strong>{conclusion}</strong></p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
         <section className="process paper" id="processo">
           <motion.div
             className="section-heading dark-copy"
@@ -516,6 +617,36 @@ export default function Home() {
           </motion.div>
         </section>
 
+        <section className="diagnostic paper" id="diagnostico">
+          <motion.div
+            className="diagnostic-copy"
+            initial={{ opacity: 0, x: -42 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.75 }}
+          >
+            <span className="eyebrow">COMECE PELO DIAGNÓSTICO</span>
+            <h2>Quatro respostas.<br /><span>Uma conversa melhor.</span></h2>
+            <p>
+              Responda às perguntas e o WhatsApp será aberto com um resumo do seu negócio, do desafio e do momento do projeto.
+            </p>
+            <div className="diagnostic-benefits">
+              <span>01</span><p>Leva menos de dois minutos.</p>
+              <span>02</span><p>Sem cadastro e sem formulário burocrático.</p>
+              <span>03</span><p>A conversa já começa com contexto.</p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 42 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.75, delay: 0.12 }}
+          >
+            <DiagnosticForm />
+          </motion.div>
+        </section>
+
         <section className="cta paper">
           <motion.div
             initial={{ opacity: 0, y: 46 }}
@@ -526,19 +657,34 @@ export default function Home() {
             <span className="eyebrow">CASES E PORTFÓLIO</span>
             <h2>Quer conhecer nossos projetos e resultados?</h2>
             <p>Converse diretamente com Ned e receba uma apresentação selecionada para o seu tipo de negócio.</p>
-            <MagneticLink className="button button-primary" href={portfolioUrl} external cursorLabel="CHAMAR">
+            <MagneticLink
+              className="button button-primary"
+              href={portfolioUrl}
+              external
+              cursorLabel="CHAMAR"
+              trackingSource="portfolio"
+            >
               <MessageCircle size={19} /> Conversar no WhatsApp
             </MagneticLink>
           </motion.div>
         </section>
 
         <footer data-theme="dark">
-          <a className="brand footer-brand" href="#inicio" data-cursor="TOPO">
-            <span className="brand-main">NED</span>
-            <span className="brand-sub">MARKETING</span>
-          </a>
-          <p>Sites, automações e tráfego para empresas que querem crescer.</p>
-          <span>© {new Date().getFullYear()} Ned Marketing</span>
+          <div className="footer-identity">
+            <a className="brand footer-brand" href="#inicio" data-cursor="TOPO">
+              <span className="brand-main">NED</span>
+              <span className="brand-sub">MARKETING</span>
+            </a>
+            <p>Sites, automações, tráfego e marketplaces para empresas que querem crescer.</p>
+          </div>
+          <div className="footer-links">
+            {navigation.map((item) => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}
+          </div>
+          <div className="footer-meta">
+            <a href={startProjectUrl} target="_blank" rel="noreferrer" data-track="footer">+55 11 91781-4612</a>
+            <span>Atendimento em todo o Brasil</span>
+            <span>© {new Date().getFullYear()} Ned Marketing</span>
+          </div>
         </footer>
 
         <a
@@ -548,6 +694,7 @@ export default function Home() {
           rel="noreferrer"
           aria-label="Falar com a Ned Marketing pelo WhatsApp"
           data-cursor="CHAMAR"
+          data-track="botao_flutuante"
         >
           <MessageCircle size={21} />
           <span>Falar com Ned</span>
