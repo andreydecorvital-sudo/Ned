@@ -3,6 +3,7 @@ import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import Analytics from "./components/analytics";
 import DiagnosticPopup from "./components/diagnostic-popup";
 import LabLauncher from "./components/lab-launcher";
+import ServiceCardLinks from "./components/service-card-links";
 import SiteRuntime from "./components/site-runtime";
 import StructuredData from "./components/structured-data";
 import "./globals.css";
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${bebasNeue.variable} ${spaceGrotesk.variable}`}>
         <StructuredData />
         <SiteRuntime />
+        <ServiceCardLinks />
         {children}
         <DiagnosticPopup />
         <LabLauncher />

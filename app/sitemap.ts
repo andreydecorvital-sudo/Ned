@@ -3,24 +3,20 @@ import type { MetadataRoute } from "next";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/lab`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/lab/maquina-quebrada`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+  const routes = [
+    { path: "", changeFrequency: "weekly" as const, priority: 1 },
+    { path: "/lab", changeFrequency: "monthly" as const, priority: 0.8 },
+    { path: "/lab/maquina-quebrada", changeFrequency: "monthly" as const, priority: 0.8 },
+    { path: "/servicos/sites", changeFrequency: "monthly" as const, priority: 0.85 },
+    { path: "/servicos/automacoes", changeFrequency: "monthly" as const, priority: 0.85 },
+    { path: "/servicos/trafego-pago", changeFrequency: "monthly" as const, priority: 0.85 },
+    { path: "/servicos/marketplaces", changeFrequency: "monthly" as const, priority: 0.85 },
   ];
+
+  return routes.map((route) => ({
+    url: `${siteUrl}${route.path}`,
+    lastModified: new Date(),
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 }
