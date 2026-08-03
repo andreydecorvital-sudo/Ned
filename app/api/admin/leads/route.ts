@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { isDatabaseConfigured, listLeads } from "@/lib/lead-store";
+import {
+  getLeadDashboardStats,
+  isDatabaseConfigured,
+  listLeads,
+} from "@/lib/lead-store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,15 +24,21 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
 
   try {
-    const leads = await listLeads({
-      status: url.searchParams.get("status") ?? "",
-      service: url.searchParams.get("service") ?? "",
-      source: url.searchParams.get("source") ?? "",
-      search: url.searchParams.get("search") ?? "",
-    });
+    const [leads, stats] = await Promise.all([
+      listLeads({
+        status: url.searchParams.get("status") ?? "",
+        service: url.searchParams.get("service") ?? "",
+        source: url.searchParams.get("source") ?? "",
+        priority: url.searchParams.get("priority") ?? "",
+        attention: url.searchParams.get("attention") ?? "",
+        search: url.searchParams.get("search") ?? "",
+      }),
+      getLeadDashboardStats(),
+    ]);
 
     return NextResponse.json({
       leads,
+      stats,
       options: {
         services: [...new Set(leads.map((lead) => lead.service))].sort(),
         sources: [...new Set(leads.map((lead) => lead.source))].sort(),
