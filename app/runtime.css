@@ -12,3 +12,31 @@
 #diagnostico {
   scroll-margin-top: 72px;
 }
+
+/*
+ * The institutional home renders its own custom cursor and globals.css hides
+ * the native cursor on precise pointer devices. Other routes, such as NED LAB,
+ * do not mount that component, so restore the appropriate native cursors there.
+ */
+@media (pointer: fine) {
+  body:not(:has(.custom-cursor)) {
+    cursor: auto !important;
+  }
+
+  body:not(:has(.custom-cursor)) a,
+  body:not(:has(.custom-cursor)) button,
+  body:not(:has(.custom-cursor)) [role="button"],
+  body:not(:has(.custom-cursor)) [data-cursor] {
+    cursor: pointer !important;
+  }
+
+  body:not(:has(.custom-cursor)) button:disabled,
+  body:not(:has(.custom-cursor)) [aria-disabled="true"] {
+    cursor: not-allowed !important;
+  }
+
+  body:not(:has(.custom-cursor)) input,
+  body:not(:has(.custom-cursor)) textarea {
+    cursor: text !important;
+  }
+}
