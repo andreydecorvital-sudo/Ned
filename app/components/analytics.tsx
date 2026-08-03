@@ -10,6 +10,19 @@ declare global {
   }
 }
 
+function getLabSessionId() {
+  const storageKey = "ned_lab_session_id";
+  const current = window.sessionStorage.getItem(storageKey);
+  if (current) return current;
+
+  const next =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `lab-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  window.sessionStorage.setItem(storageKey, next);
+  return next;
+}
+
 export default function Analytics() {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -28,12 +41,18 @@ export default function Analytics() {
       sendEvent("whatsapp_click", {
         source: link.dataset.track ?? "link_generico",
         link_url: link.href,
+        page_path: window.location.pathname,
+        transport_type: "beacon",
       });
     };
 
     const handleWhatsappEvent = (event: Event) => {
       const customEvent = event as CustomEvent<Record<string, unknown>>;
-      sendEvent("whatsapp_diagnostic", customEvent.detail ?? {});
+      sendEvent("whatsapp_diagnostic", {
+        ...(customEvent.detail ?? {}),
+        page_path: window.location.pathname,
+        transport_type: "beacon",
+      });
     };
 
     const handleLabEvent = (event: Event) => {
@@ -42,7 +61,14 @@ export default function Analytics() {
       const rawEventName = parameters.event_name;
       const eventName = typeof rawEventName === "string" ? rawEventName : "interaction";
       delete parameters.event_name;
-      sendEvent(`ned_lab_${eventName}`, parameters);
+
+      sendEvent(`ned_lab_${eventName}`, {
+        ...parameters,
+        lab_session_id: getLabSessionId(),
+        page_path: window.location.pathname,
+        page_title: document.title,
+        transport_type: "beacon",
+      });
     };
 
     document.addEventListener("click", handleClick);
