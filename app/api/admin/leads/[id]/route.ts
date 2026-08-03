@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { isLeadStatus, updateLead } from "@/lib/lead-store";
-import type { LeadStatus } from "@/lib/lead-types";
 
 export const runtime = "nodejs";
 
@@ -27,11 +26,11 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const notes = typeof body.notes === "string" ? body.notes : undefined;
   const touchContact = body.touchContact === true;
 
-  if (rawStatus && !isLeadStatus(rawStatus)) {
+  if (rawStatus !== undefined && !isLeadStatus(rawStatus)) {
     return NextResponse.json({ error: "Status inválido." }, { status: 400 });
   }
 
-  const status: LeadStatus | undefined = rawStatus;
+  const status = rawStatus !== undefined && isLeadStatus(rawStatus) ? rawStatus : undefined;
 
   try {
     const lead = await updateLead(id, { status, notes, touchContact });
