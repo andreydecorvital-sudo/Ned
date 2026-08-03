@@ -41,7 +41,7 @@ export default function LoginForm({ configured }: { configured: boolean }) {
     <form className={styles.form} onSubmit={submit}>
       {!configured && (
         <div className={styles.warning}>
-          Defina NED_ADMIN_PASSWORD e NED_ADMIN_SESSION_SECRET na Vercel antes de acessar o painel.
+          Defina NED_ADMIN_PASSWORD na Vercel antes de acessar o painel.
         </div>
       )}
 
