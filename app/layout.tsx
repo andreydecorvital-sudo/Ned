@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import Analytics from "./components/analytics";
+import LabLauncher from "./components/lab-launcher";
 import SiteRuntime from "./components/site-runtime";
 import StructuredData from "./components/structured-data";
 import "./globals.css";
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <StructuredData />
         <SiteRuntime />
         {children}
+        <LabLauncher />
         <Analytics />
       </body>
     </html>
