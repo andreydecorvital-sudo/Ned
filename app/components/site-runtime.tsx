@@ -10,9 +10,22 @@ const PROJECT_CTA_SELECTOR = [
   '[data-track="footer"]',
 ].join(",");
 
+const DIAGNOSTIC_TRIGGER_SELECTOR = [
+  "[data-open-diagnostic]",
+  'a[data-track^="servico_"]',
+  'a[data-track="ned_lab_result"]',
+].join(",");
+
 const SERVICE_NAVIGATION_ROUTES = new Map([
   ["#marketplaces", "/servicos/marketplaces"],
 ]);
+
+const servicePresetByPath: Record<string, string> = {
+  "/servicos/sites": "Site ou landing page",
+  "/servicos/automacoes": "Automações",
+  "/servicos/trafego-pago": "Tráfego pago",
+  "/servicos/marketplaces": "Marketplaces",
+};
 
 function scrollToDiagnosis() {
   const diagnosis = document.getElementById("diagnostico");
@@ -20,6 +33,27 @@ function scrollToDiagnosis() {
 
   diagnosis.scrollIntoView({ behavior: "smooth", block: "start" });
   window.history.replaceState(null, "", "#diagnostico");
+}
+
+function rewriteDiagnosticCopy() {
+  const heading = document.querySelector<HTMLElement>(".diagnostic-copy h2");
+  if (heading?.textContent?.includes("Quatro respostas")) {
+    const breakLine = document.createElement("br");
+    const accent = document.createElement("span");
+    accent.textContent = "Uma conversa melhor.";
+    heading.replaceChildren("Cinco etapas.", breakLine, accent);
+  }
+
+  const description = document.querySelector<HTMLElement>(".diagnostic-copy > p");
+  if (description) {
+    description.textContent =
+      "Informe seu contato e responda às perguntas. O lead será salvo antes de o WhatsApp abrir com o resumo do projeto.";
+  }
+
+  const benefits = document.querySelectorAll<HTMLElement>(".diagnostic-benefits p");
+  if (benefits[0]) benefits[0].textContent = "Leva menos de dois minutos.";
+  if (benefits[1]) benefits[1].textContent = "Contato salvo com consentimento.";
+  if (benefits[2]) benefits[2].textContent = "A conversa já começa com contexto.";
 }
 
 function rewriteServiceNavigation() {
@@ -77,6 +111,34 @@ export default function SiteRuntime() {
     requestAnimationFrame(forceHeroStart);
     const topTimeout = window.setTimeout(forceHeroStart, 250);
 
+    const handleDiagnosticTrigger = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const trigger = target?.closest<HTMLElement>(DIAGNOSTIC_TRIGGER_SELECTOR);
+      if (!trigger) return;
+
+      event.preventDefault();
+
+      const isLabResult = trigger.dataset.track === "ned_lab_result";
+      const context: Record<string, unknown> = {};
+      if (trigger.dataset.leadScore) context.resultado = trigger.dataset.leadScore;
+      if (trigger.dataset.leadProfile) context.perfil = trigger.dataset.leadProfile;
+      if (trigger.dataset.leadBottleneck) context.gargalo = trigger.dataset.leadBottleneck;
+      if (trigger.dataset.leadExperiment) context.experimento = trigger.dataset.leadExperiment;
+      if (isLabResult) context.experimento = "A Máquina Quebrada";
+
+      window.dispatchEvent(
+        new CustomEvent("ned:diagnostic-open", {
+          detail: {
+            source: trigger.dataset.leadSource || (isLabResult ? "ned_lab" : "pagina_servico"),
+            service:
+              trigger.dataset.leadService ||
+              (isLabResult ? "Ainda não sei" : servicePresetByPath[window.location.pathname] || ""),
+            context,
+          },
+        }),
+      );
+    };
+
     const handleProjectCta = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       const link = target?.closest<HTMLAnchorElement>(PROJECT_CTA_SELECTOR);
@@ -93,8 +155,10 @@ export default function SiteRuntime() {
       scrollToDiagnosis();
     };
 
+    document.addEventListener("click", handleDiagnosticTrigger);
     document.addEventListener("click", handleProjectCta);
 
+    rewriteDiagnosticCopy();
     rewriteServiceNavigation();
     const navigationObserver = new MutationObserver(rewriteServiceNavigation);
     navigationObserver.observe(document.body, { childList: true, subtree: true });
@@ -110,6 +174,7 @@ export default function SiteRuntime() {
     return () => {
       window.clearTimeout(topTimeout);
       window.clearTimeout(resizeTimeout.current);
+      document.removeEventListener("click", handleDiagnosticTrigger);
       document.removeEventListener("click", handleProjectCta);
       navigationObserver.disconnect();
       window.removeEventListener("resize", handleResize);

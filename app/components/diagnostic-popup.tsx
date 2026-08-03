@@ -12,12 +12,34 @@ const popupDelay = 5000;
 
 type CloseReason = "backdrop" | "button" | "escape" | "submitted";
 
-function trackDiagnostic(eventName: string, detail: Record<string, unknown> = {}) {
+type DiagnosticOpenDetail = {
+  source?: string;
+  service?: string;
+  context?: Record<string, unknown>;
+};
+
+type Invitation = {
+  source: string;
+  presetService: string;
+  context: Record<string, unknown>;
+};
+
+const defaultInvitation: Invitation = {
+  source: "popup",
+  presetService: "",
+  context: {},
+};
+
+function trackDiagnostic(
+  eventName: string,
+  source: string,
+  detail: Record<string, unknown> = {},
+) {
   window.dispatchEvent(
     new CustomEvent("ned:diagnostic", {
       detail: {
         event_name: eventName,
-        source: "diagnostico_popup",
+        source,
         ...detail,
       },
     }),
@@ -27,12 +49,10 @@ function trackDiagnostic(eventName: string, detail: Record<string, unknown> = {}
 export default function DiagnosticPopup() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [invitation, setInvitation] = useState<Invitation>(defaultInvitation);
 
   useEffect(() => {
-    if (pathname !== "/") {
-      setOpen(false);
-      return;
-    }
+    if (pathname !== "/") return;
 
     try {
       if (window.sessionStorage.getItem(popupStorageKey)) return;
@@ -47,12 +67,34 @@ export default function DiagnosticPopup() {
         // The popup remains functional even when storage is unavailable.
       }
 
+      setInvitation(defaultInvitation);
       setOpen(true);
-      trackDiagnostic("popup_opened", { delay_ms: popupDelay });
+      trackDiagnostic("popup_opened", "popup", { delay_ms: popupDelay });
     }, popupDelay);
 
     return () => window.clearTimeout(timeout);
   }, [pathname]);
+
+  useEffect(() => {
+    const openFromTrigger = (event: Event) => {
+      const detail = (event as CustomEvent<DiagnosticOpenDetail>).detail ?? {};
+      const nextInvitation: Invitation = {
+        source: detail.source || "pagina_servico",
+        presetService: detail.service || "",
+        context: detail.context ?? {},
+      };
+
+      setInvitation(nextInvitation);
+      setOpen(true);
+      trackDiagnostic("popup_opened", nextInvitation.source, {
+        trigger: "manual",
+        service: nextInvitation.presetService,
+      });
+    };
+
+    window.addEventListener("ned:diagnostic-open", openFromTrigger);
+    return () => window.removeEventListener("ned:diagnostic-open", openFromTrigger);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -63,7 +105,7 @@ export default function DiagnosticPopup() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setOpen(false);
-      trackDiagnostic("popup_closed", { reason: "escape" });
+      trackDiagnostic("popup_closed", invitation.source, { reason: "escape" });
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -71,16 +113,19 @@ export default function DiagnosticPopup() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [invitation.source, open]);
 
   const closePopup = (reason: CloseReason) => {
     setOpen(false);
-    trackDiagnostic(reason === "submitted" ? "popup_completed" : "popup_closed", {
-      reason,
-    });
+    trackDiagnostic(
+      reason === "submitted" ? "popup_completed" : "popup_closed",
+      invitation.source,
+      { reason },
+    );
   };
 
-  if (pathname !== "/") return null;
+  const isLab = invitation.source === "ned_lab";
+  const isServicePage = invitation.source === "pagina_servico";
 
   return (
     <AnimatePresence>
@@ -116,13 +161,24 @@ export default function DiagnosticPopup() {
             </button>
 
             <div className={styles.invitation}>
-              <span className={styles.kicker}>DIAGNÓSTICO EXPRESSO / 04 RESPOSTAS</span>
+              <span className={styles.kicker}>
+                {isLab
+                  ? "NED LAB / PRÓXIMO PASSO"
+                  : isServicePage
+                    ? "DIAGNÓSTICO DO SERVIÇO / 05 ETAPAS"
+                    : "DIAGNÓSTICO EXPRESSO / 05 ETAPAS"}
+              </span>
               <h2 id="diagnostic-popup-title">
-                Antes de continuar: <span>qual máquina você quer melhorar?</span>
+                {isLab ? (
+                  <>Leve o resultado do jogo para a <span>máquina real.</span></>
+                ) : isServicePage ? (
+                  <>Antes do WhatsApp, vamos <span>organizar seu pedido.</span></>
+                ) : (
+                  <>Antes de continuar: <span>qual máquina você quer melhorar?</span></>
+                )}
               </h2>
               <p>
-                Responda quatro perguntas rápidas. O WhatsApp será aberto com contexto suficiente
-                para começar uma conversa útil — sem formulário burocrático.
+                O contato será salvo com contexto e o WhatsApp abrirá com um resumo pronto. Você ainda decide se deseja enviar a mensagem.
               </p>
 
               <div className={styles.benefits}>
@@ -137,14 +193,14 @@ export default function DiagnosticPopup() {
                   <MessageCircle size={17} />
                   <span>
                     <small>02</small>
-                    Resumo pronto no WhatsApp
+                    Contexto salvo no painel
                   </span>
                 </div>
                 <div>
                   <ArrowRight size={17} />
                   <span>
                     <small>03</small>
-                    Você decide se quer enviar
+                    Resumo pronto no WhatsApp
                   </span>
                 </div>
               </div>
@@ -161,7 +217,10 @@ export default function DiagnosticPopup() {
 
             <div className={styles.formPanel}>
               <DiagnosticForm
-                source="diagnostico_popup"
+                key={`${invitation.source}-${invitation.presetService}-${JSON.stringify(invitation.context)}`}
+                source={invitation.source}
+                presetService={invitation.presetService}
+                context={invitation.context}
                 onSubmitted={() => closePopup("submitted")}
               />
             </div>

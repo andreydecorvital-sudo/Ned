@@ -2,9 +2,11 @@
 
 import { ArrowLeft, ArrowRight, Check, MessageCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import styles from "./diagnostic-form.module.css";
 
 const whatsappNumber = "5511917814612";
+const attributionStorageKey = "ned_lead_attribution";
 
 const serviceOptions = [
   "Site ou landing page",
@@ -14,7 +16,7 @@ const serviceOptions = [
   "Ainda não sei",
 ];
 
-const stageOptions = [
+const urgencyOptions = [
   "Só estou pesquisando",
   "Quero começar em breve",
   "Preciso resolver com urgência",
@@ -22,87 +24,232 @@ const stageOptions = [
 ];
 
 type Answers = {
+  name: string;
+  company: string;
+  whatsapp: string;
   business: string;
   challenge: string;
   service: string;
-  stage: string;
+  urgency: string;
+  consent: boolean;
+  website: string;
 };
 
 type DiagnosticFormProps = {
   source?: string;
+  presetService?: string;
+  context?: Record<string, unknown>;
   onSubmitted?: () => void;
 };
 
-const initialAnswers: Answers = {
-  business: "",
-  challenge: "",
-  service: "",
-  stage: "",
+type Attribution = {
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  utmContent: string;
+  utmTerm: string;
 };
 
 const questions = [
   {
-    kicker: "01 / NEGÓCIO",
+    kicker: "01 / CONTATO",
+    title: "Com quem a NED vai conversar?",
+    description: "Esses dados permitem salvar o diagnóstico antes de abrir o WhatsApp.",
+  },
+  {
+    kicker: "02 / NEGÓCIO",
     title: "Qual é o seu negócio?",
     description: "Conte de forma simples o que sua empresa vende ou oferece.",
   },
   {
-    kicker: "02 / DESAFIO",
+    kicker: "03 / DESAFIO",
     title: "O que precisa melhorar?",
     description: "Qual é o principal problema ou oportunidade que você enxerga hoje?",
   },
   {
-    kicker: "03 / SERVIÇO",
+    kicker: "04 / SERVIÇO",
     title: "Qual serviço procura?",
     description: "Escolha o caminho mais próximo do que você precisa agora.",
   },
   {
-    kicker: "04 / MOMENTO",
-    title: "Em que momento está o projeto?",
-    description: "Isso ajuda a Ned a preparar uma conversa mais objetiva.",
+    kicker: "05 / URGÊNCIA",
+    title: "Quando isso precisa avançar?",
+    description: "Isso ajuda a NED a preparar uma conversa objetiva e priorizar corretamente.",
   },
 ];
 
+function initialAnswers(presetService = ""): Answers {
+  return {
+    name: "",
+    company: "",
+    whatsapp: "",
+    business: "",
+    challenge: "",
+    service: serviceOptions.includes(presetService) ? presetService : "",
+    urgency: "",
+    consent: false,
+    website: "",
+  };
+}
+
+function phoneDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function readAttribution(): Attribution {
+  const params = new URLSearchParams(window.location.search);
+  const current: Attribution = {
+    utmSource: params.get("utm_source") ?? "",
+    utmMedium: params.get("utm_medium") ?? "",
+    utmCampaign: params.get("utm_campaign") ?? "",
+    utmContent: params.get("utm_content") ?? "",
+    utmTerm: params.get("utm_term") ?? "",
+  };
+
+  let stored: Partial<Attribution> = {};
+  try {
+    stored = JSON.parse(window.sessionStorage.getItem(attributionStorageKey) ?? "{}") as Partial<Attribution>;
+  } catch {
+    stored = {};
+  }
+
+  const merged: Attribution = {
+    utmSource: current.utmSource || stored.utmSource || "",
+    utmMedium: current.utmMedium || stored.utmMedium || "",
+    utmCampaign: current.utmCampaign || stored.utmCampaign || "",
+    utmContent: current.utmContent || stored.utmContent || "",
+    utmTerm: current.utmTerm || stored.utmTerm || "",
+  };
+
+  if (Object.values(current).some(Boolean)) {
+    try {
+      window.sessionStorage.setItem(attributionStorageKey, JSON.stringify(merged));
+    } catch {
+      // Attribution remains available for the current submit even with restricted storage.
+    }
+  }
+
+  return merged;
+}
+
 export default function DiagnosticForm({
-  source = "diagnostico",
+  source = "rodape",
+  presetService = "",
+  context = {},
   onSubmitted,
 }: DiagnosticFormProps = {}) {
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  const [answers, setAnswers] = useState<Answers>(() => initialAnswers(presetService));
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
 
-  const currentValue = useMemo(() => {
-    if (step === 0) return answers.business.trim();
-    if (step === 1) return answers.challenge.trim();
-    if (step === 2) return answers.service;
-    return answers.stage;
+  useEffect(() => {
+    readAttribution();
+  }, []);
+
+  const currentValid = useMemo(() => {
+    if (step === 0) {
+      return (
+        answers.name.trim().length >= 2 &&
+        answers.company.trim().length >= 2 &&
+        phoneDigits(answers.whatsapp).length >= 10
+      );
+    }
+    if (step === 1) return Boolean(answers.business.trim());
+    if (step === 2) return Boolean(answers.challenge.trim());
+    if (step === 3) return Boolean(answers.service);
+    return Boolean(answers.urgency && answers.consent);
   }, [answers, step]);
 
-  const updateAnswer = (key: keyof Answers, value: string) => {
+  const updateAnswer = <Key extends keyof Answers>(key: Key, value: Answers[Key]) => {
     setAnswers((current) => ({ ...current, [key]: value }));
+    setSubmissionError("");
   };
 
   const goNext = () => {
-    if (!currentValue) return;
+    if (!currentValid) return;
+    window.dispatchEvent(
+      new CustomEvent("ned:diagnostic", {
+        detail: { event_name: "step_completed", source, step: step + 1 },
+      }),
+    );
     setStep((current) => Math.min(current + 1, questions.length - 1));
   };
 
   const goBack = () => setStep((current) => Math.max(current - 1, 0));
 
-  const submitDiagnostic = () => {
-    if (!currentValue) return;
+  const submitDiagnostic = async () => {
+    if (!currentValid || submitting) return;
+
+    const whatsappWindow = window.open("about:blank", "_blank");
+    if (whatsappWindow) whatsappWindow.opener = null;
+
+    setSubmitting(true);
+    setSubmissionError("");
+
+    const attribution = readAttribution();
+    const payload = {
+      name: answers.name.trim(),
+      company: answers.company.trim(),
+      whatsapp: answers.whatsapp.trim(),
+      businessType: answers.business.trim(),
+      challenge: answers.challenge.trim(),
+      service: answers.service,
+      urgency: answers.urgency,
+      source,
+      pagePath: window.location.pathname,
+      pageUrl: window.location.href,
+      referrer: document.referrer,
+      ...attribution,
+      metadata: context,
+      consent: answers.consent,
+      website: answers.website,
+    };
+
+    let stored = false;
+    let leadId = "";
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
+      const data = (await response.json()) as { id?: string; error?: string };
+      if (!response.ok) throw new Error(data.error ?? "Não foi possível registrar o contato.");
+      stored = true;
+      leadId = data.id ?? "";
+    } catch (error) {
+      setSubmissionError(
+        error instanceof Error
+          ? `${error.message} O WhatsApp será aberto para você não perder o contato.`
+          : "Não foi possível registrar automaticamente. O WhatsApp será aberto mesmo assim.",
+      );
+    }
+
+    const contextLines = Object.entries(context)
+      .filter(([, value]) => ["string", "number", "boolean"].includes(typeof value))
+      .slice(0, 5)
+      .map(([key, value]) => `${key}: ${String(value)}`);
 
     const message = [
       "Olá, Ned! Preenchi o diagnóstico no site e quero conversar sobre meu projeto.",
       "",
+      `Nome: ${answers.name.trim()}`,
+      `Empresa: ${answers.company.trim()}`,
       `Meu negócio: ${answers.business.trim()}`,
       `O que preciso melhorar: ${answers.challenge.trim()}`,
       `Serviço que procuro: ${answers.service}`,
-      `Momento do projeto: ${answers.stage}`,
+      `Urgência do projeto: ${answers.urgency}`,
+      ...contextLines,
     ].join("\n");
+
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
     window.dispatchEvent(
       new CustomEvent("ned:whatsapp", {
-        detail: { source, service: answers.service },
+        detail: { source, service: answers.service, lead_id: leadId, lead_stored: stored },
       }),
     );
 
@@ -112,18 +259,21 @@ export default function DiagnosticForm({
           event_name: "submitted",
           source,
           service: answers.service,
-          project_stage: answers.stage,
+          project_stage: answers.urgency,
+          lead_id: leadId,
+          lead_stored: stored,
         },
       }),
     );
 
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
+    if (whatsappWindow) {
+      whatsappWindow.location.href = whatsappUrl;
+    } else {
+      window.location.href = whatsappUrl;
+    }
 
-    onSubmitted?.();
+    if (stored) onSubmitted?.();
+    setSubmitting(false);
   };
 
   return (
@@ -131,7 +281,7 @@ export default function DiagnosticForm({
       <div className="diagnostic-progress" aria-label={`Etapa ${step + 1} de ${questions.length}`}>
         <div className="diagnostic-progress-copy">
           <span>DIAGNÓSTICO NED</span>
-          <strong>{String(step + 1).padStart(2, "0")} / 04</strong>
+          <strong>{String(step + 1).padStart(2, "0")} / 05</strong>
         </div>
         <div className="diagnostic-progress-track">
           <motion.span
@@ -155,22 +305,67 @@ export default function DiagnosticForm({
           <p>{questions[step].description}</p>
 
           {step === 0 && (
+            <div className={styles.contactGrid}>
+              <label>
+                <span>SEU NOME</span>
+                <input
+                  autoFocus
+                  value={answers.name}
+                  onChange={(event) => updateAnswer("name", event.target.value)}
+                  placeholder="Como podemos chamar você?"
+                  maxLength={120}
+                  autoComplete="name"
+                />
+              </label>
+              <label>
+                <span>EMPRESA</span>
+                <input
+                  value={answers.company}
+                  onChange={(event) => updateAnswer("company", event.target.value)}
+                  placeholder="Nome da empresa ou Autônomo"
+                  maxLength={160}
+                  autoComplete="organization"
+                />
+              </label>
+              <label>
+                <span>WHATSAPP COM DDD</span>
+                <input
+                  value={answers.whatsapp}
+                  onChange={(event) => updateAnswer("whatsapp", event.target.value)}
+                  onKeyDown={(event) => { if (event.key === "Enter") goNext(); }}
+                  placeholder="Ex.: (13) 99999-9999"
+                  maxLength={24}
+                  inputMode="tel"
+                  autoComplete="tel"
+                />
+              </label>
+              <label className={styles.honeypot} aria-hidden="true">
+                Site
+                <input
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={answers.website}
+                  onChange={(event) => updateAnswer("website", event.target.value)}
+                />
+              </label>
+            </div>
+          )}
+
+          {step === 1 && (
             <label className="diagnostic-field">
-              <span>SEU NEGÓCIO</span>
+              <span>TIPO DE NEGÓCIO</span>
               <input
                 autoFocus
                 value={answers.business}
                 onChange={(event) => updateAnswer("business", event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") goNext();
-                }}
+                onKeyDown={(event) => { if (event.key === "Enter") goNext(); }}
                 placeholder="Ex.: loja de roupas, clínica, restaurante..."
-                maxLength={120}
+                maxLength={300}
               />
             </label>
           )}
 
-          {step === 1 && (
+          {step === 2 && (
             <label className="diagnostic-field">
               <span>PRINCIPAL DESAFIO</span>
               <textarea
@@ -179,12 +374,12 @@ export default function DiagnosticForm({
                 onChange={(event) => updateAnswer("challenge", event.target.value)}
                 placeholder="Ex.: organizar catálogo, vender mais, automatizar atendimento..."
                 rows={4}
-                maxLength={320}
+                maxLength={1000}
               />
             </label>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <div className="diagnostic-options" role="radiogroup" aria-label="Serviço desejado">
               {serviceOptions.map((option) => (
                 <button
@@ -202,38 +397,58 @@ export default function DiagnosticForm({
             </div>
           )}
 
-          {step === 3 && (
-            <div className="diagnostic-options" role="radiogroup" aria-label="Momento do projeto">
-              {stageOptions.map((option) => (
-                <button
-                  key={option}
-                  className={answers.stage === option ? "is-selected" : ""}
-                  type="button"
-                  role="radio"
-                  aria-checked={answers.stage === option}
-                  onClick={() => updateAnswer("stage", option)}
-                >
-                  <span>{option}</span>
-                  <Check size={17} />
-                </button>
-              ))}
-            </div>
+          {step === 4 && (
+            <>
+              <div className="diagnostic-options" role="radiogroup" aria-label="Urgência do projeto">
+                {urgencyOptions.map((option) => (
+                  <button
+                    key={option}
+                    className={answers.urgency === option ? "is-selected" : ""}
+                    type="button"
+                    role="radio"
+                    aria-checked={answers.urgency === option}
+                    onClick={() => updateAnswer("urgency", option)}
+                  >
+                    <span>{option}</span>
+                    <Check size={17} />
+                  </button>
+                ))}
+              </div>
+              <label className={styles.consent}>
+                <input
+                  type="checkbox"
+                  checked={answers.consent}
+                  onChange={(event) => updateAnswer("consent", event.target.checked)}
+                />
+                <span>
+                  Autorizo a NED a armazenar estes dados e entrar em contato exclusivamente para responder sobre meu projeto.
+                </span>
+              </label>
+            </>
           )}
         </motion.div>
       </AnimatePresence>
 
+      {submissionError && <div className={styles.error}>{submissionError}</div>}
+
       <div className="diagnostic-controls">
-        <button className="diagnostic-back" type="button" onClick={goBack} disabled={step === 0}>
+        <button className="diagnostic-back" type="button" onClick={goBack} disabled={step === 0 || submitting}>
           <ArrowLeft size={17} /> Voltar
         </button>
 
         {step < questions.length - 1 ? (
-          <button className="diagnostic-next" type="button" onClick={goNext} disabled={!currentValue}>
+          <button className="diagnostic-next" type="button" onClick={goNext} disabled={!currentValid || submitting}>
             Continuar <ArrowRight size={17} />
           </button>
         ) : (
-          <button className="diagnostic-next diagnostic-submit" type="button" onClick={submitDiagnostic} disabled={!currentValue}>
-            <MessageCircle size={18} /> Enviar para o WhatsApp
+          <button
+            className="diagnostic-next diagnostic-submit"
+            type="button"
+            onClick={() => void submitDiagnostic()}
+            disabled={!currentValid || submitting}
+          >
+            <MessageCircle size={18} />
+            {submitting ? "Registrando..." : "Registrar e abrir WhatsApp"}
           </button>
         )}
       </div>
