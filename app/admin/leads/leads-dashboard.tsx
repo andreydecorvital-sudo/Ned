@@ -3,25 +3,32 @@
 import {
   Clock3,
   Download,
+  ExternalLink,
   LogOut,
   MessageCircle,
   RefreshCcw,
   Save,
   Search,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  leadPriorities,
+  leadPriorityLabels,
   leadSourceLabels,
   leadStatusLabels,
   leadStatuses,
+  type LeadDashboardStats,
   type LeadFilters,
+  type LeadPriority,
   type LeadRecord,
   type LeadStatus,
 } from "@/lib/lead-types";
 import styles from "../admin.module.css";
+import upgrade from "./crm-upgrade.module.css";
 
 type LeadResponse = {
   leads: LeadRecord[];
+  stats?: LeadDashboardStats;
   options?: { services?: string[]; sources?: string[] };
   error?: string;
 };
@@ -30,7 +37,23 @@ const emptyFilters: Required<LeadFilters> = {
   status: "",
   service: "",
   source: "",
+  priority: "",
+  attention: "",
   search: "",
+};
+
+const emptyStats: LeadDashboardStats = {
+  total: 0,
+  today: 0,
+  lastSevenDays: 0,
+  unattended: 0,
+  hot: 0,
+  meetings: 0,
+  proposals: 0,
+  closed: 0,
+  followUpsDue: 0,
+  averageFirstContactMinutes: null,
+  conversionRate: 0,
 };
 
 function formatDate(value: string | null) {
@@ -40,6 +63,14 @@ function formatDate(value: string | null) {
     timeStyle: "short",
     timeZone: "America/Sao_Paulo",
   }).format(new Date(value));
+}
+
+function formatResponseTime(minutes: number | null) {
+  if (minutes === null) return "—";
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest ? `${hours}h ${rest}m` : `${hours}h`;
 }
 
 function queryFromFilters(filters: Required<LeadFilters>) {
@@ -59,8 +90,15 @@ function whatsappUrl(lead: LeadRecord) {
   return `https://wa.me/${lead.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
+function priorityClass(priority: LeadPriority) {
+  if (priority === "quente") return upgrade.priorityHot;
+  if (priority === "potencial") return upgrade.priorityPotential;
+  return upgrade.priorityNormal;
+}
+
 export default function LeadsDashboard({ databaseConfigured }: { databaseConfigured: boolean }) {
   const [leads, setLeads] = useState<LeadRecord[]>([]);
+  const [stats, setStats] = useState<LeadDashboardStats>(emptyStats);
   const [draftFilters, setDraftFilters] = useState(emptyFilters);
   const [appliedFilters, setAppliedFilters] = useState(emptyFilters);
   const [services, setServices] = useState<string[]>([]);
@@ -93,6 +131,7 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
       }
 
       setLeads(data.leads);
+      setStats(data.stats ?? emptyStats);
       setNotes(Object.fromEntries(data.leads.map((lead) => [lead.id, lead.notes])));
       setServices((current) =>
         [...new Set([...current, ...(data.options?.services ?? [])])].sort(),
@@ -110,15 +149,6 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
   useEffect(() => {
     void loadLeads();
   }, [loadLeads]);
-
-  const stats = useMemo(() => {
-    const newCount = leads.filter((lead) => lead.status === "novo").length;
-    const pipeline = leads.filter((lead) =>
-      ["em_contato", "reuniao", "proposta"].includes(lead.status),
-    ).length;
-    const closed = leads.filter((lead) => lead.status === "fechado").length;
-    return { total: leads.length, newCount, pipeline, closed };
-  }, [leads]);
 
   const patchLead = async (
     id: string,
@@ -197,13 +227,32 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
         href={whatsappUrl(lead)}
         target="_blank"
         rel="noreferrer"
-        onClick={() => void patchLead(lead.id, { touchContact: true, status: lead.status === "novo" ? "em_contato" : lead.status })}
+        onClick={() => void patchLead(lead.id, {
+          touchContact: true,
+          status: lead.status === "novo" ? "em_contato" : lead.status,
+        })}
       >
         <MessageCircle size={14} /> Chamar no WhatsApp
+      </a>
+      <a className={upgrade.viewLink} href={`/admin/leads/${lead.id}`}>
+        <ExternalLink size={13} /> Ver detalhes e histórico
       </a>
       <span className={styles.muted}>Último contato: {formatDate(lead.lastContactAt)}</span>
     </div>
   );
+
+  const metrics = [
+    ["LEADS HOJE", String(stats.today), "Novos contatos no dia"],
+    ["ÚLTIMOS 7 DIAS", String(stats.lastSevenDays), "Volume recente"],
+    ["SEM ATENDIMENTO", String(stats.unattended), "Status novo"],
+    ["LEADS QUENTES", String(stats.hot), "Score de 65 a 100"],
+    ["FOLLOW-UPS", String(stats.followUpsDue), "Pendentes ou vencidos"],
+    ["TEMPO DE RESPOSTA", formatResponseTime(stats.averageFirstContactMinutes), "Média até 1º contato"],
+    ["REUNIÕES", String(stats.meetings), "Etapa atual"],
+    ["PROPOSTAS", String(stats.proposals), "Etapa atual"],
+    ["FECHADOS", String(stats.closed), "Total acumulado"],
+    ["CONVERSÃO", `${stats.conversionRate}%`, "Fechados / total"],
+  ];
 
   return (
     <main className={styles.page}>
@@ -226,12 +275,10 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
         <section className={styles.intro}>
           <div>
             <span className={styles.eyebrow}>PAINEL COMERCIAL / NED</span>
-            <h1>
-              Contexto antes do <span>primeiro contato.</span>
-            </h1>
+            <h1>Prioridade antes do <span>primeiro contato.</span></h1>
           </div>
           <p>
-            Leads registrados pelo diagnóstico, páginas de serviço e NED LAB. Atualize o andamento e mantenha as próximas ações visíveis.
+            Veja os contatos que exigem ação, acompanhe o pipeline e mantenha histórico, follow-up e contexto em um único lugar.
           </p>
         </section>
 
@@ -241,11 +288,14 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
           </div>
         )}
 
-        <section className={styles.stats} aria-label="Resumo dos leads filtrados">
-          <article className={styles.stat}><span>TOTAL VISÍVEL</span><strong>{stats.total}</strong></article>
-          <article className={styles.stat}><span>NOVOS</span><strong>{stats.newCount}</strong></article>
-          <article className={styles.stat}><span>EM ANDAMENTO</span><strong>{stats.pipeline}</strong></article>
-          <article className={styles.stat}><span>FECHADOS</span><strong>{stats.closed}</strong></article>
+        <section className={upgrade.metricGrid} aria-label="Indicadores comerciais">
+          {metrics.map(([label, value, description]) => (
+            <article className={upgrade.metric} key={label}>
+              <span>{label}</span>
+              <strong>{value}</strong>
+              <small>{description}</small>
+            </article>
+          ))}
         </section>
 
         <section className={styles.toolbar} aria-label="Filtros de leads">
@@ -263,6 +313,13 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
             {leadStatuses.map((status) => <option key={status} value={status}>{leadStatusLabels[status]}</option>)}
           </select>
           <select
+            value={draftFilters.priority}
+            onChange={(event) => setDraftFilters((current) => ({ ...current, priority: event.target.value }))}
+          >
+            <option value="">Todas as prioridades</option>
+            {leadPriorities.map((priority) => <option key={priority} value={priority}>{leadPriorityLabels[priority]}</option>)}
+          </select>
+          <select
             value={draftFilters.service}
             onChange={(event) => setDraftFilters((current) => ({ ...current, service: event.target.value }))}
           >
@@ -275,6 +332,13 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
           >
             <option value="">Todas as origens</option>
             {sources.map((source) => <option key={source} value={source}>{leadSourceLabels[source] ?? source}</option>)}
+          </select>
+          <select
+            value={draftFilters.attention}
+            onChange={(event) => setDraftFilters((current) => ({ ...current, attention: event.target.value }))}
+          >
+            <option value="">Todos os follow-ups</option>
+            <option value="pending">Somente pendências</option>
           </select>
           <div className={styles.actionRow}>
             <button className={styles.primaryButton} type="button" onClick={applyFilters}>
@@ -300,6 +364,7 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
                   <tr>
                     <th>CONTATO</th>
                     <th>NECESSIDADE</th>
+                    <th>PRIORIDADE</th>
                     <th>ORIGEM</th>
                     <th>STATUS</th>
                     <th>ATENDIMENTO</th>
@@ -322,6 +387,20 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
                           <span>{lead.businessType}</span>
                           <span>{lead.challenge}</span>
                           <span className={styles.urgencyBadge}>{lead.urgency}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className={styles.detail}>
+                          <div className={upgrade.badgeRow}>
+                            <span className={`${upgrade.priorityBadge} ${priorityClass(lead.priority)}`}>
+                              {leadPriorityLabels[lead.priority]}
+                            </span>
+                            <span className={upgrade.scoreBadge}>{lead.score}/100</span>
+                          </div>
+                          {lead.attention.active && (
+                            <span className={upgrade.attentionBadge}>{lead.attention.label}</span>
+                          )}
+                          {lead.nextFollowUpAt && <span>Próximo: {formatDate(lead.nextFollowUpAt)}</span>}
                         </div>
                       </td>
                       <td>
@@ -369,6 +448,13 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
                     <strong>{lead.service}</strong>
                     <span>{lead.businessType}</span>
                     <span>{lead.challenge}</span>
+                    <div className={upgrade.badgeRow}>
+                      <span className={`${upgrade.priorityBadge} ${priorityClass(lead.priority)}`}>
+                        {leadPriorityLabels[lead.priority]}
+                      </span>
+                      <span className={upgrade.scoreBadge}>{lead.score}/100</span>
+                    </div>
+                    {lead.attention.active && <span className={upgrade.attentionBadge}>{lead.attention.label}</span>}
                     <span className={styles.sourceBadge}>{leadSourceLabels[lead.source] ?? lead.source}</span>
                   </div>
                   {leadActions(lead)}
