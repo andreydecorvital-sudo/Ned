@@ -36,12 +36,23 @@ export default function Analytics() {
       sendEvent("whatsapp_diagnostic", customEvent.detail ?? {});
     };
 
+    const handleLabEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<Record<string, unknown>>;
+      const parameters = { ...(customEvent.detail ?? {}) };
+      const rawEventName = parameters.event_name;
+      const eventName = typeof rawEventName === "string" ? rawEventName : "interaction";
+      delete parameters.event_name;
+      sendEvent(`ned_lab_${eventName}`, parameters);
+    };
+
     document.addEventListener("click", handleClick);
     window.addEventListener("ned:whatsapp", handleWhatsappEvent);
+    window.addEventListener("ned:lab", handleLabEvent);
 
     return () => {
       document.removeEventListener("click", handleClick);
       window.removeEventListener("ned:whatsapp", handleWhatsappEvent);
+      window.removeEventListener("ned:lab", handleLabEvent);
     };
   }, [gaId]);
 
