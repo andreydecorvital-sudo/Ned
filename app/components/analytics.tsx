@@ -86,16 +86,44 @@ export default function Analytics() {
       });
     };
 
+    const handleCommercialCapture = (event: Event) => {
+      const customEvent = event as CustomEvent<Record<string, unknown>>;
+      sendEvent("commercial_lead_capture", {
+        ...(customEvent.detail ?? {}),
+        page_path: window.location.pathname,
+        page_title: document.title,
+        transport_type: "beacon",
+      });
+    };
+
+    const handleScoreEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<Record<string, unknown>>;
+      const parameters = { ...(customEvent.detail ?? {}) };
+      const rawEventName = parameters.event_name;
+      const eventName = typeof rawEventName === "string" ? rawEventName : "interaction";
+      delete parameters.event_name;
+
+      sendEvent(`ned_score_${eventName}`, {
+        ...parameters,
+        page_path: window.location.pathname,
+        transport_type: "beacon",
+      });
+    };
+
     document.addEventListener("click", handleClick);
     window.addEventListener("ned:whatsapp", handleWhatsappEvent);
     window.addEventListener("ned:diagnostic", handleDiagnosticEvent);
     window.addEventListener("ned:lab", handleLabEvent);
+    window.addEventListener("ned:commercial_capture", handleCommercialCapture);
+    window.addEventListener("ned:score", handleScoreEvent);
 
     return () => {
       document.removeEventListener("click", handleClick);
       window.removeEventListener("ned:whatsapp", handleWhatsappEvent);
       window.removeEventListener("ned:diagnostic", handleDiagnosticEvent);
       window.removeEventListener("ned:lab", handleLabEvent);
+      window.removeEventListener("ned:commercial_capture", handleCommercialCapture);
+      window.removeEventListener("ned:score", handleScoreEvent);
     };
   }, [gaId]);
 
