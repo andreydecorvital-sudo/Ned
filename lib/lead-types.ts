@@ -115,4 +115,8 @@ export const leadSourceLabels: Record<string, string> = {
   ned_lab: "NED LAB",
   diagnostico: "Diagnóstico",
   diagnostico_popup: "Pop-up",
+  analise_gratuita: "Análise gratuita",
+  ned_score: "NED Score",
+  maquina_clientes: "Máquina de Clientes",
+  parceiros: "Programa de parceiros",
 };
