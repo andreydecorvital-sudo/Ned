@@ -15,7 +15,7 @@ function adminPassword() {
 }
 
 export function isAdminConfigured() {
-  return adminPassword().length >= 10;
+  return adminPassword().length > 0;
 }
 
 function safeEqual(left: string, right: string) {
