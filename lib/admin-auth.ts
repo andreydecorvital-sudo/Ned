@@ -1,8 +1,9 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
 const ADMIN_COOKIE = "ned_admin_session";
 const SESSION_SECONDS = 60 * 60 * 12;
+const SESSION_KEY_CONTEXT = "ned-admin-session:v1";
 
 type SessionPayload = {
   exp: number;
@@ -13,12 +14,8 @@ function adminPassword() {
   return (process.env.NED_ADMIN_PASSWORD ?? "").trim();
 }
 
-function sessionSecret() {
-  return (process.env.NED_ADMIN_SESSION_SECRET ?? "").trim();
-}
-
 export function isAdminConfigured() {
-  return adminPassword().length >= 10 && sessionSecret().length >= 32;
+  return adminPassword().length >= 10;
 }
 
 function safeEqual(left: string, right: string) {
@@ -33,8 +30,14 @@ export function verifyAdminPassword(value: string) {
   return Boolean(configured) && safeEqual(value, configured);
 }
 
+function sessionSigningKey() {
+  return createHash("sha256")
+    .update(`${SESSION_KEY_CONTEXT}\0${adminPassword()}`)
+    .digest();
+}
+
 function signature(payload: string) {
-  return createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
+  return createHmac("sha256", sessionSigningKey()).update(payload).digest("base64url");
 }
 
 function createSessionToken() {
