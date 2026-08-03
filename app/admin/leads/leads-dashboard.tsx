@@ -4,13 +4,20 @@ import {
   Clock3,
   Download,
   ExternalLink,
+  GripVertical,
   LogOut,
   MessageCircle,
   RefreshCcw,
-  Save,
   Search,
+  Trash2,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type DragEvent,
+} from "react";
 import {
   leadPriorities,
   leadPriorityLabels,
@@ -25,6 +32,7 @@ import {
 } from "@/lib/lead-types";
 import styles from "../admin.module.css";
 import upgrade from "./crm-upgrade.module.css";
+import pipeline from "./pipeline-board.module.css";
 
 type LeadResponse = {
   leads: LeadRecord[];
@@ -65,12 +73,13 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function formatResponseTime(minutes: number | null) {
-  if (minutes === null) return "—";
-  if (minutes < 60) return `${minutes} min`;
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  return rest ? `${hours}h ${rest}m` : `${hours}h`;
+function formatShortDate(value: string | null) {
+  if (!value) return "";
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(value));
 }
 
 function queryFromFilters(filters: Required<LeadFilters>) {
@@ -103,56 +112,71 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
   const [appliedFilters, setAppliedFilters] = useState(emptyFilters);
   const [services, setServices] = useState<string[]>([]);
   const [sources, setSources] = useState<string[]>([]);
-  const [notes, setNotes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(databaseConfigured);
   const [error, setError] = useState(databaseConfigured ? "" : "Banco de leads não configurado.");
   const [savingId, setSavingId] = useState("");
+  const [deletingId, setDeletingId] = useState("");
+  const [draggingId, setDraggingId] = useState("");
+  const [dragOverStatus, setDragOverStatus] = useState<LeadStatus | "">("");
 
-  const loadLeads = useCallback(async () => {
-    if (!databaseConfigured) return;
-    setLoading(true);
-    setError("");
+  const loadLeads = useCallback(
+    async (silent = false) => {
+      if (!databaseConfigured) return;
+      if (!silent) setLoading(true);
+      setError("");
 
-    try {
-      const query = queryFromFilters(appliedFilters);
-      const response = await fetch(`/api/admin/leads${query ? `?${query}` : ""}`, {
-        cache: "no-store",
-      });
-      const data = (await response.json()) as LeadResponse;
+      try {
+        const query = queryFromFilters(appliedFilters);
+        const response = await fetch(`/api/admin/leads${query ? `?${query}` : ""}`, {
+          cache: "no-store",
+        });
+        const data = (await response.json()) as LeadResponse;
 
-      if (response.status === 401) {
-        window.location.assign("/admin/login");
-        return;
+        if (response.status === 401) {
+          window.location.assign("/admin/login");
+          return;
+        }
+
+        if (!response.ok) {
+          setError(data.error ?? "Não foi possível carregar os leads.");
+          return;
+        }
+
+        setLeads(data.leads);
+        setStats(data.stats ?? emptyStats);
+        setServices((current) =>
+          [...new Set([...current, ...(data.options?.services ?? [])])].sort(),
+        );
+        setSources((current) =>
+          [...new Set([...current, ...(data.options?.sources ?? [])])].sort(),
+        );
+      } catch {
+        setError("Falha de conexão ao carregar os leads.");
+      } finally {
+        if (!silent) setLoading(false);
       }
-
-      if (!response.ok) {
-        setError(data.error ?? "Não foi possível carregar os leads.");
-        return;
-      }
-
-      setLeads(data.leads);
-      setStats(data.stats ?? emptyStats);
-      setNotes(Object.fromEntries(data.leads.map((lead) => [lead.id, lead.notes])));
-      setServices((current) =>
-        [...new Set([...current, ...(data.options?.services ?? [])])].sort(),
-      );
-      setSources((current) =>
-        [...new Set([...current, ...(data.options?.sources ?? [])])].sort(),
-      );
-    } catch {
-      setError("Falha de conexão ao carregar os leads.");
-    } finally {
-      setLoading(false);
-    }
-  }, [appliedFilters, databaseConfigured]);
+    },
+    [appliedFilters, databaseConfigured],
+  );
 
   useEffect(() => {
     void loadLeads();
   }, [loadLeads]);
 
+  const leadsByStatus = useMemo(
+    () =>
+      Object.fromEntries(
+        leadStatuses.map((status) => [
+          status,
+          leads.filter((lead) => lead.status === status),
+        ]),
+      ) as Record<LeadStatus, LeadRecord[]>,
+    [leads],
+  );
+
   const patchLead = async (
     id: string,
-    changes: { status?: LeadStatus; notes?: string; touchContact?: boolean },
+    changes: { status?: LeadStatus; touchContact?: boolean },
   ) => {
     setSavingId(id);
     setError("");
@@ -165,18 +189,96 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
       });
       const data = (await response.json()) as { lead?: LeadRecord; error?: string };
 
-      if (!response.ok || !data.lead) {
-        setError(data.error ?? "Não foi possível atualizar o lead.");
-        return;
+      if (response.status === 401) {
+        window.location.assign("/admin/login");
+        return null;
       }
 
-      setLeads((current) => current.map((lead) => (lead.id === id ? data.lead! : lead)));
-      setNotes((current) => ({ ...current, [id]: data.lead!.notes }));
+      if (!response.ok || !data.lead) {
+        setError(data.error ?? "Não foi possível atualizar o lead.");
+        return null;
+      }
+
+      setLeads((current) =>
+        current.map((lead) => (lead.id === id ? data.lead! : lead)),
+      );
+      return data.lead;
     } catch {
       setError("Falha de conexão ao atualizar o lead.");
+      return null;
     } finally {
       setSavingId("");
     }
+  };
+
+  const moveLead = async (lead: LeadRecord, status: LeadStatus) => {
+    if (lead.status === status || savingId === lead.id) return;
+
+    const previousStatus = lead.status;
+    setLeads((current) =>
+      current.map((item) => (item.id === lead.id ? { ...item, status } : item)),
+    );
+
+    const updated = await patchLead(lead.id, { status });
+    if (!updated) {
+      setLeads((current) =>
+        current.map((item) =>
+          item.id === lead.id ? { ...item, status: previousStatus } : item,
+        ),
+      );
+      return;
+    }
+
+    await loadLeads(true);
+  };
+
+  const deleteLead = async (lead: LeadRecord) => {
+    const confirmed = window.confirm(
+      `Excluir permanentemente ${lead.name} e todo o histórico deste contato?`,
+    );
+    if (!confirmed || deletingId) return;
+
+    setDeletingId(lead.id);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/admin/leads/${lead.id}`, {
+        method: "DELETE",
+      });
+      const data = (await response.json()) as { ok?: boolean; error?: string };
+
+      if (response.status === 401) {
+        window.location.assign("/admin/login");
+        return;
+      }
+
+      if (!response.ok || !data.ok) {
+        setError(data.error ?? "Não foi possível excluir o lead.");
+        return;
+      }
+
+      setLeads((current) => current.filter((item) => item.id !== lead.id));
+      await loadLeads(true);
+    } catch {
+      setError("Falha de conexão ao excluir o lead.");
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+  const registerContact = async (lead: LeadRecord) => {
+    const status = lead.status === "novo" ? "em_contato" : lead.status;
+    const updated = await patchLead(lead.id, { touchContact: true, status });
+    if (updated) await loadLeads(true);
+  };
+
+  const dropLead = (event: DragEvent<HTMLDivElement>, status: LeadStatus) => {
+    event.preventDefault();
+    const id = event.dataTransfer.getData("text/plain") || draggingId;
+    const lead = leads.find((item) => item.id === id);
+    setDragOverStatus("");
+    setDraggingId("");
+    if (lead) void moveLead(lead, status);
   };
 
   const applyFilters = () => setAppliedFilters(draftFilters);
@@ -193,64 +295,11 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
     window.location.assign("/admin/login");
   };
 
-  const leadActions = (lead: LeadRecord) => (
-    <div className={styles.actions}>
-      <textarea
-        className={styles.notes}
-        value={notes[lead.id] ?? ""}
-        onChange={(event) =>
-          setNotes((current) => ({ ...current, [lead.id]: event.target.value }))
-        }
-        placeholder="Observações do atendimento..."
-        maxLength={4000}
-      />
-      <div className={styles.actionRow}>
-        <button
-          className={styles.smallButton}
-          type="button"
-          disabled={savingId === lead.id}
-          onClick={() => patchLead(lead.id, { notes: notes[lead.id] ?? "" })}
-        >
-          <Save size={13} /> Salvar
-        </button>
-        <button
-          className={styles.smallButton}
-          type="button"
-          disabled={savingId === lead.id}
-          onClick={() => patchLead(lead.id, { touchContact: true })}
-        >
-          <Clock3 size={13} /> Contato
-        </button>
-      </div>
-      <a
-        className={styles.actionLink}
-        href={whatsappUrl(lead)}
-        target="_blank"
-        rel="noreferrer"
-        onClick={() => void patchLead(lead.id, {
-          touchContact: true,
-          status: lead.status === "novo" ? "em_contato" : lead.status,
-        })}
-      >
-        <MessageCircle size={14} /> Chamar no WhatsApp
-      </a>
-      <a className={upgrade.viewLink} href={`/admin/leads/${lead.id}`}>
-        <ExternalLink size={13} /> Ver detalhes e histórico
-      </a>
-      <span className={styles.muted}>Último contato: {formatDate(lead.lastContactAt)}</span>
-    </div>
-  );
-
   const metrics = [
-    ["LEADS HOJE", String(stats.today), "Novos contatos no dia"],
-    ["ÚLTIMOS 7 DIAS", String(stats.lastSevenDays), "Volume recente"],
-    ["SEM ATENDIMENTO", String(stats.unattended), "Status novo"],
-    ["LEADS QUENTES", String(stats.hot), "Score de 65 a 100"],
+    ["LEADS HOJE", String(stats.today), "Entradas no dia"],
+    ["SEM ATENDIMENTO", String(stats.unattended), "Precisam de ação"],
+    ["LEADS QUENTES", String(stats.hot), "Maior prioridade"],
     ["FOLLOW-UPS", String(stats.followUpsDue), "Pendentes ou vencidos"],
-    ["TEMPO DE RESPOSTA", formatResponseTime(stats.averageFirstContactMinutes), "Média até 1º contato"],
-    ["REUNIÕES", String(stats.meetings), "Etapa atual"],
-    ["PROPOSTAS", String(stats.proposals), "Etapa atual"],
-    ["FECHADOS", String(stats.closed), "Total acumulado"],
     ["CONVERSÃO", `${stats.conversionRate}%`, "Fechados / total"],
   ];
 
@@ -259,7 +308,7 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
       <header className={styles.dashboardHeader}>
         <a className={styles.brand} href="/" aria-label="NED Marketing">
           <strong>NED</strong>
-          <small>LEADS</small>
+          <small>CRM</small>
         </a>
         <div className={styles.headerActions}>
           <a className={styles.secondaryButton} href={exportUrl}>
@@ -274,17 +323,20 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
       <div className={styles.content}>
         <section className={styles.intro}>
           <div>
-            <span className={styles.eyebrow}>PAINEL COMERCIAL / NED</span>
-            <h1>Prioridade antes do <span>primeiro contato.</span></h1>
+            <span className={styles.eyebrow}>PIPELINE COMERCIAL / NED</span>
+            <h1>
+              Cada lead no <span>lugar certo.</span>
+            </h1>
           </div>
           <p>
-            Veja os contatos que exigem ação, acompanhe o pipeline e mantenha histórico, follow-up e contexto em um único lugar.
+            Arraste os contatos entre as etapas, priorize o que exige atenção e abra
+            os detalhes apenas quando precisar do histórico completo.
           </p>
         </section>
 
         {!databaseConfigured && (
           <div className={styles.warning}>
-            Configure DATABASE_URL na Vercel para ativar a captura e a listagem persistente.
+            Configure DATABASE_URL na Vercel para ativar a captura e o pipeline.
           </div>
         )}
 
@@ -298,51 +350,91 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
           ))}
         </section>
 
-        <section className={styles.toolbar} aria-label="Filtros de leads">
-          <input
-            value={draftFilters.search}
-            onChange={(event) => setDraftFilters((current) => ({ ...current, search: event.target.value }))}
-            onKeyDown={(event) => { if (event.key === "Enter") applyFilters(); }}
-            placeholder="Buscar nome, empresa, WhatsApp ou desafio"
-          />
-          <select
-            value={draftFilters.status}
-            onChange={(event) => setDraftFilters((current) => ({ ...current, status: event.target.value }))}
-          >
-            <option value="">Todos os status</option>
-            {leadStatuses.map((status) => <option key={status} value={status}>{leadStatusLabels[status]}</option>)}
-          </select>
+        <section className={pipeline.filters} aria-label="Filtros de leads">
+          <div className={pipeline.searchField}>
+            <Search size={16} />
+            <input
+              value={draftFilters.search}
+              onChange={(event) =>
+                setDraftFilters((current) => ({
+                  ...current,
+                  search: event.target.value,
+                }))
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") applyFilters();
+              }}
+              placeholder="Buscar nome, empresa, WhatsApp ou desafio"
+            />
+          </div>
+
           <select
             value={draftFilters.priority}
-            onChange={(event) => setDraftFilters((current) => ({ ...current, priority: event.target.value }))}
+            onChange={(event) =>
+              setDraftFilters((current) => ({
+                ...current,
+                priority: event.target.value,
+              }))
+            }
           >
             <option value="">Todas as prioridades</option>
-            {leadPriorities.map((priority) => <option key={priority} value={priority}>{leadPriorityLabels[priority]}</option>)}
+            {leadPriorities.map((priority) => (
+              <option key={priority} value={priority}>
+                {leadPriorityLabels[priority]}
+              </option>
+            ))}
           </select>
+
           <select
             value={draftFilters.service}
-            onChange={(event) => setDraftFilters((current) => ({ ...current, service: event.target.value }))}
+            onChange={(event) =>
+              setDraftFilters((current) => ({
+                ...current,
+                service: event.target.value,
+              }))
+            }
           >
             <option value="">Todos os serviços</option>
-            {services.map((service) => <option key={service} value={service}>{service}</option>)}
+            {services.map((service) => (
+              <option key={service} value={service}>
+                {service}
+              </option>
+            ))}
           </select>
+
           <select
             value={draftFilters.source}
-            onChange={(event) => setDraftFilters((current) => ({ ...current, source: event.target.value }))}
+            onChange={(event) =>
+              setDraftFilters((current) => ({
+                ...current,
+                source: event.target.value,
+              }))
+            }
           >
             <option value="">Todas as origens</option>
-            {sources.map((source) => <option key={source} value={source}>{leadSourceLabels[source] ?? source}</option>)}
+            {sources.map((source) => (
+              <option key={source} value={source}>
+                {leadSourceLabels[source] ?? source}
+              </option>
+            ))}
           </select>
+
           <select
             value={draftFilters.attention}
-            onChange={(event) => setDraftFilters((current) => ({ ...current, attention: event.target.value }))}
+            onChange={(event) =>
+              setDraftFilters((current) => ({
+                ...current,
+                attention: event.target.value,
+              }))
+            }
           >
             <option value="">Todos os follow-ups</option>
             <option value="pending">Somente pendências</option>
           </select>
-          <div className={styles.actionRow}>
+
+          <div className={pipeline.filterActions}>
             <button className={styles.primaryButton} type="button" onClick={applyFilters}>
-              <Search size={14} /> Filtrar
+              Filtrar
             </button>
             <button className={styles.secondaryButton} type="button" onClick={clearFilters}>
               <RefreshCcw size={14} /> Limpar
@@ -350,118 +442,199 @@ export default function LeadsDashboard({ databaseConfigured }: { databaseConfigu
           </div>
         </section>
 
+        <div className={pipeline.boardHeading}>
+          <div>
+            <span>PIPELINE</span>
+            <strong>{leads.length} contatos visíveis</strong>
+          </div>
+          <p>
+            <GripVertical size={14} /> Arraste um card para mudar a etapa.
+          </p>
+        </div>
+
         {error && <div className={styles.error}>{error}</div>}
 
         {loading ? (
           <div className={styles.loading}>Carregando contatos...</div>
-        ) : leads.length === 0 ? (
-          <div className={styles.empty}>Nenhum lead encontrado com os filtros atuais.</div>
         ) : (
-          <>
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>CONTATO</th>
-                    <th>NECESSIDADE</th>
-                    <th>PRIORIDADE</th>
-                    <th>ORIGEM</th>
-                    <th>STATUS</th>
-                    <th>ATENDIMENTO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead) => (
-                    <tr key={lead.id}>
-                      <td>
-                        <div className={styles.leadIdentity}>
-                          <strong>{lead.name}</strong>
-                          <span>{lead.company}</span>
-                          <span>{lead.whatsapp}</span>
-                          <span>{formatDate(lead.createdAt)}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className={styles.detail}>
-                          <strong>{lead.service}</strong>
-                          <span>{lead.businessType}</span>
-                          <span>{lead.challenge}</span>
-                          <span className={styles.urgencyBadge}>{lead.urgency}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className={styles.detail}>
-                          <div className={upgrade.badgeRow}>
-                            <span className={`${upgrade.priorityBadge} ${priorityClass(lead.priority)}`}>
-                              {leadPriorityLabels[lead.priority]}
-                            </span>
-                            <span className={upgrade.scoreBadge}>{lead.score}/100</span>
-                          </div>
-                          {lead.attention.active && (
-                            <span className={upgrade.attentionBadge}>{lead.attention.label}</span>
-                          )}
-                          {lead.nextFollowUpAt && <span>Próximo: {formatDate(lead.nextFollowUpAt)}</span>}
-                        </div>
-                      </td>
-                      <td>
-                        <div className={styles.detail}>
-                          <span className={styles.sourceBadge}>{leadSourceLabels[lead.source] ?? lead.source}</span>
-                          <span>{lead.pagePath}</span>
-                          {lead.utmCampaign && <span>Campanha: {lead.utmCampaign}</span>}
-                        </div>
-                      </td>
-                      <td>
-                        <select
-                          className={styles.statusSelect}
-                          value={lead.status}
-                          disabled={savingId === lead.id}
-                          onChange={(event) => void patchLead(lead.id, { status: event.target.value as LeadStatus })}
-                        >
-                          {leadStatuses.map((status) => <option key={status} value={status}>{leadStatusLabels[status]}</option>)}
-                        </select>
-                      </td>
-                      <td>{leadActions(lead)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className={pipeline.boardScroll}>
+            <section className={pipeline.board} aria-label="Pipeline de leads">
+              {leadStatuses.map((status) => {
+                const columnLeads = leadsByStatus[status];
+                const isDropTarget = dragOverStatus === status;
 
-            <div className={styles.mobileCards}>
-              {leads.map((lead) => (
-                <article className={styles.mobileLead} key={lead.id}>
-                  <div className={styles.mobileLeadTop}>
-                    <div className={styles.leadIdentity}>
-                      <strong>{lead.name}</strong>
-                      <span>{lead.company}</span>
-                      <span>{formatDate(lead.createdAt)}</span>
+                return (
+                  <div
+                    className={`${pipeline.column} ${
+                      isDropTarget ? pipeline.columnDropTarget : ""
+                    }`}
+                    data-status={status}
+                    key={status}
+                    onDragEnter={() => setDragOverStatus(status)}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      event.dataTransfer.dropEffect = "move";
+                    }}
+                    onDragLeave={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                        setDragOverStatus("");
+                      }
+                    }}
+                    onDrop={(event) => dropLead(event, status)}
+                  >
+                    <header className={pipeline.columnHeader}>
+                      <div>
+                        <span className={pipeline.columnMarker} />
+                        <strong>{leadStatusLabels[status]}</strong>
+                      </div>
+                      <span className={pipeline.columnCount}>{columnLeads.length}</span>
+                    </header>
+
+                    <div className={pipeline.columnBody}>
+                      {columnLeads.length === 0 ? (
+                        <div className={pipeline.emptyColumn}>
+                          Solte um contato aqui.
+                        </div>
+                      ) : (
+                        columnLeads.map((lead) => {
+                          const isBusy =
+                            savingId === lead.id || deletingId === lead.id;
+                          return (
+                            <article
+                              className={`${pipeline.card} ${
+                                draggingId === lead.id ? pipeline.cardDragging : ""
+                              }`}
+                              draggable={!isBusy}
+                              key={lead.id}
+                              onDragStart={(event) => {
+                                event.dataTransfer.setData("text/plain", lead.id);
+                                event.dataTransfer.effectAllowed = "move";
+                                setDraggingId(lead.id);
+                              }}
+                              onDragEnd={() => {
+                                setDraggingId("");
+                                setDragOverStatus("");
+                              }}
+                              aria-label={`${lead.name}, ${leadStatusLabels[lead.status]}`}
+                            >
+                              <div className={pipeline.cardTop}>
+                                <button
+                                  className={pipeline.dragHandle}
+                                  type="button"
+                                  title="Arraste para mover"
+                                  aria-label={`Arrastar ${lead.name}`}
+                                >
+                                  <GripVertical size={16} />
+                                </button>
+
+                                <div className={pipeline.cardBadges}>
+                                  <span
+                                    className={`${upgrade.priorityBadge} ${priorityClass(
+                                      lead.priority,
+                                    )}`}
+                                  >
+                                    {leadPriorityLabels[lead.priority]}
+                                  </span>
+                                  <span className={upgrade.scoreBadge}>
+                                    {lead.score}/100
+                                  </span>
+                                </div>
+
+                                <button
+                                  className={pipeline.deleteButton}
+                                  type="button"
+                                  disabled={isBusy}
+                                  onClick={() => void deleteLead(lead)}
+                                  title="Excluir contato"
+                                  aria-label={`Excluir ${lead.name}`}
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              </div>
+
+                              <a
+                                className={pipeline.identity}
+                                href={`/admin/leads/${lead.id}`}
+                              >
+                                <strong>{lead.name}</strong>
+                                <span>{lead.company}</span>
+                              </a>
+
+                              <div className={pipeline.need}>
+                                <span>{lead.service}</span>
+                                <p>{lead.challenge}</p>
+                              </div>
+
+                              <div className={pipeline.tags}>
+                                <span>{leadSourceLabels[lead.source] ?? lead.source}</span>
+                                <span>{lead.urgency}</span>
+                              </div>
+
+                              {lead.attention.active && (
+                                <div className={pipeline.attention}>
+                                  <Clock3 size={13} />
+                                  <span>{lead.attention.label}</span>
+                                </div>
+                              )}
+
+                              <div className={pipeline.cardMeta}>
+                                <span>Entrada: {formatShortDate(lead.createdAt)}</span>
+                                {lead.nextFollowUpAt && (
+                                  <span>
+                                    Próximo: {formatDate(lead.nextFollowUpAt)}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className={pipeline.cardActions}>
+                                <a
+                                  className={pipeline.whatsappAction}
+                                  href={whatsappUrl(lead)}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  onClick={() => void registerContact(lead)}
+                                >
+                                  <MessageCircle size={15} />
+                                  WhatsApp
+                                </a>
+                                <a
+                                  className={pipeline.detailAction}
+                                  href={`/admin/leads/${lead.id}`}
+                                >
+                                  <ExternalLink size={14} />
+                                  Detalhes
+                                </a>
+                              </div>
+
+                              <label className={pipeline.moveControl}>
+                                <span>MOVER PARA</span>
+                                <select
+                                  value={lead.status}
+                                  disabled={isBusy}
+                                  onChange={(event) =>
+                                    void moveLead(
+                                      lead,
+                                      event.target.value as LeadStatus,
+                                    )
+                                  }
+                                >
+                                  {leadStatuses.map((option) => (
+                                    <option key={option} value={option}>
+                                      {leadStatusLabels[option]}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            </article>
+                          );
+                        })
+                      )}
                     </div>
-                    <select
-                      className={styles.statusSelect}
-                      value={lead.status}
-                      onChange={(event) => void patchLead(lead.id, { status: event.target.value as LeadStatus })}
-                    >
-                      {leadStatuses.map((status) => <option key={status} value={status}>{leadStatusLabels[status]}</option>)}
-                    </select>
                   </div>
-                  <div className={styles.detail}>
-                    <strong>{lead.service}</strong>
-                    <span>{lead.businessType}</span>
-                    <span>{lead.challenge}</span>
-                    <div className={upgrade.badgeRow}>
-                      <span className={`${upgrade.priorityBadge} ${priorityClass(lead.priority)}`}>
-                        {leadPriorityLabels[lead.priority]}
-                      </span>
-                      <span className={upgrade.scoreBadge}>{lead.score}/100</span>
-                    </div>
-                    {lead.attention.active && <span className={upgrade.attentionBadge}>{lead.attention.label}</span>}
-                    <span className={styles.sourceBadge}>{leadSourceLabels[lead.source] ?? lead.source}</span>
-                  </div>
-                  {leadActions(lead)}
-                </article>
-              ))}
-            </div>
-          </>
+                );
+              })}
+            </section>
+          </div>
         )}
       </div>
     </main>
