@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import Analytics from "./components/analytics";
+import CommercialGrowthRuntime from "./components/commercial-growth-runtime";
 import DiagnosticPopup from "./components/diagnostic-popup";
 import LabLauncher from "./components/lab-launcher";
 import LegalFooter from "./components/legal-footer";
@@ -97,6 +98,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <StructuredData />
         <SiteRuntime />
         <ServiceCardLinks />
+        <CommercialGrowthRuntime />
         {children}
         <LegalFooter />
         <DiagnosticPopup />
