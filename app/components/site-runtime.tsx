@@ -10,12 +10,29 @@ const PROJECT_CTA_SELECTOR = [
   '[data-track="footer"]',
 ].join(",");
 
+const SERVICE_NAVIGATION_ROUTES = new Map([
+  ["#marketplaces", "/servicos/marketplaces"],
+]);
+
 function scrollToDiagnosis() {
   const diagnosis = document.getElementById("diagnostico");
   if (!diagnosis) return;
 
   diagnosis.scrollIntoView({ behavior: "smooth", block: "start" });
   window.history.replaceState(null, "", "#diagnostico");
+}
+
+function rewriteServiceNavigation() {
+  SERVICE_NAVIGATION_ROUTES.forEach((route, hash) => {
+    document
+      .querySelectorAll<HTMLAnchorElement>(
+        `nav a[href="${hash}"], .mobile-menu-links a[href="${hash}"]`,
+      )
+      .forEach((link) => {
+        link.setAttribute("href", route);
+        link.dataset.track = `navigation_${hash.slice(1)}`;
+      });
+  });
 }
 
 function rebuildMarquee() {
@@ -78,6 +95,10 @@ export default function SiteRuntime() {
 
     document.addEventListener("click", handleProjectCta);
 
+    rewriteServiceNavigation();
+    const navigationObserver = new MutationObserver(rewriteServiceNavigation);
+    navigationObserver.observe(document.body, { childList: true, subtree: true });
+
     rebuildMarquee();
     const resizeTimeout = { current: 0 };
     const handleResize = () => {
@@ -90,6 +111,7 @@ export default function SiteRuntime() {
       window.clearTimeout(topTimeout);
       window.clearTimeout(resizeTimeout.current);
       document.removeEventListener("click", handleProjectCta);
+      navigationObserver.disconnect();
       window.removeEventListener("resize", handleResize);
     };
   }, []);
