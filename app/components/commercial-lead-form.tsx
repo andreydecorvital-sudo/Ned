@@ -78,6 +78,10 @@ export default function CommercialLeadForm({ variant }: { variant: Variant }) {
 
   const submit = async () => {
     if (!valid || submitting) return;
+
+    const whatsappWindow = window.open("about:blank", "_blank");
+    if (whatsappWindow) whatsappWindow.opener = null;
+
     setSubmitting(true);
     setError("");
 
@@ -153,12 +157,15 @@ export default function CommercialLeadForm({ variant }: { variant: Variant }) {
         detail: { source, service, lead_id: leadId, lead_stored: stored },
       }),
     );
-
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer",
+    window.dispatchEvent(
+      new CustomEvent("ned:whatsapp", {
+        detail: { source, service, lead_id: leadId, lead_stored: stored },
+      }),
     );
+
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+    else window.location.href = whatsappUrl;
     setSubmitting(false);
   };
 
