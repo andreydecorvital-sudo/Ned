@@ -10,6 +10,8 @@ const PROJECT_CTA_SELECTOR = [
   '[data-track="footer"]',
 ].join(",");
 
+const DIAGNOSTIC_TRIGGER_SELECTOR = "[data-open-diagnostic]";
+
 const SERVICE_NAVIGATION_ROUTES = new Map([
   ["#marketplaces", "/servicos/marketplaces"],
 ]);
@@ -77,6 +79,30 @@ export default function SiteRuntime() {
     requestAnimationFrame(forceHeroStart);
     const topTimeout = window.setTimeout(forceHeroStart, 250);
 
+    const handleDiagnosticTrigger = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const trigger = target?.closest<HTMLElement>(DIAGNOSTIC_TRIGGER_SELECTOR);
+      if (!trigger) return;
+
+      event.preventDefault();
+
+      const context: Record<string, unknown> = {};
+      if (trigger.dataset.leadScore) context.resultado = trigger.dataset.leadScore;
+      if (trigger.dataset.leadProfile) context.perfil = trigger.dataset.leadProfile;
+      if (trigger.dataset.leadBottleneck) context.gargalo = trigger.dataset.leadBottleneck;
+      if (trigger.dataset.leadExperiment) context.experimento = trigger.dataset.leadExperiment;
+
+      window.dispatchEvent(
+        new CustomEvent("ned:diagnostic-open", {
+          detail: {
+            source: trigger.dataset.leadSource || "pagina_servico",
+            service: trigger.dataset.leadService || "",
+            context,
+          },
+        }),
+      );
+    };
+
     const handleProjectCta = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       const link = target?.closest<HTMLAnchorElement>(PROJECT_CTA_SELECTOR);
@@ -93,6 +119,7 @@ export default function SiteRuntime() {
       scrollToDiagnosis();
     };
 
+    document.addEventListener("click", handleDiagnosticTrigger);
     document.addEventListener("click", handleProjectCta);
 
     rewriteServiceNavigation();
@@ -110,6 +137,7 @@ export default function SiteRuntime() {
     return () => {
       window.clearTimeout(topTimeout);
       window.clearTimeout(resizeTimeout.current);
+      document.removeEventListener("click", handleDiagnosticTrigger);
       document.removeEventListener("click", handleProjectCta);
       navigationObserver.disconnect();
       window.removeEventListener("resize", handleResize);
