@@ -1,0 +1,19 @@
+.footer {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  color: #85838d;
+  background: #08080a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.footer a {
+  color: #aaa2c7;
+  border-bottom: 1px solid rgba(169, 143, 255, 0.32);
+}

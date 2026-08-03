@@ -1,6 +1,10 @@
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { listLeads } from "@/lib/lead-store";
-import { leadSourceLabels, leadStatusLabels } from "@/lib/lead-types";
+import {
+  leadPriorityLabels,
+  leadSourceLabels,
+  leadStatusLabels,
+} from "@/lib/lead-types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,6 +24,8 @@ export async function GET(request: Request) {
     status: url.searchParams.get("status") ?? "",
     service: url.searchParams.get("service") ?? "",
     source: url.searchParams.get("source") ?? "",
+    priority: url.searchParams.get("priority") ?? "",
+    attention: url.searchParams.get("attention") ?? "",
     search: url.searchParams.get("search") ?? "",
   });
 
@@ -32,6 +38,9 @@ export async function GET(request: Request) {
     "Principal desafio",
     "Serviço",
     "Urgência",
+    "Prioridade",
+    "Score",
+    "Pendência",
     "Origem",
     "Página",
     "UTM source",
@@ -39,7 +48,11 @@ export async function GET(request: Request) {
     "UTM campaign",
     "Status",
     "Observações",
+    "Primeiro contato",
     "Último contato",
+    "Próximo follow-up",
+    "Versão do consentimento",
+    "Data do consentimento",
   ];
 
   const rows = leads.map((lead) => [
@@ -51,6 +64,9 @@ export async function GET(request: Request) {
     lead.challenge,
     lead.service,
     lead.urgency,
+    leadPriorityLabels[lead.priority],
+    lead.score,
+    lead.attention.label,
     leadSourceLabels[lead.source] ?? lead.source,
     lead.pagePath,
     lead.utmSource,
@@ -58,7 +74,11 @@ export async function GET(request: Request) {
     lead.utmCampaign,
     leadStatusLabels[lead.status],
     lead.notes,
+    lead.firstContactAt ?? "",
     lead.lastContactAt ?? "",
+    lead.nextFollowUpAt ?? "",
+    lead.consentVersion,
+    lead.consentAt ?? "",
   ]);
 
   const csv = `\uFEFF${[headers, ...rows]

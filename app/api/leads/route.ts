@@ -3,10 +3,13 @@ import {
   createLead,
   isDatabaseConfigured,
   normalizeWhatsapp,
+  registerLeadAttempt,
   type CreateLeadInput,
 } from "@/lib/lead-store";
 
 export const runtime = "nodejs";
+
+const CONSENT_VERSION = "diagnostico-2026-08";
 
 function text(value: unknown, maxLength: number) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
@@ -20,6 +23,14 @@ function metadata(value: unknown) {
   } catch {
     return {};
   }
+}
+
+function requestFingerprint(request: Request) {
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  const ip = forwarded || request.headers.get("x-real-ip") || "unknown";
+  const agent = request.headers.get("user-agent") || "unknown";
+  const language = request.headers.get("accept-language") || "unknown";
+  return `${ip}\0${agent}\0${language}`;
 }
 
 export async function POST(request: Request) {
@@ -48,6 +59,8 @@ export async function POST(request: Request) {
     );
   }
 
+  const consentAt = new Date().toISOString();
+  const originalMetadata = metadata(body.metadata);
   const input: CreateLeadInput = {
     name: text(body.name, 120),
     company: text(body.company, 160),
@@ -65,7 +78,13 @@ export async function POST(request: Request) {
     utmCampaign: text(body.utmCampaign, 200),
     utmContent: text(body.utmContent, 200),
     utmTerm: text(body.utmTerm, 200),
-    metadata: metadata(body.metadata),
+    consentVersion: CONSENT_VERSION,
+    consentAt,
+    metadata: {
+      ...originalMetadata,
+      consentVersion: CONSENT_VERSION,
+      consentRecordedAt: consentAt,
+    },
   };
 
   const required = [
@@ -91,11 +110,21 @@ export async function POST(request: Request) {
   }
 
   try {
+    const rateLimit = await registerLeadAttempt(requestFingerprint(request));
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente." },
+        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+      );
+    }
+
     const result = await createLead(input);
     return NextResponse.json({
       ok: true,
       id: result.lead.id,
       deduplicated: result.deduplicated,
+      priority: result.lead.priority,
+      score: result.lead.score,
     });
   } catch (error) {
     console.error("Failed to store NED lead", error);

@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/servicos/automacoes", changeFrequency: "monthly" as const, priority: 0.85 },
     { path: "/servicos/trafego-pago", changeFrequency: "monthly" as const, priority: 0.85 },
     { path: "/servicos/marketplaces", changeFrequency: "monthly" as const, priority: 0.85 },
+    { path: "/privacidade", changeFrequency: "yearly" as const, priority: 0.35 },
   ];
 
   return routes.map((route) => ({
