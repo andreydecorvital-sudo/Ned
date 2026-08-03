@@ -10,11 +10,22 @@ const PROJECT_CTA_SELECTOR = [
   '[data-track="footer"]',
 ].join(",");
 
-const DIAGNOSTIC_TRIGGER_SELECTOR = "[data-open-diagnostic]";
+const DIAGNOSTIC_TRIGGER_SELECTOR = [
+  "[data-open-diagnostic]",
+  'a[data-track^="servico_"]',
+  'a[data-track="ned_lab_result"]',
+].join(",");
 
 const SERVICE_NAVIGATION_ROUTES = new Map([
   ["#marketplaces", "/servicos/marketplaces"],
 ]);
+
+const servicePresetByPath: Record<string, string> = {
+  "/servicos/sites": "Site ou landing page",
+  "/servicos/automacoes": "Automações",
+  "/servicos/trafego-pago": "Tráfego pago",
+  "/servicos/marketplaces": "Marketplaces",
+};
 
 function scrollToDiagnosis() {
   const diagnosis = document.getElementById("diagnostico");
@@ -86,17 +97,21 @@ export default function SiteRuntime() {
 
       event.preventDefault();
 
+      const isLabResult = trigger.dataset.track === "ned_lab_result";
       const context: Record<string, unknown> = {};
       if (trigger.dataset.leadScore) context.resultado = trigger.dataset.leadScore;
       if (trigger.dataset.leadProfile) context.perfil = trigger.dataset.leadProfile;
       if (trigger.dataset.leadBottleneck) context.gargalo = trigger.dataset.leadBottleneck;
       if (trigger.dataset.leadExperiment) context.experimento = trigger.dataset.leadExperiment;
+      if (isLabResult) context.experimento = "A Máquina Quebrada";
 
       window.dispatchEvent(
         new CustomEvent("ned:diagnostic-open", {
           detail: {
-            source: trigger.dataset.leadSource || "pagina_servico",
-            service: trigger.dataset.leadService || "",
+            source: trigger.dataset.leadSource || (isLabResult ? "ned_lab" : "pagina_servico"),
+            service:
+              trigger.dataset.leadService ||
+              (isLabResult ? "Ainda não sei" : servicePresetByPath[window.location.pathname] || ""),
             context,
           },
         }),
