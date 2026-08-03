@@ -28,6 +28,11 @@ type Answers = {
   stage: string;
 };
 
+type DiagnosticFormProps = {
+  source?: string;
+  onSubmitted?: () => void;
+};
+
 const initialAnswers: Answers = {
   business: "",
   challenge: "",
@@ -58,7 +63,10 @@ const questions = [
   },
 ];
 
-export default function DiagnosticForm() {
+export default function DiagnosticForm({
+  source = "diagnostico",
+  onSubmitted,
+}: DiagnosticFormProps = {}) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
 
@@ -94,7 +102,18 @@ export default function DiagnosticForm() {
 
     window.dispatchEvent(
       new CustomEvent("ned:whatsapp", {
-        detail: { source: "diagnostico", service: answers.service },
+        detail: { source, service: answers.service },
+      }),
+    );
+
+    window.dispatchEvent(
+      new CustomEvent("ned:diagnostic", {
+        detail: {
+          event_name: "submitted",
+          source,
+          service: answers.service,
+          project_stage: answers.stage,
+        },
       }),
     );
 
@@ -103,6 +122,8 @@ export default function DiagnosticForm() {
       "_blank",
       "noopener,noreferrer",
     );
+
+    onSubmitted?.();
   };
 
   return (
