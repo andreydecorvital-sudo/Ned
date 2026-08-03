@@ -35,6 +35,27 @@ function scrollToDiagnosis() {
   window.history.replaceState(null, "", "#diagnostico");
 }
 
+function rewriteDiagnosticCopy() {
+  const heading = document.querySelector<HTMLElement>(".diagnostic-copy h2");
+  if (heading?.textContent?.includes("Quatro respostas")) {
+    const breakLine = document.createElement("br");
+    const accent = document.createElement("span");
+    accent.textContent = "Uma conversa melhor.";
+    heading.replaceChildren("Cinco etapas.", breakLine, accent);
+  }
+
+  const description = document.querySelector<HTMLElement>(".diagnostic-copy > p");
+  if (description) {
+    description.textContent =
+      "Informe seu contato e responda às perguntas. O lead será salvo antes de o WhatsApp abrir com o resumo do projeto.";
+  }
+
+  const benefits = document.querySelectorAll<HTMLElement>(".diagnostic-benefits p");
+  if (benefits[0]) benefits[0].textContent = "Leva menos de dois minutos.";
+  if (benefits[1]) benefits[1].textContent = "Contato salvo com consentimento.";
+  if (benefits[2]) benefits[2].textContent = "A conversa já começa com contexto.";
+}
+
 function rewriteServiceNavigation() {
   SERVICE_NAVIGATION_ROUTES.forEach((route, hash) => {
     document
@@ -137,6 +158,7 @@ export default function SiteRuntime() {
     document.addEventListener("click", handleDiagnosticTrigger);
     document.addEventListener("click", handleProjectCta);
 
+    rewriteDiagnosticCopy();
     rewriteServiceNavigation();
     const navigationObserver = new MutationObserver(rewriteServiceNavigation);
     navigationObserver.observe(document.body, { childList: true, subtree: true });
