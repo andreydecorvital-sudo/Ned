@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import CommercialHome from "./commercial-home";
 
-function appendNavLink(container: Element | null, href: string, label: string, className = "") {
+function appendNavLink(container: Element | null, href: string, label: string) {
   if (!container || container.querySelector(`[data-commercial-link="${href}"]`)) return () => undefined;
   const link = document.createElement("a");
   link.href = href;
   link.textContent = label;
   link.dataset.commercialLink = href;
-  if (className) link.className = className;
   container.appendChild(link);
   return () => link.remove();
 }
@@ -38,9 +37,16 @@ export default function CommercialGrowthRuntime() {
     cleanups.push(appendNavLink(desktopNav, "/ned-score", "NED Score"));
     cleanups.push(appendNavLink(desktopNav, "/analise-gratuita", "Análise"));
 
-    const mobileNav = document.querySelector(".mobile-menu-links");
-    cleanups.push(appendNavLink(mobileNav, "/ned-score", "NED Score"));
-    cleanups.push(appendNavLink(mobileNav, "/analise-gratuita", "Análise gratuita"));
+    const installMobileLinks = () => {
+      const mobileNav = document.querySelector(".mobile-menu-links");
+      if (!mobileNav) return;
+      cleanups.push(appendNavLink(mobileNav, "/ned-score", "NED Score"));
+      cleanups.push(appendNavLink(mobileNav, "/analise-gratuita", "Análise gratuita"));
+    };
+    installMobileLinks();
+    const menuObserver = new MutationObserver(installMobileLinks);
+    menuObserver.observe(document.body, { childList: true, subtree: true });
+    cleanups.push(() => menuObserver.disconnect());
 
     const headerCta = document.querySelector<HTMLAnchorElement>(".header-cta");
     const headerText = headerCta?.querySelector("span");
@@ -65,6 +71,18 @@ export default function CommercialGrowthRuntime() {
       if (textNode) textNode.textContent = "Solicitar análise ";
     }
 
+    const diagnostic = document.querySelector<HTMLElement>("section.diagnostic");
+    const diagnosticTitle = diagnostic?.querySelector<HTMLElement>("h2");
+    const diagnosticCopy = diagnostic?.querySelector<HTMLElement>(".diagnostic-copy > p");
+    const benefits = diagnostic?.querySelectorAll<HTMLElement>(".diagnostic-benefits p");
+    if (diagnosticTitle) diagnosticTitle.innerHTML = "Cinco etapas.<br /><span>Uma conversa melhor.</span>";
+    if (diagnosticCopy) {
+      diagnosticCopy.textContent = "As respostas são registradas no CRM antes de o WhatsApp abrir, para que a conversa comece com contexto e nenhuma oportunidade dependa apenas da mensagem enviada.";
+    }
+    if (benefits?.[0]) benefits[0].textContent = "Leva poucos minutos e organiza a necessidade.";
+    if (benefits?.[1]) benefits[1].textContent = "Contato salvo com consentimento e origem.";
+    if (benefits?.[2]) benefits[2].textContent = "WhatsApp aberto com um resumo pronto.";
+
     const finalCta = document.querySelector<HTMLElement>("section.cta");
     const finalEyebrow = finalCta?.querySelector<HTMLElement>(".eyebrow");
     const finalTitle = finalCta?.querySelector<HTMLElement>("h2");
@@ -83,7 +101,6 @@ export default function CommercialGrowthRuntime() {
 
     return () => {
       cleanups.forEach((cleanup) => cleanup());
-      setMountNode(null);
       node?.remove();
     };
   }, []);
