@@ -41,7 +41,8 @@ export default function LoginForm({ configured }: { configured: boolean }) {
     <form className={styles.form} onSubmit={submit}>
       {!configured && (
         <div className={styles.warning}>
-          Defina NED_ADMIN_PASSWORD na Vercel antes de acessar o painel.
+          Este deploy não recebeu NED_ADMIN_PASSWORD. Confirme que a variável está vinculada ao
+          ambiente Production do projeto Ned e faça um novo redeploy.
         </div>
       )}
 
