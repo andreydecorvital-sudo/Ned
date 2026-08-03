@@ -55,6 +55,21 @@ export default function Analytics() {
       });
     };
 
+    const handleDiagnosticEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<Record<string, unknown>>;
+      const parameters = { ...(customEvent.detail ?? {}) };
+      const rawEventName = parameters.event_name;
+      const eventName = typeof rawEventName === "string" ? rawEventName : "interaction";
+      delete parameters.event_name;
+
+      sendEvent(`diagnostic_${eventName}`, {
+        ...parameters,
+        page_path: window.location.pathname,
+        page_title: document.title,
+        transport_type: "beacon",
+      });
+    };
+
     const handleLabEvent = (event: Event) => {
       const customEvent = event as CustomEvent<Record<string, unknown>>;
       const parameters = { ...(customEvent.detail ?? {}) };
@@ -73,11 +88,13 @@ export default function Analytics() {
 
     document.addEventListener("click", handleClick);
     window.addEventListener("ned:whatsapp", handleWhatsappEvent);
+    window.addEventListener("ned:diagnostic", handleDiagnosticEvent);
     window.addEventListener("ned:lab", handleLabEvent);
 
     return () => {
       document.removeEventListener("click", handleClick);
       window.removeEventListener("ned:whatsapp", handleWhatsappEvent);
+      window.removeEventListener("ned:diagnostic", handleDiagnosticEvent);
       window.removeEventListener("ned:lab", handleLabEvent);
     };
   }, [gaId]);
