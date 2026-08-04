@@ -8,17 +8,19 @@ export default function StructuredData() {
     url: siteUrl,
     telephone: "+55 11 91781-4612",
     description:
-      "Sites, landing pages, automações, tráfego e operação de marketplaces para empresas que querem crescer com estrutura.",
+      "Agência de marketing para estratégia, posicionamento, conteúdo, presença digital, tráfego pago, conversão e marketplaces.",
     areaServed: {
       "@type": "Country",
       name: "Brasil",
     },
     serviceType: [
-      "Desenvolvimento de sites",
-      "Landing pages",
-      "Automações empresariais",
+      "Estratégia de marketing",
+      "Posicionamento de marca",
+      "Conteúdo e direção criativa",
+      "Sites e landing pages",
       "Gestão de tráfego pago",
-      "Operação de marketplaces",
+      "Marketing para marketplaces",
+      "Mensuração e otimização",
     ],
   };
 
