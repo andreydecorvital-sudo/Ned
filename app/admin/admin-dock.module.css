@@ -1,0 +1,95 @@
+.dock {
+  position: fixed;
+  z-index: 1000;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100vw - 36px);
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(8, 8, 10, 0.94);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px);
+}
+
+.dock a,
+.dock button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #aaa4b4;
+  font: 800 0.65rem var(--font-body), sans-serif;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.dock a:hover,
+.dock button:hover,
+.dock .active {
+  color: #fff;
+  background: rgba(169, 143, 255, 0.18);
+}
+
+.dock a:active,
+.dock button:active {
+  transform: scale(0.97);
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.dock .back {
+  color: #d6cfdf;
+}
+
+.dock .logout {
+  color: #d996a1;
+}
+
+.dock .logout:hover {
+  color: #ffd0d6;
+  background: rgba(255, 113, 133, 0.13);
+}
+
+@media (max-width: 760px) {
+  .dock {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    justify-content: space-between;
+    max-width: none;
+    padding: 6px;
+  }
+
+  .dock a,
+  .dock button {
+    min-width: 42px;
+    padding: 0 9px;
+  }
+
+  .dock a span,
+  .dock button span {
+    display: none;
+  }
+
+  .divider {
+    margin: 0;
+  }
+}
