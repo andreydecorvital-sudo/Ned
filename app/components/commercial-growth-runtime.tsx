@@ -22,10 +22,21 @@ export default function CommercialGrowthRuntime() {
     }
     setMountNode(node);
 
+    const heroEyebrow = document.querySelector<HTMLElement>(".hero-copy > .eyebrow");
+    const heroTitle = document.querySelector<HTMLElement>(".hero-copy > h1");
+    const heroCopy = document.querySelector<HTMLElement>(".hero-copy > p");
+    if (heroEyebrow) heroEyebrow.textContent = "ESTRATÉGIA • CRIAÇÃO • PERFORMANCE";
+    if (heroTitle) {
+      heroTitle.innerHTML = "Marketing que chama atenção.<br />E transforma interesse em <span>crescimento.</span>";
+    }
+    if (heroCopy) {
+      heroCopy.textContent = "Estratégia, posicionamento, conteúdo, presença digital, tráfego e marketplaces para empresas que querem ser encontradas, escolhidas e lembradas.";
+    }
+
     const headerCta = document.querySelector<HTMLAnchorElement>(".header-cta");
     const headerText = headerCta?.querySelector("span");
     if (headerCta) headerCta.href = "/analise-gratuita";
-    if (headerText) headerText.textContent = "Análise gratuita";
+    if (headerText) headerText.textContent = "Solicitar análise";
 
     const heroLinks = document.querySelectorAll<HTMLAnchorElement>(".hero-actions a");
     if (heroLinks[0]) {
@@ -34,8 +45,15 @@ export default function CommercialGrowthRuntime() {
       if (textNode) textNode.textContent = "Solicitar análise ";
     }
     if (heroLinks[1]) {
-      heroLinks[1].href = "/maquina-de-clientes";
-      heroLinks[1].textContent = "Conhecer a Máquina de Clientes";
+      heroLinks[1].href = "/servicos";
+      heroLinks[1].textContent = "Conhecer nossos serviços";
+    }
+
+    const servicesTitle = document.querySelector<HTMLElement>("section.services .section-heading h2");
+    const servicesCopy = document.querySelector<HTMLElement>("section.services .section-heading p");
+    if (servicesTitle) servicesTitle.innerHTML = "Sua marca precisa aparecer.<br />E <span>ser escolhida.</span>";
+    if (servicesCopy) {
+      servicesCopy.textContent = "A NED conecta estratégia, comunicação, presença, aquisição e conversão. Cada serviço resolve uma parte do marketing, sem perder a visão do todo.";
     }
 
     const installMobileCta = () => {
@@ -53,22 +71,22 @@ export default function CommercialGrowthRuntime() {
     const diagnosticTitle = diagnostic?.querySelector<HTMLElement>("h2");
     const diagnosticCopy = diagnostic?.querySelector<HTMLElement>(".diagnostic-copy > p");
     const benefits = diagnostic?.querySelectorAll<HTMLElement>(".diagnostic-benefits p");
-    if (diagnosticTitle) diagnosticTitle.innerHTML = "Cinco etapas.<br /><span>Uma conversa melhor.</span>";
+    if (diagnosticTitle) diagnosticTitle.innerHTML = "Cinco etapas.<br /><span>Uma análise melhor.</span>";
     if (diagnosticCopy) {
-      diagnosticCopy.textContent = "As respostas são registradas no CRM antes de o WhatsApp abrir, para que a conversa comece com contexto e nenhuma oportunidade dependa apenas da mensagem enviada.";
+      diagnosticCopy.textContent = "Conte sobre o negócio, o objetivo e o principal desafio. A NED usa esse contexto para identificar prioridades antes de recomendar qualquer serviço.";
     }
-    if (benefits?.[0]) benefits[0].textContent = "Leva poucos minutos e organiza a necessidade.";
-    if (benefits?.[1]) benefits[1].textContent = "Contato salvo com consentimento e origem.";
-    if (benefits?.[2]) benefits[2].textContent = "WhatsApp aberto com um resumo pronto.";
+    if (benefits?.[0]) benefits[0].textContent = "Leva poucos minutos e organiza o momento da empresa.";
+    if (benefits?.[1]) benefits[1].textContent = "Ajuda a identificar a prioridade de marketing.";
+    if (benefits?.[2]) benefits[2].textContent = "A conversa começa com contexto, não com pacote pronto.";
 
     const finalCta = document.querySelector<HTMLElement>("section.cta");
     const finalEyebrow = finalCta?.querySelector<HTMLElement>(".eyebrow");
     const finalTitle = finalCta?.querySelector<HTMLElement>("h2");
     const finalCopy = finalCta?.querySelector<HTMLElement>("p");
     const finalLink = finalCta?.querySelector<HTMLAnchorElement>("a");
-    if (finalEyebrow) finalEyebrow.textContent = "NED SCORE / DIAGNÓSTICO INTERATIVO";
-    if (finalTitle) finalTitle.textContent = "Descubra onde sua estrutura comercial está vazando.";
-    if (finalCopy) finalCopy.textContent = "Responda oito perguntas e receba uma pontuação para oferta, presença digital, atendimento, dados e automação.";
+    if (finalEyebrow) finalEyebrow.textContent = "NED SCORE / DIAGNÓSTICO DE MARKETING";
+    if (finalTitle) finalTitle.textContent = "Descubra onde sua marca está perdendo força.";
+    if (finalCopy) finalCopy.textContent = "Responda oito perguntas e receba uma leitura inicial sobre oferta, posicionamento, presença, aquisição, atendimento e consistência.";
     if (finalLink) {
       finalLink.href = "/ned-score";
       finalLink.removeAttribute("target");
