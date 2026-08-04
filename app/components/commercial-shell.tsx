@@ -1,7 +1,8 @@
 import { ArrowRight, MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
-import styles from "../commercial.module.css";
 import CommercialMobileNav from "./commercial-mobile-nav";
+import NedBrandMark from "./ned-brand-mark";
+import styles from "./brand-shell.module.css";
 
 const navigation = [
   ["Serviços", "/servicos"],
@@ -10,13 +11,12 @@ const navigation = [
   ["Sobre", "/sobre"],
 ] as const;
 
+type BrandAccent = "institutional" | "misterios" | "sites" | "ia" | "automacao" | "marketplaces";
+
 export function CommercialHeader() {
   return (
     <header className={styles.header}>
-      <a className={styles.brand} href="/" aria-label="NED Marketing — início">
-        <strong>NED</strong>
-        <span>MARKETING</span>
-      </a>
+      <NedBrandMark />
       <nav className={styles.headerLinks} aria-label="Navegação principal">
         {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
       </nav>
@@ -31,9 +31,12 @@ export function CommercialHeader() {
 export function CommercialFooter() {
   return (
     <footer className={styles.footer}>
-      <div>
-        <span>© {new Date().getFullYear()} NED Marketing</span>
-        <span>Marketing, conteúdo, conversão e marketplaces.</span>
+      <div className={styles.footerIdentity}>
+        <NedBrandMark compact />
+        <div>
+          <span>© {new Date().getFullYear()} NED Marketing</span>
+          <span>Direção antes de ferramenta.</span>
+        </div>
       </div>
       <nav aria-label="Links do rodapé">
         {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
@@ -46,9 +49,19 @@ export function CommercialFooter() {
   );
 }
 
-export function CommercialPage({ children }: { children: ReactNode }) {
+export function CommercialPage({
+  children,
+  accent = "institutional",
+}: {
+  children: ReactNode;
+  accent?: BrandAccent;
+}) {
   return (
-    <main className={styles.page}>
+    <main
+      className={styles.page}
+      data-ned-brand="institutional"
+      data-ned-accent={accent}
+    >
       <CommercialHeader />
       {children}
       <CommercialFooter />

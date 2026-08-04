@@ -1,0 +1,60 @@
+:root {
+  --ned-black: #08080a;
+  --ned-ink: #111116;
+  --ned-ink-soft: #18181d;
+  --ned-paper: #f1eee7;
+  --ned-white: #f7f5ef;
+  --ned-muted: #8b8993;
+  --ned-metal: #6c6b72;
+  --ned-line-dark: rgba(255, 255, 255, 0.12);
+  --ned-line-light: rgba(8, 8, 10, 0.14);
+
+  --ned-red: #ff3b42;
+  --ned-green: #39f27f;
+  --ned-blue: #3a78ff;
+  --ned-purple: #8e65ff;
+  --ned-orange: #ff8a32;
+
+  --ned-accent: var(--ned-white);
+  --ned-accent-soft: rgba(247, 245, 239, 0.12);
+  --ned-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+}
+
+[data-ned-accent="misterios"] {
+  --ned-accent: var(--ned-red);
+  --ned-accent-soft: rgba(255, 59, 66, 0.14);
+}
+
+[data-ned-accent="sites"] {
+  --ned-accent: var(--ned-green);
+  --ned-accent-soft: rgba(57, 242, 127, 0.13);
+}
+
+[data-ned-accent="ia"] {
+  --ned-accent: var(--ned-blue);
+  --ned-accent-soft: rgba(58, 120, 255, 0.14);
+}
+
+[data-ned-accent="automacao"] {
+  --ned-accent: var(--ned-purple);
+  --ned-accent-soft: rgba(142, 101, 255, 0.14);
+}
+
+[data-ned-accent="marketplaces"] {
+  --ned-accent: var(--ned-orange);
+  --ned-accent-soft: rgba(255, 138, 50, 0.14);
+}
+
+[data-ned-brand="institutional"] {
+  color: var(--ned-white);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    var(--ned-black);
+  background-size: 96px 96px;
+}
+
+[data-ned-brand="institutional"] ::selection {
+  color: var(--ned-black);
+  background: var(--ned-white);
+}

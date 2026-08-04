@@ -1,0 +1,71 @@
+[data-ned-brand="institutional"] [class*="eyebrow"],
+[data-ned-brand="institutional"] [class*="panelLabel"],
+[data-ned-brand="institutional"] [class*="panelKicker"],
+[data-ned-brand="institutional"] [class*="projectType"],
+[data-ned-brand="institutional"] [class*="priceLabel"] {
+  color: var(--ned-accent);
+}
+
+:where([data-ned-brand="institutional"]) :where(h1 span, h2 span, h2 em) {
+  color: var(--ned-accent);
+}
+
+[data-ned-brand="institutional"] [class*="primaryButton"],
+[data-ned-brand="institutional"] [class*="headerCta"],
+[data-ned-brand="institutional"] button[type="submit"] {
+  color: var(--ned-black);
+  background: var(--ned-accent);
+  border-color: var(--ned-accent);
+}
+
+[data-ned-brand="institutional"] [class*="primaryButton"]:hover,
+[data-ned-brand="institutional"] [class*="headerCta"]:hover,
+[data-ned-brand="institutional"] button[type="submit"]:hover {
+  filter: brightness(0.9);
+}
+
+[data-ned-brand="institutional"] [class*="secondaryButton"],
+[data-ned-brand="institutional"] [class*="secondary"] {
+  color: var(--ned-white);
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-ned-brand="institutional"] [class*="cardIcon"],
+[data-ned-brand="institutional"] [class*="toolIcon"] {
+  color: var(--ned-accent);
+  background: var(--ned-accent-soft);
+  border-color: color-mix(in srgb, var(--ned-accent) 35%, transparent);
+}
+
+[data-ned-brand="institutional"] [class*="cardNumber"],
+[data-ned-brand="institutional"] [class*="stageNumber"],
+[data-ned-brand="institutional"] [class*="panelItem"] > span:first-child,
+[data-ned-brand="institutional"] [class*="pipelineItem"] > span:first-child,
+[data-ned-brand="institutional"] [class*="projectStatus"] {
+  color: var(--ned-accent);
+}
+
+[data-ned-brand="institutional"] [class*="heroPanel"]::before {
+  background: var(--ned-accent-soft);
+}
+
+[data-ned-brand="institutional"] [class*="textLink"] {
+  color: var(--ned-accent);
+}
+
+[data-ned-brand="institutional"] a:focus-visible,
+[data-ned-brand="institutional"] button:focus-visible,
+[data-ned-brand="institutional"] input:focus-visible,
+[data-ned-brand="institutional"] select:focus-visible,
+[data-ned-brand="institutional"] textarea:focus-visible {
+  outline: 3px solid var(--ned-accent);
+  outline-offset: 3px;
+}
+
+@supports not (color: color-mix(in srgb, black, white)) {
+  [data-ned-brand="institutional"] [class*="cardIcon"],
+  [data-ned-brand="institutional"] [class*="toolIcon"] {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+}

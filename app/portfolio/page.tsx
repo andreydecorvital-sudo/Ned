@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { ArrowRight, Check, Gauge, Gamepad2, Layers3 } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
+import CaseVisual from "../components/case-visual";
 import { CommercialPage } from "../components/commercial-shell";
-import styles from "../client-pages.module.css";
+import styles from "./portfolio-brand.module.css";
 
 export const metadata: Metadata = {
   title: "Trabalhos — estudos de caso e experiências NED",
@@ -13,7 +14,6 @@ export const metadata: Metadata = {
 const cases = [
   {
     id: "ned-score",
-    icon: Gauge,
     type: "DIAGNÓSTICO INTERATIVO",
     title: "NED Score",
     summary:
@@ -37,10 +37,10 @@ const cases = [
     tags: ["Estratégia", "Diagnóstico", "Conversão", "Experiência"],
     href: "/ned-score",
     cta: "Testar NED Score",
+    variant: "score" as const,
   },
   {
     id: "maquina-quebrada",
-    icon: Gamepad2,
     type: "CONTEÚDO INTERATIVO / NED LAB",
     title: "A Máquina Quebrada",
     summary:
@@ -64,10 +64,10 @@ const cases = [
     tags: ["Storytelling", "Gamificação", "Conteúdo", "Compartilhamento"],
     href: "/portfolio/maquina-quebrada",
     cta: "Ver estudo completo",
+    variant: "machine" as const,
   },
   {
     id: "growth-studio",
-    icon: Layers3,
     type: "MÉTODO E PRODUÇÃO INTERNA",
     title: "NED Growth Studio",
     summary:
@@ -91,36 +91,37 @@ const cases = [
     tags: ["Conteúdo", "Método", "IA supervisionada", "Produção"],
     href: "/processo",
     cta: "Entender o método",
+    variant: "studio" as const,
   },
 ];
 
 export default function PortfolioPage() {
   return (
     <CommercialPage>
-      <section className={`${styles.hero} ${styles.heroCompact}`}>
+      <section className={styles.hero}>
         <div>
           <span className={styles.eyebrow}>TRABALHOS / NED MARKETING</span>
           <h1>Menos vitrine vazia. <span>Mais contexto e evolução.</span></h1>
           <p className={styles.heroLead}>
             Estes estudos de caso mostram o problema, o raciocínio, a entrega, o que cada projeto demonstra e o que ainda precisa evoluir. Todos são projetos próprios da NED.
           </p>
-          <div className={styles.heroActions}>
-            <a className={styles.primaryButton} href="#casos">Ver estudos de caso <ArrowRight size={17} /></a>
-            <a className={styles.secondaryButton} href="/analise-gratuita">Solicitar análise</a>
+          <div className={styles.actions}>
+            <a className={styles.primary} href="#casos">Ver estudos de caso <ArrowRight size={17} /></a>
+            <a className={styles.secondary} href="/analise-gratuita">Solicitar análise</a>
           </div>
         </div>
         <aside className={styles.heroPanel} aria-label="Critérios do portfólio NED">
           <span className={styles.panelLabel}>COMO OS CASES SÃO APRESENTADOS</span>
           <div className={styles.panelStack}>
-            <div className={styles.panelItem}><span>01</span><strong>Contexto</strong><small>Qual problema precisava ser resolvido</small></div>
-            <div className={styles.panelItem}><span>02</span><strong>Decisão</strong><small>Por que o caminho foi escolhido</small></div>
-            <div className={styles.panelItem}><span>03</span><strong>Entrega</strong><small>O que foi realmente construído</small></div>
-            <div className={styles.panelItem}><span>04</span><strong>Evolução</strong><small>O que ainda pode ficar melhor</small></div>
+            <div className={styles.panelItem}><span>01</span><div><strong>Contexto</strong><small>Qual problema precisava ser resolvido</small></div></div>
+            <div className={styles.panelItem}><span>02</span><div><strong>Decisão</strong><small>Por que o caminho foi escolhido</small></div></div>
+            <div className={styles.panelItem}><span>03</span><div><strong>Entrega</strong><small>O que foi realmente construído</small></div></div>
+            <div className={styles.panelItem}><span>04</span><div><strong>Evolução</strong><small>O que ainda pode ficar melhor</small></div></div>
           </div>
         </aside>
       </section>
 
-      <section className={styles.pageSectionDark} id="casos">
+      <section className={styles.section} id="casos">
         <div className={styles.sectionHead}>
           <div>
             <span className={styles.eyebrow}>ESTUDOS DE CASO</span>
@@ -129,39 +130,39 @@ export default function PortfolioPage() {
           <p>Os cases não usam clientes fictícios, depoimentos inventados ou números que não podem ser comprovados.</p>
         </div>
 
-        <div className={styles.portfolioNotice}>
+        <div className={styles.notice}>
           Projetos próprios demonstram capacidade de estratégia e execução, mas não substituem cases de clientes. Essa diferença continua explícita.
         </div>
 
-        <div className={styles.projectGrid} style={{ marginTop: 18 }}>
-          {cases.map(({ id, icon: Icon, type, title, summary, context, decision, deliveries, demonstrates, next, evidence, tags, href, cta }) => (
-            <article className={styles.projectCard} key={id} id={id}>
-              <div className={styles.projectContent}>
-                <div className={styles.projectTop}>
-                  <span className={styles.projectType}>{type}</span>
-                  <span className={styles.projectStatus}>PROJETO PRÓPRIO</span>
+        <div className={styles.caseList}>
+          {cases.map(({ id, type, title, summary, context, decision, deliveries, demonstrates, next, evidence, tags, href, cta, variant }) => (
+            <article className={styles.case} key={id} id={id}>
+              <div className={styles.media}><CaseVisual variant={variant} large /></div>
+              <div className={styles.content}>
+                <div className={styles.topline}>
+                  <span className={styles.type}>{type}</span>
+                  <span className={styles.status}>PROJETO PRÓPRIO</span>
                 </div>
-                <span className={styles.cardIcon}><Icon size={22} /></span>
-                <h2 className={styles.projectTitle}>{title}</h2>
-                <p className={styles.projectDescription}>{summary}</p>
+                <h2>{title}</h2>
+                <p className={styles.summary}>{summary}</p>
 
-                <div className={styles.faqGrid}>
-                  <article className={styles.faqCard}><h3>Contexto</h3><p>{context}</p></article>
-                  <article className={styles.faqCard}><h3>Decisão</h3><p>{decision}</p></article>
+                <div className={styles.twoCol}>
+                  <article className={styles.info}><h3>Contexto</h3><p>{context}</p></article>
+                  <article className={styles.info}><h3>Decisão</h3><p>{decision}</p></article>
                 </div>
 
-                <h3>Entregas</h3>
-                <ul className={styles.projectFacts}>
+                <h3 className={styles.deliveryTitle}>Entregas</h3>
+                <ul className={styles.deliveries}>
                   {deliveries.map((delivery) => <li key={delivery}><Check size={14} /> {delivery}</li>)}
                 </ul>
 
-                <div className={styles.faqGrid}>
-                  <article className={styles.faqCard}><h3>O que demonstra</h3><p>{demonstrates}</p></article>
-                  <article className={styles.faqCard}><h3>Próxima evolução</h3><p>{next}</p></article>
+                <div className={styles.twoCol}>
+                  <article className={styles.info}><h3>O que demonstra</h3><p>{demonstrates}</p></article>
+                  <article className={styles.info}><h3>Próxima evolução</h3><p>{next}</p></article>
                 </div>
 
-                <div className={styles.portfolioNotice}>{evidence}</div>
-                <div className={styles.tagRow}>{tags.map((tag) => <span className={styles.tag} key={tag}>{tag}</span>)}</div>
+                <div className={styles.evidence}>{evidence}</div>
+                <div className={styles.tags}>{tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                 <a className={styles.textLink} href={href}>{cta} <ArrowRight size={15} /></a>
               </div>
             </article>
@@ -169,15 +170,20 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      <section className={styles.pageSectionSoft}>
-        <div className={styles.ctaBand}>
+      <div className={styles.paper}>
+        <section className={styles.finalCta}>
           <div>
-            <h2>Seu projeto não precisa começar com uma solução pronta.</h2>
-            <p>Mostre o cenário atual. A NED identifica a prioridade antes de recomendar conteúdo, campanha, página, mídia ou marketplace.</p>
+            <span className={styles.eyebrow}>PRÓXIMO PROJETO</span>
+            <h2>Seu problema pode virar <span>um trabalho verificável.</span></h2>
           </div>
-          <a className={styles.secondaryButton} href="/analise-gratuita">Solicitar análise <ArrowRight size={16} /></a>
-        </div>
-      </section>
+          <div>
+            <p>Mostre o cenário atual. A NED identifica a prioridade antes de recomendar conteúdo, campanha, página, mídia ou marketplace.</p>
+            <div className={styles.actions}>
+              <a className={styles.primary} href="/analise-gratuita">Solicitar análise <ArrowRight size={16} /></a>
+            </div>
+          </div>
+        </section>
+      </div>
     </CommercialPage>
   );
 }

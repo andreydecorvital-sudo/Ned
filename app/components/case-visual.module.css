@@ -1,0 +1,222 @@
+.frame {
+  position: relative;
+  min-height: 240px;
+  overflow: hidden;
+  color: var(--ned-white);
+  background: #0d0d11;
+  border: 1px solid rgba(255, 255, 255, .13);
+}
+
+.frame::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+.large { min-height: 390px; }
+
+.label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 4;
+  padding: 8px 9px;
+  color: #b9b7be;
+  background: rgba(8, 8, 10, .76);
+  border: 1px solid rgba(255, 255, 255, .11);
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.score {
+  background:
+    radial-gradient(circle at 72% 22%, rgba(57, 242, 127, .14), transparent 32%),
+    #0e1110;
+}
+
+.scoreRing {
+  position: absolute;
+  top: 50%;
+  left: 18%;
+  display: grid;
+  width: 128px;
+  height: 128px;
+  place-items: center;
+  border: 1px solid rgba(57, 242, 127, .65);
+  border-radius: 50%;
+  box-shadow: inset 0 0 32px rgba(57, 242, 127, .08), 0 0 34px rgba(57, 242, 127, .08);
+  transform: translateY(-42%);
+}
+
+.scoreRing::after {
+  position: absolute;
+  inset: 12px;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, .11);
+  border-radius: 50%;
+}
+
+.scoreRing strong {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-display), sans-serif;
+  font-size: 58px;
+  font-weight: 400;
+}
+
+.scoreBars {
+  position: absolute;
+  top: 31%;
+  right: 9%;
+  display: grid;
+  width: 42%;
+  gap: 15px;
+}
+
+.scoreBars span {
+  position: relative;
+  display: block;
+  height: 4px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.scoreBars span::after {
+  display: block;
+  width: var(--bar, 70%);
+  height: 100%;
+  content: "";
+  background: #39f27f;
+}
+
+.machine {
+  background:
+    radial-gradient(circle at 54% 44%, rgba(142, 101, 255, .12), transparent 35%),
+    #111116;
+}
+
+.machineDesk {
+  position: absolute;
+  right: 10%;
+  bottom: 20%;
+  left: 10%;
+  height: 16px;
+  background: #313139;
+  box-shadow: 0 11px 0 #1b1b21;
+}
+
+.machineScreen {
+  position: absolute;
+  top: 25%;
+  left: 14%;
+  width: 42%;
+  height: 36%;
+  padding: 14px;
+  background: var(--ned-paper);
+  border: 8px solid #2c2c34;
+}
+
+.machineScreen span {
+  display: block;
+  height: 7px;
+  margin-bottom: 9px;
+  background: #202026;
+  opacity: .24;
+}
+
+.machinePhone {
+  position: absolute;
+  right: 18%;
+  bottom: 24%;
+  width: 62px;
+  height: 112px;
+  background: #202027;
+  border: 4px solid #383842;
+  border-radius: 14px;
+  transform: rotate(5deg);
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: white;
+  background: var(--ned-purple);
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 50%;
+  box-shadow: 0 0 0 7px rgba(142, 101, 255, .12), 0 0 22px rgba(142, 101, 255, .45);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.hotspotOne { top: 22%; left: 51%; }
+.hotspotTwo { right: 14%; bottom: 45%; }
+.hotspotThree { bottom: 24%; left: 17%; }
+
+.studio {
+  background:
+    linear-gradient(135deg, rgba(58, 120, 255, .09), transparent 45%),
+    #0d0f13;
+}
+
+.studioColumns {
+  position: absolute;
+  inset: 58px 18px 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.studioColumn {
+  padding: 10px;
+  background: rgba(255, 255, 255, .025);
+  border: 1px solid rgba(255, 255, 255, .1);
+}
+
+.studioColumn strong {
+  display: block;
+  color: #8f8d96;
+  font-size: 7px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.studioCard {
+  height: 52px;
+  margin-top: 10px;
+  padding: 9px;
+  background: #17181d;
+  border-left: 2px solid #3a78ff;
+}
+
+.studioCard::before,
+.studioCard::after {
+  display: block;
+  height: 5px;
+  content: "";
+  background: rgba(255, 255, 255, .18);
+}
+
+.studioCard::after {
+  width: 58%;
+  margin-top: 7px;
+  opacity: .55;
+}
+
+@media (max-width: 640px) {
+  .frame { min-height: 220px; }
+  .large { min-height: 310px; }
+  .scoreRing { left: 9%; width: 104px; height: 104px; }
+  .scoreRing strong { font-size: 46px; }
+  .scoreBars { right: 7%; width: 44%; }
+  .studioColumns { grid-template-columns: repeat(3, 150px); overflow: hidden; }
+}
