@@ -48,6 +48,8 @@ type IdeaRow = {
   score: number | string;
   checklist: ViralIdea["checklist"] | string;
   provider: ViralIdea["provider"];
+  used_in_studio: boolean | null;
+  used_at: string | Date | null;
   created_at: string | Date;
   updated_at: string | Date;
 };
@@ -88,11 +90,46 @@ function parseJson<T>(value: T | string | null, fallback: T): T {
 }
 
 const missionSeeds = [
-  ["strategy-focus", "Defina o foco do dia", "Escolha um tema ligado ao objetivo principal da conta.", 10, "strategy", 1],
-  ["strong-hook", "Crie um gancho forte", "Produza ou gere uma abertura que pare a rolagem sem usar promessa enganosa.", 20, "creation", 2],
-  ["publish-ready", "Prepare uma publicação", "Leve uma ideia até o checklist e deixe o conteúdo pronto para o estúdio.", 30, "distribution", 3],
-  ["real-conversation", "Estimule uma conversa", "Inclua uma pergunta ou CTA que convide o público a participar.", 15, "engagement", 4],
-  ["learn-from-data", "Registre um aprendizado", "Revise um conteúdo anterior e anote o que deve ser repetido ou evitado.", 25, "analysis", 5],
+  [
+    "strategy-focus",
+    "Escolha uma pauta com objetivo",
+    "Defina o tema e o resultado esperado antes de começar a escrever.",
+    10,
+    "strategy",
+    1,
+  ],
+  [
+    "strong-hook",
+    "Teste três ganchos",
+    "Compare aberturas diferentes e escolha a que deixa a promessa mais clara.",
+    20,
+    "creation",
+    2,
+  ],
+  [
+    "publish-ready",
+    "Leve uma ideia ao estúdio",
+    "Transforme uma ideia em rascunho real, com formato e texto já definidos.",
+    30,
+    "distribution",
+    3,
+  ],
+  [
+    "real-conversation",
+    "Crie uma próxima ação",
+    "Use um CTA coerente para comentário, salvamento, compartilhamento ou conversa.",
+    15,
+    "engagement",
+    4,
+  ],
+  [
+    "learn-from-data",
+    "Registre um aprendizado",
+    "Revise um conteúdo anterior e decida o que repetir, cortar ou testar.",
+    25,
+    "analysis",
+    5,
+  ],
 ] as const;
 
 export async function ensureViralSchema() {
@@ -149,11 +186,16 @@ export async function ensureViralSchema() {
         score integer NOT NULL DEFAULT 0,
         checklist jsonb NOT NULL DEFAULT '{}'::jsonb,
         provider varchar(24) NOT NULL DEFAULT 'manual',
+        used_in_studio boolean NOT NULL DEFAULT false,
+        used_at timestamptz,
         created_at timestamptz NOT NULL DEFAULT now(),
         updated_at timestamptz NOT NULL DEFAULT now()
       )
     `;
+    await sql`ALTER TABLE ned_viral_ideas ADD COLUMN IF NOT EXISTS used_in_studio boolean NOT NULL DEFAULT false`;
+    await sql`ALTER TABLE ned_viral_ideas ADD COLUMN IF NOT EXISTS used_at timestamptz`;
     await sql`CREATE INDEX IF NOT EXISTS ned_viral_ideas_created_idx ON ned_viral_ideas (created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS ned_viral_ideas_execution_idx ON ned_viral_ideas (used_in_studio, used_at DESC)`;
 
     await sql`
       INSERT INTO ned_viral_profiles (id)
@@ -210,6 +252,20 @@ function mapMission(row: MissionRow): ViralMission {
   };
 }
 
+function emptyChecklist(): ViralIdea["checklist"] {
+  return {
+    hook: 0,
+    clarity: 0,
+    retention: 0,
+    value: 0,
+    interaction: 0,
+    cta: 0,
+    formatFit: 0,
+    readability: 0,
+    hashtags: 0,
+  };
+}
+
 function mapIdea(row: IdeaRow): ViralIdea {
   return {
     id: row.id,
@@ -223,26 +279,30 @@ function mapIdea(row: IdeaRow): ViralIdea {
     cta: row.cta,
     firstComment: row.first_comment,
     score: Number(row.score),
-    checklist: parseJson(row.checklist, {
-      hook: 0,
-      clarity: 0,
-      retention: 0,
-      value: 0,
-      interaction: 0,
-      cta: 0,
-      formatFit: 0,
-      readability: 0,
-      hashtags: 0,
-    }),
+    checklist: parseJson(row.checklist, emptyChecklist()),
     provider: row.provider,
+    usedInStudio: Boolean(row.used_in_studio),
+    usedAt: iso(row.used_at),
     createdAt: iso(row.created_at) ?? new Date().toISOString(),
     updatedAt: iso(row.updated_at) ?? new Date().toISOString(),
   };
 }
 
+function saoPauloDateKey(value = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(value);
+  const lookup = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${lookup.year}-${lookup.month}-${lookup.day}`;
+}
+
 function calculateStreak(dates: string[]) {
   const completed = new Set(dates.map((date) => date.slice(0, 10)));
-  let cursor = new Date();
+  const [year, month, day] = saoPauloDateKey().split("-").map(Number);
+  const cursor = new Date(Date.UTC(year, month - 1, day));
   let streak = 0;
   while (streak < 365) {
     const key = cursor.toISOString().slice(0, 10);
@@ -251,6 +311,17 @@ function calculateStreak(dates: string[]) {
     cursor.setUTCDate(cursor.getUTCDate() - 1);
   }
   return streak;
+}
+
+function profileCompleteness(profile: ViralProfile) {
+  let score = 0;
+  if (profile.instagramHandle.trim()) score += 10;
+  if (profile.niche.trim().length >= 4) score += 20;
+  if (profile.audience.trim().length >= 20) score += 25;
+  if (profile.tone.trim().length >= 4) score += 10;
+  if (profile.objective.trim().length >= 15) score += 20;
+  if (profile.contentPillars.length >= 3) score += 15;
+  return score;
 }
 
 export async function getViralDashboardData(): Promise<Omit<ViralDashboardData, "configuration">> {
@@ -266,16 +337,16 @@ export async function getViralDashboardData(): Promise<Omit<ViralDashboardData, 
       FROM ned_viral_missions mission
       LEFT JOIN ned_viral_mission_progress progress
         ON progress.mission_id = mission.id
-       AND progress.mission_date = CURRENT_DATE
+       AND progress.mission_date = (now() AT TIME ZONE 'America/Sao_Paulo')::date
       WHERE mission.active = true
       ORDER BY mission.sort_order, mission.created_at
     `,
-    sql`SELECT * FROM ned_viral_ideas ORDER BY created_at DESC LIMIT 80`,
+    sql`SELECT * FROM ned_viral_ideas ORDER BY created_at DESC LIMIT 100`,
     sql`
       SELECT DISTINCT mission_date::text AS day
       FROM ned_viral_mission_progress
       WHERE completed = true
-        AND mission_date >= CURRENT_DATE - INTERVAL '40 days'
+        AND mission_date >= (now() AT TIME ZONE 'America/Sao_Paulo')::date - INTERVAL '60 days'
       ORDER BY day DESC
     `,
   ]);
@@ -290,9 +361,17 @@ export async function getViralDashboardData(): Promise<Omit<ViralDashboardData, 
   const averageIdeaScore = ideas.length
     ? Math.round(ideas.reduce((sum, idea) => sum + idea.score, 0) / ideas.length)
     : 0;
-  const viralScore = ideas.length
-    ? Math.round(averageIdeaScore * 0.7 + missionCompletion * 0.3)
-    : missionCompletion;
+  const readyIdeas = ideas.filter((idea) => idea.score >= 70).length;
+  const studioTransfers = ideas.filter((idea) => idea.usedInStudio).length;
+  const executionRate = ideas.length ? Math.round((studioTransfers / ideas.length) * 100) : 0;
+  const completeness = profileCompleteness(profile);
+  const viralScore = Math.round(
+    averageIdeaScore * 0.45 +
+      executionRate * 0.25 +
+      missionCompletion * 0.15 +
+      completeness * 0.15,
+  );
+
   const stats: ViralStats = {
     viralScore,
     missionCompletion,
@@ -301,6 +380,10 @@ export async function getViralDashboardData(): Promise<Omit<ViralDashboardData, 
     totalMissions: missions.length,
     ideasCount: ideas.length,
     averageIdeaScore,
+    readyIdeas,
+    studioTransfers,
+    executionRate,
+    profileCompleteness: completeness,
     streakDays: calculateStreak((streakRows as Array<{ day: string }>).map((row) => row.day)),
   };
 
@@ -334,7 +417,10 @@ export async function toggleViralMission(id: string, completed: boolean) {
     INSERT INTO ned_viral_mission_progress (
       mission_id, mission_date, completed, completed_at
     ) VALUES (
-      ${id}, CURRENT_DATE, ${completed}, ${completed ? new Date().toISOString() : null}
+      ${id},
+      (now() AT TIME ZONE 'America/Sao_Paulo')::date,
+      ${completed},
+      ${completed ? new Date().toISOString() : null}
     )
     ON CONFLICT (mission_id, mission_date) DO UPDATE SET
       completed = EXCLUDED.completed,
@@ -373,6 +459,19 @@ export async function saveViralIdea(input: {
     RETURNING *
   `;
   return mapIdea((rows as IdeaRow[])[0]);
+}
+
+export async function markViralIdeaUsed(id: string) {
+  await ensureViralSchema();
+  const sql = database();
+  const rows = await sql`
+    UPDATE ned_viral_ideas
+    SET used_in_studio = true, used_at = COALESCE(used_at, now()), updated_at = now()
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  const row = (rows as IdeaRow[])[0];
+  return row ? mapIdea(row) : null;
 }
 
 export async function deleteViralIdea(id: string) {
