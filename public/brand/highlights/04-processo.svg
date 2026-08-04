@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NED destaque Processo">
+  <rect width="512" height="512" fill="#08080a"/><circle cx="256" cy="256" r="242" fill="none" stroke="#f1eee7" stroke-width="2"/>
+  <path d="M120 342 C162 342 168 298 205 298 C242 298 245 253 282 253 C319 253 326 208 392 174" fill="none" stroke="#f1eee7" stroke-width="18" stroke-linecap="round"/>
+  <g fill="#08080a" stroke="#f1eee7" stroke-width="17">
+    <circle cx="120" cy="342" r="29"/><circle cx="205" cy="298" r="29"/><circle cx="282" cy="253" r="29"/><circle cx="392" cy="174" r="29"/>
+  </g>
+</svg>
