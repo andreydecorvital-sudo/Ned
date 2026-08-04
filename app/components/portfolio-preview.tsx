@@ -1,26 +1,26 @@
-import { ArrowRight, Gauge, Gamepad2, LayoutDashboard } from "lucide-react";
+import { ArrowRight, Gauge, Gamepad2, Megaphone } from "lucide-react";
 import styles from "../commercial.module.css";
 
 const projects = [
   {
     icon: Gauge,
-    label: "FERRAMENTA INTERATIVA",
+    label: "DIAGNÓSTICO DE MARKETING",
     title: "NED Score",
-    text: "Diagnóstico com pontuação, perfil, gargalo principal e envio de contexto para o CRM.",
+    text: "Experiência que transforma respostas em uma leitura inicial sobre oferta, posicionamento, presença, aquisição e atendimento.",
     href: "/ned-score",
   },
   {
     icon: Gamepad2,
-    label: "EXPERIÊNCIA / NED LAB",
+    label: "CONTEÚDO INTERATIVO / NED LAB",
     title: "A Máquina Quebrada",
-    text: "Experiência gamificada sobre oferta, atendimento e operação com resultado compartilhável.",
+    text: "Narrativa gamificada sobre oferta, atendimento e operação, criada para gerar reflexão, interação e compartilhamento.",
     href: "/lab/maquina-quebrada",
   },
   {
-    icon: LayoutDashboard,
-    label: "SISTEMA INTERNO",
-    title: "CRM NED",
-    text: "Pipeline Kanban, prioridade, histórico, follow-up, métricas, filtros e proteção de dados.",
+    icon: Megaphone,
+    label: "ESTRATÉGIA E CONVERSÃO",
+    title: "Jornada NED",
+    text: "Posicionamento, páginas, conteúdo, diagnóstico e acompanhamento conectados para transformar atenção em conversa com contexto.",
     href: "/portfolio",
   },
 ];
@@ -30,13 +30,13 @@ export default function PortfolioPreview() {
     <section className={styles.sectionSoft} aria-labelledby="portfolio-preview-title">
       <div className={styles.sectionHead}>
         <div>
-          <span className={styles.eyebrow}>PORTFÓLIO / PROJETOS REAIS</span>
+          <span className={styles.eyebrow}>PORTFÓLIO / MARKETING EM PRÁTICA</span>
           <h2 className={styles.sectionTitle} id="portfolio-preview-title">
-            Veja o que a NED já <span>construiu.</span>
+            Veja como a NED transforma estratégia em <span>experiência.</span>
           </h2>
         </div>
         <p>
-          Produtos próprios, ferramentas internas e experiências públicas demonstram estratégia, design, desenvolvimento e operação sem depender de cases fictícios.
+          Projetos próprios e experiências públicas demonstram pensamento estratégico, direção criativa, conteúdo, conversão e mensuração sem inventar clientes ou resultados.
         </p>
       </div>
 
