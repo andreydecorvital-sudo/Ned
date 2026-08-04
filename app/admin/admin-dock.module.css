@@ -26,7 +26,7 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: #aaa4b4;
+  color: #aaa8af;
   font: 800 0.65rem var(--font-body), sans-serif;
   letter-spacing: 0.08em;
   text-decoration: none;
@@ -36,11 +36,19 @@
   transition: color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
+.dock a::after {
+  display: none !important;
+}
+
 .dock a:hover,
-.dock button:hover,
-.dock .active {
+.dock button:hover {
   color: #fff;
-  background: rgba(169, 143, 255, 0.18);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.dock .active {
+  color: var(--ned-black);
+  background: var(--ned-paper);
 }
 
 .dock a:active,
@@ -56,7 +64,7 @@
 }
 
 .dock .back {
-  color: #d6cfdf;
+  color: #d6d3cc;
 }
 
 .dock .logout {
