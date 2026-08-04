@@ -12,6 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import styles from "../commercial.module.css";
+import marketingStyles from "./marketing-home.module.css";
 
 const marketingJourney = [
   ["01", "Atrair", "Conteúdo, mídia, Google, redes sociais, indicação e marketplaces."],
@@ -163,9 +164,9 @@ export default function CommercialHome() {
         </div>
       </section>
 
-      <section className={styles.marketingSection} id="frentes" data-theme="dark">
-        <div className={styles.marketingEditorial}>
-          <div className={styles.marketingEditorialIntro}>
+      <section className={marketingStyles.marketingSection} id="frentes" data-theme="dark">
+        <div className={marketingStyles.marketingEditorial}>
+          <div className={marketingStyles.marketingEditorialIntro}>
             <span className={styles.eyebrow}>COMO A NED PODE ATUAR</span>
             <h2>Uma estratégia. Diferentes frentes de <span>marketing.</span></h2>
             <p>
@@ -176,19 +177,19 @@ export default function CommercialHome() {
             </a>
           </div>
 
-          <div className={styles.marketingDirectionList}>
+          <div className={marketingStyles.marketingDirectionList}>
             {marketingFronts.map(({ icon: Icon, number, label, title, description, tags, href }) => (
-              <article className={styles.marketingDirection} key={number}>
-                <span className={styles.marketingDirectionIcon}><Icon size={22} /></span>
-                <div className={styles.marketingDirectionBody}>
-                  <span className={styles.marketingDirectionLabel}>{number} / {label}</span>
+              <article className={marketingStyles.marketingDirection} key={number}>
+                <span className={marketingStyles.marketingDirectionIcon}><Icon size={22} /></span>
+                <div className={marketingStyles.marketingDirectionBody}>
+                  <span className={marketingStyles.marketingDirectionLabel}>{number} / {label}</span>
                   <h3>{title}</h3>
                   <p>{description}</p>
-                  <ul className={styles.marketingTags}>
+                  <ul className={marketingStyles.marketingTags}>
                     {tags.map((tag) => <li key={tag}>{tag}</li>)}
                   </ul>
                 </div>
-                <a className={styles.marketingDirectionLink} href={href} aria-label={`Conhecer ${label.toLowerCase()}`}>
+                <a className={marketingStyles.marketingDirectionLink} href={href} aria-label={`Conhecer ${label.toLowerCase()}`}>
                   <ArrowRight size={19} />
                 </a>
               </article>
