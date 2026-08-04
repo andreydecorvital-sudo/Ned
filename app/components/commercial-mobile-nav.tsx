@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./commercial-mobile-nav.module.css";
 
@@ -11,8 +12,13 @@ const links = [
   ["Sobre", "/sobre"],
 ] as const;
 
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function CommercialMobileNav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!open) return;
@@ -38,11 +44,19 @@ export default function CommercialMobileNav() {
       {open && (
         <div className={styles.backdrop} onClick={() => setOpen(false)}>
           <nav className={styles.panel} aria-label="Navegação mobile" onClick={(event) => event.stopPropagation()}>
-            {links.map(([label, href], index) => (
-              <a key={href} href={href} onClick={() => setOpen(false)}>
-                {label} <span>{String(index + 1).padStart(2, "0")}</span>
-              </a>
-            ))}
+            {links.map(([label, href], index) => {
+              const active = isActive(pathname, href);
+              return (
+                <a
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                >
+                  {label} <span>{String(index + 1).padStart(2, "0")}</span>
+                </a>
+              );
+            })}
             <a className={styles.cta} href="/analise-gratuita" onClick={() => setOpen(false)}>
               Solicitar análise <ArrowRight size={16} />
             </a>
