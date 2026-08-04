@@ -3,16 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import CommercialHome from "./commercial-home";
-
-function appendNavLink(container: Element | null, href: string, label: string) {
-  if (!container || container.querySelector(`[data-commercial-link="${href}"]`)) return () => undefined;
-  const link = document.createElement("a");
-  link.href = href;
-  link.textContent = label;
-  link.dataset.commercialLink = href;
-  container.appendChild(link);
-  return () => link.remove();
-}
+import PortfolioPreview from "./portfolio-preview";
 
 export default function CommercialGrowthRuntime() {
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
@@ -31,23 +22,6 @@ export default function CommercialGrowthRuntime() {
     }
     setMountNode(node);
 
-    const cleanups: Array<() => void> = [];
-
-    const desktopNav = document.querySelector(".site-header nav");
-    cleanups.push(appendNavLink(desktopNav, "/ned-score", "NED Score"));
-    cleanups.push(appendNavLink(desktopNav, "/analise-gratuita", "Análise"));
-
-    const installMobileLinks = () => {
-      const mobileNav = document.querySelector(".mobile-menu-links");
-      if (!mobileNav) return;
-      cleanups.push(appendNavLink(mobileNav, "/ned-score", "NED Score"));
-      cleanups.push(appendNavLink(mobileNav, "/analise-gratuita", "Análise gratuita"));
-    };
-    installMobileLinks();
-    const menuObserver = new MutationObserver(installMobileLinks);
-    menuObserver.observe(document.body, { childList: true, subtree: true });
-    cleanups.push(() => menuObserver.disconnect());
-
     const headerCta = document.querySelector<HTMLAnchorElement>(".header-cta");
     const headerText = headerCta?.querySelector("span");
     if (headerCta) headerCta.href = "/analise-gratuita";
@@ -64,12 +38,16 @@ export default function CommercialGrowthRuntime() {
       heroLinks[1].textContent = "Conhecer a Máquina de Clientes";
     }
 
-    const mobileCta = document.querySelector<HTMLAnchorElement>(".mobile-menu-cta");
-    if (mobileCta) {
+    const installMobileCta = () => {
+      const mobileCta = document.querySelector<HTMLAnchorElement>(".mobile-menu-cta");
+      if (!mobileCta) return;
       mobileCta.href = "/analise-gratuita";
       const textNode = Array.from(mobileCta.childNodes).find((item) => item.nodeType === Node.TEXT_NODE);
       if (textNode) textNode.textContent = "Solicitar análise ";
-    }
+    };
+    installMobileCta();
+    const menuObserver = new MutationObserver(installMobileCta);
+    menuObserver.observe(document.body, { childList: true, subtree: true });
 
     const diagnostic = document.querySelector<HTMLElement>("section.diagnostic");
     const diagnosticTitle = diagnostic?.querySelector<HTMLElement>("h2");
@@ -100,10 +78,18 @@ export default function CommercialGrowthRuntime() {
     }
 
     return () => {
-      cleanups.forEach((cleanup) => cleanup());
+      menuObserver.disconnect();
       node?.remove();
     };
   }, []);
 
-  return mountNode ? createPortal(<CommercialHome />, mountNode) : null;
+  return mountNode
+    ? createPortal(
+        <>
+          <CommercialHome />
+          <PortfolioPreview />
+        </>,
+        mountNode,
+      )
+    : null;
 }
