@@ -1,157 +1,160 @@
 import type { Metadata } from "next";
-import { ArrowRight, BarChart3, Bot, Check, Globe2, ShoppingBag } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Megaphone,
+  MousePointerClick,
+  Settings2,
+  ShoppingBag,
+} from "lucide-react";
 import { CommercialPage } from "../components/commercial-shell";
 import styles from "../client-pages.module.css";
-import { serviceOrder, services, type ServiceSlug } from "./service-data";
 
 export const metadata: Metadata = {
-  title: "Serviços de marketing — estratégia, presença, aquisição e vendas",
+  title: "Serviços — marketing, conversão e marketplaces",
   description:
-    "Conheça as frentes da NED Marketing para posicionamento, presença digital, tráfego, conversão, automação de apoio e marketplaces.",
+    "Conheça as três frentes da NED Marketing: marketing e conteúdo, conversão e aquisição, e marketplaces. Escopo e investimento definidos após análise.",
   alternates: { canonical: "/servicos" },
 };
 
-const icons = {
-  sites: Globe2,
-  automacoes: Bot,
-  "trafego-pago": BarChart3,
-  marketplaces: ShoppingBag,
-} satisfies Record<ServiceSlug, typeof Globe2>;
-
-const paths = [
+const pillars = [
   {
-    label: "MARCA E PRESENÇA",
-    title: "Preciso apresentar melhor meu negócio e gerar interesse.",
-    text: "Comece por posicionamento, mensagem, conteúdo e uma presença digital que facilite a decisão do público.",
+    icon: Megaphone,
+    number: "01",
+    eyebrow: "MARKETING E CONTEÚDO",
+    title: "Apresentar melhor a marca e criar comunicação com função.",
+    description:
+      "Para empresas que precisam organizar posicionamento, mensagem, campanhas e presença nas redes sem depender de postagem aleatória.",
+    deliveries: [
+      "Posicionamento e proposta de valor",
+      "Campanhas e direção criativa",
+      "Criativos, copy e calendário",
+      "Feed, Stories, carrosséis e peças comerciais",
+    ],
+    href: "/servicos/marketing-conteudo",
+  },
+  {
+    icon: MousePointerClick,
+    number: "02",
+    eyebrow: "CONVERSÃO E AQUISIÇÃO",
+    title: "Transformar atenção em contato e próximo passo claro.",
+    description:
+      "Para empresas que já têm uma oferta, mas precisam melhorar páginas, campanhas, rastreamento ou a jornada até o WhatsApp.",
+    deliveries: [
+      "Sites e landing pages",
+      "Meta Ads e Google Ads",
+      "Oferta, CTA e jornada de conversão",
+      "Métricas, testes e otimização",
+    ],
     href: "/servicos/sites",
+    secondHref: "/servicos/trafego-pago",
   },
   {
-    label: "AQUISIÇÃO E CAMPANHAS",
-    title: "Já tenho uma oferta e quero alcançar mais pessoas.",
-    text: "Campanhas e tráfego fazem mais sentido quando criativo, página, rastreamento e atendimento trabalham na mesma direção.",
-    href: "/servicos/trafego-pago",
-  },
-  {
-    label: "VENDAS E MARKETPLACES",
-    title: "Quero melhorar minha presença nos canais de venda.",
-    text: "Catálogo, anúncios, criativos, reputação e operação precisam sustentar a comunicação e o desempenho da marca.",
+    icon: ShoppingBag,
+    number: "03",
+    eyebrow: "MARKETPLACES",
+    title: "Fortalecer comunicação, catálogo e rotina nos canais de venda.",
+    description:
+      "Para operações que vendem em Mercado Livre, Shopee, Amazon ou TikTok Shop e precisam de mais consistência na apresentação e execução.",
+    deliveries: [
+      "Catálogo e estrutura de anúncios",
+      "Criativos e campanhas",
+      "Reputação e experiência de compra",
+      "Acompanhamento de oportunidades",
+    ],
     href: "/servicos/marketplaces",
-  },
-  {
-    label: "ATENDIMENTO E EFICIÊNCIA",
-    title: "Meu marketing gera trabalho, mas o processo perde oportunidades.",
-    text: "Automações entram como apoio para organizar contatos, informações e tarefas — sem substituir estratégia ou atendimento humano.",
-    href: "/servicos/automacoes",
   },
 ];
 
 export default function ServicesPage() {
   return (
     <CommercialPage>
-      <section className={styles.hero}>
+      <section className={`${styles.hero} ${styles.heroCompact}`}>
         <div>
           <span className={styles.eyebrow}>SERVIÇOS / NED MARKETING</span>
-          <h1>
-            Escolha pelo <span>objetivo.</span>
-          </h1>
+          <h1>Comece pelo problema. <span>Não pela ferramenta.</span></h1>
           <p className={styles.heroLead}>
-            Você não precisa chegar com um escopo técnico pronto. Comece pelo que sua marca precisa conquistar e veja como cada frente de marketing pode contribuir.
+            A NED organiza a oferta pública em três frentes para facilitar a escolha. O projeto pode começar em uma delas ou combinar entregas depois da análise do negócio.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.primaryButton} href="#servicos">
-              Explorar serviços <ArrowRight size={17} />
-            </a>
-            <a className={styles.secondaryButton} href="/analise-gratuita">
-              Quero uma recomendação
-            </a>
+            <a className={styles.primaryButton} href="#frentes">Ver as três frentes <ArrowRight size={17} /></a>
+            <a className={styles.secondaryButton} href="/analise-gratuita">Solicitar análise</a>
           </div>
         </div>
 
-        <aside className={styles.heroPanel} aria-label="Mapa dos serviços NED">
-          <span className={styles.panelLabel}>MAPA DE MARKETING / 04 FRENTES</span>
+        <aside className={styles.heroPanel} aria-label="Resumo das frentes de marketing">
+          <span className={styles.panelLabel}>OFERTA NED / 03 FRENTES</span>
           <div className={styles.panelStack}>
-            {serviceOrder.map((slug) => (
-              <div className={styles.panelItem} key={slug}>
-                <span>{services[slug].number}</span>
-                <strong>{services[slug].shortName}</strong>
-                <small>{services[slug].heroPoints[0]}</small>
+            {pillars.map((pillar) => (
+              <div className={styles.panelItem} key={pillar.number}>
+                <span>{pillar.number}</span><strong>{pillar.eyebrow}</strong><small>{pillar.deliveries[0]}</small>
               </div>
             ))}
           </div>
         </aside>
       </section>
 
-      <section className={styles.pageSection} id="servicos">
+      <section className={styles.pageSection} id="frentes">
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.eyebrow}>VISÃO GERAL</span>
-            <h2 className={styles.sectionTitle}>
-              Quatro frentes. <span>Uma estratégia coerente.</span>
-            </h2>
+            <span className={styles.eyebrow}>ENTREGAS CONCRETAS</span>
+            <h2 className={styles.sectionTitle}>O que pode entrar <span>no projeto.</span></h2>
           </div>
-          <p>
-            Cada página detalha problemas atendidos, entregáveis, processo, público indicado e dúvidas frequentes. Uma frente pode ser contratada isoladamente ou combinada com outras após a análise.
-          </p>
+          <p>As listas abaixo mostram entregas possíveis, não pacotes fechados. O escopo final depende do objetivo, dos ativos existentes, do prazo e da capacidade de execução da empresa.</p>
         </div>
 
         <div className={styles.serviceGrid}>
-          {serviceOrder.map((slug) => {
-            const service = services[slug];
-            const Icon = icons[slug];
-            return (
-              <article className={styles.serviceCard} key={slug}>
-                <div className={styles.cardTop}>
-                  <span className={styles.cardIcon}><Icon size={23} /></span>
-                  <span className={styles.cardNumber}>{service.number}</span>
-                </div>
-                <h2>{service.eyebrow}</h2>
-                <div>
-                  <p>{service.description}</p>
-                  <ul className={styles.problemList}>
-                    {service.heroPoints.map((point) => (
-                      <li key={point}><Check size={14} /> {point}</li>
-                    ))}
-                  </ul>
-                </div>
-                <a className={styles.cardLink} href={`/servicos/${slug}`}>
-                  Ver serviço completo <ArrowRight size={16} />
-                </a>
-              </article>
-            );
-          })}
+          {pillars.map(({ icon: Icon, number, eyebrow, title, description, deliveries, href, secondHref }) => (
+            <article className={styles.serviceCard} key={number}>
+              <div className={styles.cardTop}>
+                <span className={styles.cardIcon}><Icon size={23} /></span>
+                <span className={styles.cardNumber}>{number}</span>
+              </div>
+              <h2>{eyebrow}</h2>
+              <div>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <ul className={styles.problemList}>
+                  {deliveries.map((delivery) => <li key={delivery}><Check size={14} /> {delivery}</li>)}
+                </ul>
+              </div>
+              <div className={styles.heroActions}>
+                <a className={styles.cardLink} href={href}>Ver detalhes <ArrowRight size={16} /></a>
+                {secondHref && <a className={styles.textLink} href={secondHref}>Ver tráfego pago</a>}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className={styles.pageSectionDark}>
-        <div className={styles.sectionHead}>
-          <div>
-            <span className={styles.eyebrow}>ESCOLHA RÁPIDA</span>
-            <h2 className={styles.sectionTitle}>Qual objetivo parece mais com o seu momento?</h2>
+        <div className={styles.communication}>
+          <aside className={styles.communicationAside}>
+            <span className={styles.eyebrow}>TECNOLOGIA NOS BASTIDORES</span>
+            <h2>Automação não é a oferta principal.</h2>
+            <p>Ela entra quando ajuda a organizar contatos, reduzir tarefas repetitivas, registrar decisões ou diminuir oportunidades perdidas.</p>
+          </aside>
+          <div className={styles.communicationMain}>
+            <span className={styles.eyebrow}>APOIO À EXECUÇÃO</span>
+            <h2>Ferramenta só faz sentido quando resolve uma perda real.</h2>
+            <ul className={styles.checkList}>
+              <li><Settings2 size={15} /> CRM e organização de oportunidades.</li>
+              <li><Settings2 size={15} /> Respostas iniciais e triagem de contatos.</li>
+              <li><Settings2 size={15} /> Integrações entre formulário, atendimento e agenda.</li>
+              <li><Settings2 size={15} /> Inteligência artificial supervisionada para rascunhos e análise.</li>
+            </ul>
+            <a className={styles.textLink} href="/servicos/automacoes">Conhecer automações de apoio <ArrowRight size={15} /></a>
           </div>
-          <p>Os caminhos abaixo são uma orientação inicial. A recomendação final e o investimento dependem do objetivo, do momento, dos ativos existentes e da prioridade da empresa.</p>
-        </div>
-
-        <div className={styles.decisionGrid}>
-          {paths.map((item) => (
-            <article className={styles.decisionCard} key={item.label}>
-              <span>{item.label}</span>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-              <a className={styles.textLink} href={item.href}>Ver caminho <ArrowRight size={15} /></a>
-            </article>
-          ))}
         </div>
       </section>
 
       <section className={styles.pageSectionSoft}>
         <div className={styles.ctaBand}>
           <div>
-            <h2>Prefere mostrar o negócio em vez de escolher um serviço?</h2>
-            <p>Envie seu site, Instagram ou marketplace. A NED analisa comunicação, posicionamento, jornada e oportunidades antes de sugerir uma direção.</p>
+            <h2>Não sabe qual frente precisa vir primeiro?</h2>
+            <p>Envie o site, Instagram ou marketplace. A NED organiza o cenário e recomenda uma prioridade antes de discutir investimento.</p>
           </div>
-          <a className={styles.secondaryButton} href="/analise-gratuita">
-            Solicitar análise <ArrowRight size={16} />
-          </a>
+          <a className={styles.secondaryButton} href="/analise-gratuita">Solicitar análise <ArrowRight size={16} /></a>
         </div>
       </section>
     </CommercialPage>
