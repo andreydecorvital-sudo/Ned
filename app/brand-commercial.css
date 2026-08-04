@@ -6,9 +6,7 @@
   color: var(--ned-accent);
 }
 
-[data-ned-brand="institutional"] h1 span,
-[data-ned-brand="institutional"] h2 span,
-[data-ned-brand="institutional"] h2 em {
+:where([data-ned-brand="institutional"]) :where(h1 span, h2 span, h2 em) {
   color: var(--ned-accent);
 }
 
