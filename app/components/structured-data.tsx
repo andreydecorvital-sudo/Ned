@@ -8,19 +8,18 @@ export default function StructuredData() {
     url: siteUrl,
     telephone: "+55 11 91781-4612",
     description:
-      "Agência de marketing para estratégia, posicionamento, conteúdo, presença digital, tráfego pago, conversão e marketplaces.",
+      "Estrutura de marketing para posicionamento, conteúdo, campanhas, conversão, tráfego pago e marketplaces.",
     areaServed: {
       "@type": "Country",
       name: "Brasil",
     },
     serviceType: [
-      "Estratégia de marketing",
-      "Posicionamento de marca",
-      "Conteúdo e direção criativa",
+      "Estratégia e posicionamento de marca",
+      "Marketing de conteúdo e direção criativa",
+      "Campanhas e criativos publicitários",
       "Sites e landing pages",
       "Gestão de tráfego pago",
       "Marketing para marketplaces",
-      "Mensuração e otimização",
     ],
   };
 

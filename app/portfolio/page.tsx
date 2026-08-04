@@ -1,197 +1,152 @@
 import type { Metadata } from "next";
-import { ArrowRight, Check, Gauge, Gamepad2, Megaphone, PanelsTopLeft, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Check, Gauge, Gamepad2, Layers3 } from "lucide-react";
 import { CommercialPage } from "../components/commercial-shell";
 import styles from "../client-pages.module.css";
 
 export const metadata: Metadata = {
-  title: "Portfólio de marketing — estratégia, criação e experiências NED",
+  title: "Trabalhos — estudos de caso e experiências NED",
   description:
-    "Conheça projetos próprios e experiências da NED Marketing que demonstram posicionamento, direção criativa, conteúdo, conversão e mensuração.",
+    "Veja estudos de caso de projetos próprios da NED Marketing, com contexto, decisões, entregas e limites apresentados sem métricas fictícias.",
   alternates: { canonical: "/portfolio" },
 };
 
-const projects = [
+const cases = [
   {
-    type: "ESTRATÉGIA DE MARKETING / FEATURED",
-    title: "Estratégia de Crescimento NED",
-    description:
-      "Uma proposta de marketing integrado que organiza diagnóstico, posicionamento, criação, presença digital, aquisição e acompanhamento em uma direção única.",
-    href: "/maquina-de-clientes",
-    cta: "Explorar estratégia",
-    tags: ["Posicionamento", "Campanhas", "Conversão", "Jornada"],
-    facts: ["Marketing organizado por objetivo", "Escopo definido após análise", "Estratégia conectada à execução"],
-    icon: TrendingUp,
-    featured: true,
-  },
-  {
+    id: "ned-score",
+    icon: Gauge,
     type: "DIAGNÓSTICO INTERATIVO",
     title: "NED Score",
-    description:
-      "Experiência de oito etapas que transforma respostas em uma leitura inicial sobre oferta, posicionamento, presença, aquisição, atendimento e consistência.",
+    summary:
+      "Uma experiência que transforma perguntas de marketing em uma leitura inicial sobre oferta, posicionamento, presença, aquisição e atendimento.",
+    context:
+      "Muitas empresas sabem que o marketing está fraco, mas não conseguem identificar se o problema principal está na oferta, na mensagem, na aquisição ou no atendimento.",
+    decision:
+      "Criar um diagnóstico curto e compreensível, sem usar uma auditoria genérica como isca. A experiência precisava orientar a conversa e registrar contexto útil.",
+    deliveries: [
+      "Fluxo de oito perguntas",
+      "Pontuação de 0 a 100",
+      "Leitura por áreas de marketing",
+      "Recomendações iniciais",
+      "Integração com captação de oportunidades",
+    ],
+    evidence: "A experiência é pública e pode ser testada diretamente no site.",
+    tags: ["Estratégia", "Diagnóstico", "Conversão", "Experiência"],
     href: "/ned-score",
     cta: "Testar NED Score",
-    tags: ["Diagnóstico", "Experiência", "Conteúdo", "Qualificação"],
-    facts: ["Pontuação de 0 a 100", "Leitura personalizada", "Próximos pontos de atenção"],
-    icon: Gauge,
   },
   {
+    id: "maquina-quebrada",
+    icon: Gamepad2,
     type: "CONTEÚDO INTERATIVO / NED LAB",
     title: "A Máquina Quebrada",
-    description:
-      "Narrativa gamificada sobre oferta, atendimento e operação. O resultado muda conforme as decisões e pode ser compartilhado em formato vertical.",
+    summary:
+      "Uma narrativa gamificada sobre oferta, atendimento e operação, construída para gerar participação em vez de apenas consumo passivo.",
+    context:
+      "Problemas de negócio costumam virar conteúdo abstrato ou listas repetidas. A proposta era falar sobre falhas reais de marketing de uma forma mais memorável.",
+    decision:
+      "Usar escolhas e consequências para fazer o visitante perceber como decisões diferentes alteram o resultado da empresa.",
+    deliveries: [
+      "Narrativa com três desafios",
+      "Escolhas e resultados dinâmicos",
+      "Direção visual própria",
+      "Resultado compartilhável",
+      "Experiência responsiva",
+    ],
+    evidence: "O projeto está disponível publicamente no NED LAB.",
+    tags: ["Storytelling", "Gamificação", "Conteúdo", "Compartilhamento"],
     href: "/lab/maquina-quebrada",
-    cta: "Jogar experiência",
-    tags: ["Gamificação", "Storytelling", "Conteúdo", "Compartilhamento"],
-    facts: ["Três desafios de negócio", "Resultado dinâmico", "Formato pensado para redes sociais"],
-    icon: Gamepad2,
+    cta: "Abrir experiência",
   },
   {
-    type: "BASTIDOR COMERCIAL",
-    title: "Organização de oportunidades NED",
-    description:
-      "Estrutura interna criada para acompanhar contatos, origem, prioridade e próximos passos. Ela demonstra como a tecnologia pode apoiar o marketing sem ocupar o lugar da estratégia.",
+    id: "growth-studio",
+    icon: Layers3,
+    type: "MÉTODO E PRODUÇÃO INTERNA",
+    title: "NED Growth Studio",
+    summary:
+      "Uma ferramenta interna para planejar, estruturar, revisar e levar conteúdo até o Estúdio sem depender cegamente de inteligência artificial.",
+    context:
+      "Geradores automáticos produzem volume, mas frequentemente entregam textos genéricos, CTAs fracos e peças sem relação suficiente com a marca.",
+    decision:
+      "Colocar briefing, formato, direção, avaliação e aprovação humana antes da execução. A IA gratuita permanece opcional e subordinada ao método.",
+    deliveries: [
+      "Briefing por objetivo e formato",
+      "Estruturas para Feed, Stories e carrosséis",
+      "Avaliação de clareza, relevância e conversão",
+      "Edição e aprovação humana obrigatória",
+      "Fluxo para rascunho e publicação",
+    ],
+    evidence: "A ferramenta é interna; o case mostra o raciocínio e as entregas sem expor dados administrativos.",
+    tags: ["Conteúdo", "Método", "IA supervisionada", "Produção"],
     href: "/processo",
-    cta: "Entender o processo",
-    tags: ["Atendimento", "Follow-up", "Dados", "Experiência"],
-    facts: ["Visão do caminho comercial", "Histórico e prioridade", "Apoio à tomada de decisão"],
-    icon: Target,
-  },
-  {
-    type: "PLATAFORMA DE EXPERIÊNCIAS",
-    title: "NED LAB",
-    description:
-      "Área criada para publicar experimentos de comunicação, interação e conteúdo que demonstram ideias em funcionamento, não apenas em apresentações.",
-    href: "/lab",
-    cta: "Abrir NED LAB",
-    tags: ["Experimentos", "Interação", "Direção criativa", "Portfólio vivo"],
-    facts: ["Ambiente de testes públicos", "Experiências compartilháveis", "Base para novos formatos"],
-    icon: PanelsTopLeft,
+    cta: "Entender o método",
   },
 ];
-
-const capabilities = [
-  {
-    icon: Target,
-    title: "Estratégia e posicionamento",
-    text: "Leitura do negócio, público, proposta de valor, mensagem e prioridades antes de decidir canais ou formatos.",
-  },
-  {
-    icon: Megaphone,
-    title: "Direção criativa e conteúdo",
-    text: "Conceitos, narrativas, peças e experiências que traduzem a estratégia em comunicação com personalidade e função.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Aquisição e conversão",
-    text: "Campanhas, páginas e jornadas pensadas para levar a mensagem até o público e facilitar o próximo passo.",
-  },
-  {
-    icon: Gauge,
-    title: "Mensuração e evolução",
-    text: "Origem, comportamento e qualidade das oportunidades usados para melhorar mensagens, criativos, páginas e campanhas.",
-  },
-];
-
-function ProjectVisual({ title, icon: Icon }: { title: string; icon: typeof Gauge }) {
-  return (
-    <div className={styles.projectVisual} aria-hidden="true">
-      <div className={styles.browserMock}>
-        <div className={styles.browserBar}><i /><i /><i /></div>
-        <div className={styles.browserBody}>
-          <div className={styles.browserRail}><span /><span /><span /><span /></div>
-          <div className={styles.browserCanvas}>
-            <Icon size={28} />
-            <strong>{title}</strong>
-            <span /><span />
-            <div className={styles.browserCards}><div /><div /><div /></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function PortfolioPage() {
   return (
     <CommercialPage>
       <section className={`${styles.hero} ${styles.heroCompact}`}>
         <div>
-          <span className={styles.eyebrow}>PORTFÓLIO / MARKETING EM PRÁTICA</span>
-          <h1>
-            Não inventamos resultado. <span>Mostramos raciocínio e execução.</span>
-          </h1>
+          <span className={styles.eyebrow}>TRABALHOS / NED MARKETING</span>
+          <h1>Menos vitrine vazia. <span>Mais contexto e decisão.</span></h1>
           <p className={styles.heroLead}>
-            Este portfólio reúne estratégias, experiências e ferramentas próprias. Cada projeto demonstra uma parte real da capacidade da NED: posicionamento, direção criativa, conteúdo, conversão, interação e mensuração.
+            Estes estudos de caso mostram o problema, o raciocínio e a entrega. Todos são projetos próprios da NED. Trabalhos de clientes serão publicados somente com autorização.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.primaryButton} href="#projetos">Ver projetos <ArrowRight size={17} /></a>
-            <a className={styles.secondaryButton} href="/analise-gratuita">Trazer um desafio</a>
+            <a className={styles.primaryButton} href="#casos">Ver estudos de caso <ArrowRight size={17} /></a>
+            <a className={styles.secondaryButton} href="/analise-gratuita">Solicitar análise</a>
           </div>
         </div>
-
-        <aside className={styles.heroPanel} aria-label="Resumo do portfólio NED">
-          <span className={styles.panelLabel}>PORTFÓLIO VIVO / MARKETING EM MOVIMENTO</span>
+        <aside className={styles.heroPanel} aria-label="Critérios do portfólio NED">
+          <span className={styles.panelLabel}>COMO OS CASES SÃO APRESENTADOS</span>
           <div className={styles.panelStack}>
-            <div className={styles.panelItem}><span>01</span><strong>Estratégia</strong><small>Posicionamento e direção</small></div>
-            <div className={styles.panelItem}><span>02</span><strong>Criação</strong><small>Conteúdo e campanhas</small></div>
-            <div className={styles.panelItem}><span>03</span><strong>Experiência</strong><small>Interação e conversão</small></div>
-            <div className={styles.panelItem}><span>04</span><strong>Aprendizado</strong><small>Dados e otimização</small></div>
+            <div className={styles.panelItem}><span>01</span><strong>Contexto</strong><small>Qual problema precisava ser resolvido</small></div>
+            <div className={styles.panelItem}><span>02</span><strong>Decisão</strong><small>Por que o caminho foi escolhido</small></div>
+            <div className={styles.panelItem}><span>03</span><strong>Entrega</strong><small>O que foi realmente construído</small></div>
+            <div className={styles.panelItem}><span>04</span><strong>Evidência</strong><small>O que pode ser verificado</small></div>
           </div>
         </aside>
       </section>
 
-      <section className={styles.pageSectionDark} id="projetos">
+      <section className={styles.pageSectionDark} id="casos">
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.eyebrow}>PROJETOS SELECIONADOS</span>
-            <h2 className={styles.sectionTitle}>Ideias que você pode <span>abrir e experimentar.</span></h2>
+            <span className={styles.eyebrow}>ESTUDOS DE CASO</span>
+            <h2 className={styles.sectionTitle}>Três projetos. <span>Três problemas diferentes.</span></h2>
           </div>
-          <p>Os projetos públicos possuem links diretos. Ferramentas internas são apresentadas sem expor dados, senhas ou informações comerciais.</p>
+          <p>Os cases não usam clientes fictícios, depoimentos inventados ou números que não podem ser comprovados.</p>
         </div>
 
         <div className={styles.portfolioNotice}>
-          Estes trabalhos são projetos próprios e demonstrações da NED. Eles não são apresentados como resultados de clientes e não usam métricas comerciais fictícias.
+          Projetos próprios demonstram capacidade de estratégia e execução, mas não substituem cases de clientes. Essa diferença é apresentada de forma explícita.
         </div>
 
         <div className={styles.projectGrid} style={{ marginTop: 18 }}>
-          {projects.map(({ type, title, description, href, cta, tags, facts, icon: Icon, featured }) => (
-            <article className={`${styles.projectCard}${featured ? ` ${styles.projectCardFeatured}` : ""}`} key={title}>
+          {cases.map(({ id, icon: Icon, type, title, summary, context, decision, deliveries, evidence, tags, href, cta }) => (
+            <article className={styles.projectCard} key={id} id={id}>
               <div className={styles.projectContent}>
                 <div className={styles.projectTop}>
                   <span className={styles.projectType}>{type}</span>
-                  <span className={styles.projectStatus}>CRIADO PELA NED</span>
+                  <span className={styles.projectStatus}>PROJETO PRÓPRIO</span>
                 </div>
+                <span className={styles.cardIcon}><Icon size={22} /></span>
                 <h2 className={styles.projectTitle}>{title}</h2>
-                <p className={styles.projectDescription}>{description}</p>
-                <ul className={styles.projectFacts}>
-                  {facts.map((fact) => <li key={fact}><Check size={14} /> {fact}</li>)}
-                </ul>
-                <div className={styles.tagRow}>
-                  {tags.map((tag) => <span className={styles.tag} key={tag}>{tag}</span>)}
+                <p className={styles.projectDescription}>{summary}</p>
+
+                <div className={styles.faqGrid}>
+                  <article className={styles.faqCard}><h3>Contexto</h3><p>{context}</p></article>
+                  <article className={styles.faqCard}><h3>Decisão</h3><p>{decision}</p></article>
                 </div>
+
+                <h3>Entregas</h3>
+                <ul className={styles.projectFacts}>
+                  {deliveries.map((delivery) => <li key={delivery}><Check size={14} /> {delivery}</li>)}
+                </ul>
+
+                <div className={styles.portfolioNotice}>{evidence}</div>
+                <div className={styles.tagRow}>{tags.map((tag) => <span className={styles.tag} key={tag}>{tag}</span>)}</div>
                 <a className={styles.textLink} href={href}>{cta} <ArrowRight size={15} /></a>
               </div>
-              <ProjectVisual title={title} icon={Icon} />
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.pageSection}>
-        <div className={styles.sectionHead}>
-          <div>
-            <span className={styles.eyebrow}>O QUE O PORTFÓLIO COMPROVA</span>
-            <h2 className={styles.sectionTitle}>Marketing pensado em <span>várias camadas.</span></h2>
-          </div>
-          <p>Um bom portfólio não precisa mostrar apenas a peça final. Ele também precisa deixar claro o problema, a ideia, a experiência criada e o tipo de decisão que o trabalho ajuda a melhorar.</p>
-        </div>
-
-        <div className={styles.valueGrid}>
-          {capabilities.map(({ icon: Icon, title, text }) => (
-            <article className={styles.valueCard} key={title}>
-              <span className={styles.cardIcon}><Icon size={22} /></span>
-              <h3>{title}</h3>
-              <p>{text}</p>
             </article>
           ))}
         </div>
@@ -200,8 +155,8 @@ export default function PortfolioPage() {
       <section className={styles.pageSectionSoft}>
         <div className={styles.ctaBand}>
           <div>
-            <h2>Seu projeto pode ser o próximo trabalho bem direcionado.</h2>
-            <p>Envie o contexto atual. A NED analisa primeiro a marca, o objetivo e o público; depois define quais ações de marketing fazem sentido e qual investimento será necessário.</p>
+            <h2>Seu projeto não precisa começar com uma solução pronta.</h2>
+            <p>Mostre o cenário atual. A NED identifica a prioridade antes de recomendar conteúdo, campanha, página, mídia ou marketplace.</p>
           </div>
           <a className={styles.secondaryButton} href="/analise-gratuita">Solicitar análise <ArrowRight size={16} /></a>
         </div>

@@ -3,9 +3,7 @@ import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import Analytics from "./components/analytics";
 import ClientNavigation from "./components/client-navigation";
 import DiagnosticPopup from "./components/diagnostic-popup";
-import LabLauncher from "./components/lab-launcher";
 import LegalFooter from "./components/legal-footer";
-import ServiceCardLinks from "./components/service-card-links";
 import SiteRuntime from "./components/site-runtime";
 import StructuredData from "./components/structured-data";
 import "./globals.css";
@@ -30,11 +28,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Ned Marketing — Estratégia, criação, tráfego e crescimento",
+    default: "Ned Marketing — marketing, conteúdo, conversão e marketplaces",
     template: "%s | Ned Marketing",
   },
   description:
-    "Agência de marketing para posicionamento, conteúdo, presença digital, tráfego pago, conversão e marketplaces. Projetos e investimentos definidos após análise.",
+    "Marketing para empresas que precisam apresentar melhor sua marca, gerar oportunidades e vender com mais direção. Escopo e investimento definidos após análise.",
   applicationName: "Ned Marketing",
   authors: [{ name: "Ned Marketing" }],
   creator: "Ned Marketing",
@@ -42,33 +40,31 @@ export const metadata: Metadata = {
   keywords: [
     "agência de marketing",
     "estratégia de marketing",
+    "marketing de conteúdo",
     "posicionamento de marca",
-    "conteúdo e criativos",
+    "campanhas publicitárias",
     "criação de sites",
     "landing pages",
     "tráfego pago",
     "marketplaces",
     "Mercado Livre",
     "Shopee",
-    "marketing digital",
   ],
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "pt_BR",
     url: siteUrl,
     siteName: "Ned Marketing",
-    title: "Ned Marketing — Marketing para ser encontrado, escolhido e lembrado",
+    title: "Ned Marketing — direção para sua marca ser escolhida",
     description:
-      "Estratégia, criação, presença digital, mídia e conversão para empresas que querem crescer com mais direção.",
+      "Marketing, conteúdo, conversão e marketplaces para empresas que querem transformar interesse em oportunidades.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ned Marketing — Estratégia, criação e crescimento",
+    title: "Ned Marketing — marketing com direção",
     description:
-      "Marketing integrado para posicionar marcas, criar demanda e transformar atenção em oportunidades.",
+      "Posicionamento, conteúdo, páginas, campanhas e marketplaces organizados conforme o problema real da empresa.",
   },
   robots: {
     index: true,
@@ -99,12 +95,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${bebasNeue.variable} ${spaceGrotesk.variable}`}>
         <StructuredData />
         <SiteRuntime />
-        <ServiceCardLinks />
         <ClientNavigation />
         {children}
         <LegalFooter />
         <DiagnosticPopup />
-        <LabLauncher />
         <Analytics />
       </body>
     </html>
