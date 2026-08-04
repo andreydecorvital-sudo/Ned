@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { isInstagramPublishingConfigured } from "@/lib/instagram-publisher";
+import {
+  isInstagramAudioConfigured,
+  isInstagramPublishingConfigured,
+} from "@/lib/instagram-publisher";
 import { isSocialSchedulerConfigured, scheduleSocialDelivery } from "@/lib/qstash-social";
 import {
   createSocialPost,
@@ -9,8 +12,10 @@ import {
   updateSocialPost,
 } from "@/lib/social-store";
 import {
+  isSocialAudioType,
   isSocialFormat,
   type CreateSocialPostInput,
+  type SocialAudioSelection,
   type SocialMediaAsset,
 } from "@/lib/social-types";
 
@@ -27,6 +32,56 @@ function isMediaAsset(value: unknown): value is SocialMediaAsset {
     typeof asset.size === "number" &&
     Number.isFinite(asset.size)
   );
+}
+
+function boundedVolume(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.min(100, Math.round(value)))
+    : fallback;
+}
+
+function audioSelection(value: unknown): SocialAudioSelection | null | undefined {
+  if (value === null || value === undefined) return null;
+  if (!value || typeof value !== "object") return undefined;
+  const audio = value as Record<string, unknown>;
+  if (typeof audio.id !== "string" || !audio.id.trim() || !isSocialAudioType(audio.type)) {
+    return undefined;
+  }
+  return {
+    id: audio.id.trim().slice(0, 120),
+    title:
+      typeof audio.title === "string"
+        ? audio.title.trim().slice(0, 200)
+        : "Áudio do Instagram",
+    artist: typeof audio.artist === "string" ? audio.artist.trim().slice(0, 160) : "",
+    type: audio.type,
+    thumbnailUrl:
+      typeof audio.thumbnailUrl === "string" && audio.thumbnailUrl.startsWith("https://")
+        ? audio.thumbnailUrl.slice(0, 1500)
+        : "",
+    previewUrl:
+      typeof audio.previewUrl === "string" && audio.previewUrl.startsWith("https://")
+        ? audio.previewUrl.slice(0, 1500)
+        : "",
+    musicVolume: boundedVolume(audio.musicVolume, 80),
+    originalAudioVolume: boundedVolume(audio.originalAudioVolume, 35),
+  };
+}
+
+function collaborators(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(
+    value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim().replace(/^@/, ""))
+      .filter((item) => /^[A-Za-z0-9._]{1,30}$/.test(item)),
+  )].slice(0, 3);
+}
+
+function safeUrl(value: unknown) {
+  return typeof value === "string" && value.startsWith("https://")
+    ? value.slice(0, 1500)
+    : "";
 }
 
 function validateInput(value: unknown): { input?: CreateSocialPostInput; error?: string } {
@@ -49,15 +104,24 @@ function validateInput(value: unknown): { input?: CreateSocialPostInput; error?:
     return { error: "Reel precisa de um arquivo de vídeo." };
   }
 
+  const audio = audioSelection(body.audio);
+  if (audio === undefined) return { error: "Áudio selecionado inválido." };
+  if (audio && body.format !== "reel") {
+    return {
+      error: "A música da biblioteca do Instagram só pode ser anexada automaticamente a Reels.",
+    };
+  }
+
   const caption = typeof body.caption === "string" ? body.caption.trim().slice(0, 2200) : "";
   const accountName =
     typeof body.accountName === "string" && body.accountName.trim()
       ? body.accountName.trim().slice(0, 120)
       : "NED Marketing";
   const status = body.status === "scheduled" ? "scheduled" : "draft";
-  const scheduledAt = typeof body.scheduledAt === "string" && body.scheduledAt
-    ? new Date(body.scheduledAt)
-    : null;
+  const scheduledAt =
+    typeof body.scheduledAt === "string" && body.scheduledAt
+      ? new Date(body.scheduledAt)
+      : null;
 
   if (status === "scheduled") {
     if (!scheduledAt || Number.isNaN(scheduledAt.getTime())) {
@@ -77,6 +141,18 @@ function validateInput(value: unknown): { input?: CreateSocialPostInput; error?:
       scheduledAt: scheduledAt?.toISOString() ?? null,
       status,
       shareToFeed: body.shareToFeed !== false,
+      audio,
+      audioName: typeof body.audioName === "string" ? body.audioName.trim().slice(0, 120) : "",
+      coverUrl: safeUrl(body.coverUrl),
+      collaborators: collaborators(body.collaborators),
+      firstComment:
+        typeof body.firstComment === "string" ? body.firstComment.trim().slice(0, 2200) : "",
+      locationId:
+        typeof body.locationId === "string"
+          ? body.locationId.trim().replace(/\D/g, "").slice(0, 40)
+          : "",
+      altText: typeof body.altText === "string" ? body.altText.trim().slice(0, 1000) : "",
+      isAiGenerated: body.isAiGenerated === true,
     },
   };
 }
@@ -94,6 +170,7 @@ export async function GET() {
       database: databaseConfigured,
       blob: Boolean((process.env.BLOB_READ_WRITE_TOKEN ?? "").trim()),
       instagram: isInstagramPublishingConfigured(),
+      audio: isInstagramAudioConfigured(),
       scheduler: isSocialSchedulerConfigured(),
     },
   });
