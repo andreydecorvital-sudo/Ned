@@ -31,24 +31,26 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Ned Marketing — Sites, automações, tráfego e marketplaces",
+    default: "Ned Marketing — Estratégia, criação, tráfego e crescimento",
     template: "%s | Ned Marketing",
   },
   description:
-    "Sites, landing pages, automações, tráfego e operação de marketplaces para empresas que querem crescer com estratégia e estrutura.",
+    "Agência de marketing para posicionamento, conteúdo, presença digital, tráfego pago, conversão e marketplaces. Projetos e investimentos definidos após análise.",
   applicationName: "Ned Marketing",
   authors: [{ name: "Ned Marketing" }],
   creator: "Ned Marketing",
   publisher: "Ned Marketing",
   keywords: [
+    "agência de marketing",
+    "estratégia de marketing",
+    "posicionamento de marca",
+    "conteúdo e criativos",
     "criação de sites",
     "landing pages",
-    "automação empresarial",
     "tráfego pago",
     "marketplaces",
     "Mercado Livre",
     "Shopee",
-    "TikTok Shop",
     "marketing digital",
   ],
   alternates: {
@@ -59,15 +61,15 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: siteUrl,
     siteName: "Ned Marketing",
-    title: "Ned Marketing — Construímos sistemas que vendem",
+    title: "Ned Marketing — Marketing para ser encontrado, escolhido e lembrado",
     description:
-      "Sites, automações, tráfego e marketplaces para empresas que querem crescer com estrutura.",
+      "Estratégia, criação, presença digital, mídia e conversão para empresas que querem crescer com mais direção.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ned Marketing — Construímos sistemas que vendem",
+    title: "Ned Marketing — Estratégia, criação e crescimento",
     description:
-      "Sites, automações, tráfego e marketplaces para empresas que querem crescer com estrutura.",
+      "Marketing integrado para posicionar marcas, criar demanda e transformar atenção em oportunidades.",
   },
   robots: {
     index: true,
@@ -80,7 +82,7 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  category: "Marketing e tecnologia",
+  category: "Marketing e publicidade",
 };
 
 export const viewport: Viewport = {

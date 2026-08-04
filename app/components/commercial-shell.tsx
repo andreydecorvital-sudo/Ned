@@ -27,7 +27,7 @@ export function CommercialFooter() {
     <footer className={styles.footer}>
       <div>
         <span>© {new Date().getFullYear()} NED Marketing</span>
-        <span>Estrutura digital, captação e operação comercial.</span>
+        <span>Estratégia, criação, aquisição e crescimento.</span>
       </div>
       <nav aria-label="Links do rodapé">
         <a href="/servicos">Serviços</a>
