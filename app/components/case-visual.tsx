@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import styles from "./case-visual.module.css";
 
 type Variant = "score" | "machine" | "studio";
@@ -15,10 +16,10 @@ export default function CaseVisual({
         <span className={styles.label}>NED SCORE / DIAGNÓSTICO</span>
         <div className={styles.scoreRing}><strong>78</strong></div>
         <div className={styles.scoreBars} aria-hidden="true">
-          <span style={{ "--bar": "82%" } as React.CSSProperties} />
-          <span style={{ "--bar": "61%" } as React.CSSProperties} />
-          <span style={{ "--bar": "74%" } as React.CSSProperties} />
-          <span style={{ "--bar": "46%" } as React.CSSProperties} />
+          <span style={{ "--bar": "82%" } as CSSProperties} />
+          <span style={{ "--bar": "61%" } as CSSProperties} />
+          <span style={{ "--bar": "74%" } as CSSProperties} />
+          <span style={{ "--bar": "46%" } as CSSProperties} />
         </div>
       </div>
     );
