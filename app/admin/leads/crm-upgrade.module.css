@@ -57,9 +57,9 @@
 }
 
 .priorityPotential {
-  color: #d8cbff;
-  background: rgba(112, 64, 255, 0.12);
-  border: 1px solid rgba(112, 64, 255, 0.3);
+  color: #cfe5ff;
+  background: rgba(106, 168, 255, 0.1);
+  border: 1px solid rgba(106, 168, 255, 0.26);
 }
 
 .priorityNormal {
@@ -95,19 +95,19 @@
   justify-content: center;
   gap: 7px;
   padding: 0 11px;
-  color: #e9e2ff;
-  background: rgba(112, 64, 255, 0.12);
-  border: 1px solid rgba(112, 64, 255, 0.28);
+  color: var(--ned-black);
+  background: var(--ned-paper);
+  border: 1px solid var(--ned-paper);
   font-size: 10px;
   font-weight: 800;
 }
 
 .detailPage {
   min-height: 100svh;
-  color: #f7f5ef;
+  color: var(--ned-white);
   background:
-    radial-gradient(circle at 82% 8%, rgba(112, 64, 255, 0.18), transparent 28%),
-    #08080a;
+    radial-gradient(circle at 82% 8%, rgba(255, 255, 255, 0.065), transparent 28%),
+    var(--ned-black);
 }
 
 .detailHeader {
@@ -185,7 +185,7 @@
 
 .panelTitle {
   margin: 0 0 20px;
-  color: #a98fff;
+  color: #d2cfc8;
   font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.17em;
@@ -228,7 +228,7 @@
 .formGrid label {
   display: grid;
   gap: 7px;
-  color: #a98fff;
+  color: #d2cfc8;
   font-size: 8px;
   font-weight: 850;
   letter-spacing: 0.14em;
@@ -261,7 +261,7 @@
 .formGrid select:focus,
 .formGrid input:focus,
 .formGrid textarea:focus {
-  border-color: #7040ff;
+  border-color: var(--ned-paper);
 }
 
 .buttonRow {
@@ -287,8 +287,8 @@
 }
 
 .primary {
-  color: white;
-  background: #7040ff;
+  color: var(--ned-black);
+  background: var(--ned-paper);
 }
 
 .secondary {
@@ -311,7 +311,7 @@
 .timelineItem {
   position: relative;
   padding: 0 0 22px 25px;
-  border-left: 1px solid rgba(112, 64, 255, 0.32);
+  border-left: 1px solid rgba(255, 255, 255, 0.24);
 }
 
 .timelineItem::before {
@@ -321,7 +321,7 @@
   width: 9px;
   height: 9px;
   content: "";
-  background: #7040ff;
+  background: var(--ned-paper);
   border-radius: 50%;
   box-shadow: 0 0 0 5px #0e0e12;
 }
@@ -348,9 +348,9 @@
 .notice {
   margin-top: 14px;
   padding: 12px 14px;
-  color: #e7dbff;
-  background: rgba(112, 64, 255, 0.1);
-  border: 1px solid rgba(112, 64, 255, 0.24);
+  color: #dceaff;
+  background: rgba(106, 168, 255, 0.08);
+  border: 1px solid rgba(106, 168, 255, 0.2);
   font-size: 11px;
   line-height: 1.55;
 }

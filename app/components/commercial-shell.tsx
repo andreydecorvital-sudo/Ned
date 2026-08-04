@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, LockKeyhole, MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import CommercialMobileNav from "./commercial-mobile-nav";
 import NedBrandMark from "./ned-brand-mark";
@@ -38,13 +38,23 @@ export function CommercialFooter() {
           <span>Direção antes de ferramenta.</span>
         </div>
       </div>
-      <nav aria-label="Links do rodapé">
-        {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
-        <a href="/privacidade">Privacidade</a>
-        <a href="https://wa.me/5511917814612?text=Ol%C3%A1%2C%20Ned!%20Quero%20conversar%20sobre%20marketing%20para%20minha%20empresa." target="_blank" rel="noreferrer">
-          <MessageCircle size={12} /> WhatsApp
+      <div className={styles.footerLinks}>
+        <nav aria-label="Links do rodapé">
+          {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
+          <a href="/privacidade">Privacidade</a>
+          <a href="https://wa.me/5511917814612?text=Ol%C3%A1%2C%20Ned!%20Quero%20conversar%20sobre%20marketing%20para%20minha%20empresa." target="_blank" rel="noreferrer">
+            <MessageCircle size={12} /> WhatsApp
+          </a>
+        </nav>
+        <a
+          className={styles.internalLink}
+          href="/admin"
+          aria-label="Abrir painel administrativo e CRM"
+          title="Painel administrativo e CRM"
+        >
+          <LockKeyhole size={12} />
         </a>
-      </nav>
+      </div>
     </footer>
   );
 }

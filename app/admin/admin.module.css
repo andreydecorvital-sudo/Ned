@@ -1,10 +1,10 @@
 .page,
 .loginPage {
   min-height: 100svh;
-  color: #f7f5ef;
+  color: var(--ned-white);
   background:
-    radial-gradient(circle at 82% 8%, rgba(112, 64, 255, 0.2), transparent 30%),
-    #08080a;
+    radial-gradient(circle at 82% 8%, rgba(255, 255, 255, 0.075), transparent 30%),
+    var(--ned-black);
 }
 
 .loginPage {
@@ -36,7 +36,7 @@
 }
 
 .brand small {
-  color: #a98fff;
+  color: #d2cfc8;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -45,7 +45,7 @@
 .eyebrow {
   display: block;
   margin-top: 44px;
-  color: #a98fff;
+  color: #d2cfc8;
   font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.2em;
@@ -74,7 +74,7 @@
 }
 
 .form label {
-  color: #a98fff;
+  color: #d2cfc8;
   font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.17em;
@@ -91,8 +91,8 @@
 }
 
 .form input:focus {
-  border-color: #7040ff;
-  box-shadow: 0 0 0 3px rgba(112, 64, 255, 0.14);
+  border-color: var(--ned-paper);
+  box-shadow: 0 0 0 3px rgba(241, 238, 231, 0.1);
 }
 
 .primaryButton,
@@ -112,8 +112,8 @@
 }
 
 .primaryButton {
-  color: white;
-  background: #7040ff;
+  color: var(--ned-black);
+  background: var(--ned-paper);
 }
 
 .secondaryButton {
@@ -148,9 +148,9 @@
 }
 
 .warning {
-  color: #e7dbff;
-  background: rgba(112, 64, 255, 0.11);
-  border: 1px solid rgba(112, 64, 255, 0.28);
+  color: #ffe3ad;
+  background: rgba(255, 184, 82, 0.08);
+  border: 1px solid rgba(255, 184, 82, 0.22);
 }
 
 .dashboardHeader {
@@ -198,7 +198,7 @@
 }
 
 .intro h1 span {
-  color: #8f68ff;
+  color: var(--ned-paper);
 }
 
 .intro p {
@@ -274,7 +274,7 @@
 .toolbar select:focus,
 .statusSelect:focus,
 .notes:focus {
-  border-color: #7040ff;
+  border-color: var(--ned-paper);
 }
 
 .tableWrap {
@@ -346,9 +346,9 @@
 .urgencyBadge {
   display: inline-flex;
   padding: 7px 9px;
-  color: #cdbfff;
-  background: rgba(112, 64, 255, 0.1);
-  border: 1px solid rgba(112, 64, 255, 0.22);
+  color: #d7d4cd;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.13);
   font-size: 9px;
   font-weight: 800;
 }
@@ -396,7 +396,7 @@
 
 .actionLink:hover,
 .smallButton:hover {
-  border-color: #7040ff;
+  border-color: rgba(255, 255, 255, 0.42);
 }
 
 .empty,
