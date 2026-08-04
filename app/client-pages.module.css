@@ -1,0 +1,724 @@
+.pageSection,
+.pageSectionSoft,
+.pageSectionDark {
+  padding: clamp(72px, 9vw, 132px) max(22px, calc((100vw - 1280px) / 2));
+}
+
+.pageSection {
+  color: #121216;
+  background: #f2f0ea;
+}
+
+.pageSectionSoft {
+  color: #121216;
+  background: #e9e6de;
+}
+
+.pageSectionDark {
+  color: #f7f5ef;
+  background:
+    radial-gradient(circle at 82% 12%, rgba(112, 64, 255, 0.17), transparent 30%),
+    #08080a;
+}
+
+.hero {
+  min-height: min(820px, calc(100svh - 76px));
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+  align-items: center;
+  gap: clamp(42px, 7vw, 100px);
+  padding: clamp(76px, 10vw, 150px) max(22px, calc((100vw - 1280px) / 2));
+  color: #f7f5ef;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 78% 25%, rgba(112, 64, 255, 0.26), transparent 32%),
+    #08080a;
+  background-size: 64px 64px, 64px 64px, auto, auto;
+}
+
+.heroCompact {
+  min-height: 660px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #8d66ff;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero h1,
+.sectionTitle,
+.bigTitle,
+.projectTitle {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 920px;
+  margin: 20px 0 0;
+  font-size: clamp(5rem, 9vw, 9.2rem);
+  line-height: 0.83;
+}
+
+.hero h1 span,
+.sectionTitle span,
+.bigTitle span {
+  color: #8d66ff;
+}
+
+.heroLead {
+  max-width: 680px;
+  margin: 28px 0 0;
+  color: #aaa8b2;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.75;
+}
+
+.heroActions,
+.buttonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-top: 32px;
+}
+
+.primaryButton,
+.secondaryButton,
+.darkButton,
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.primaryButton {
+  color: white;
+  background: #7040ff;
+  border: 1px solid #7040ff;
+}
+
+.secondaryButton {
+  color: white;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.darkButton {
+  color: white;
+  background: #101014;
+  border: 1px solid #101014;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.darkButton:hover,
+.textLink:hover {
+  transform: translateY(-2px);
+}
+
+.heroPanel {
+  position: relative;
+  min-height: 440px;
+  padding: 28px;
+  overflow: hidden;
+  background: rgba(17, 17, 22, 0.87);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.heroPanel::before,
+.projectVisual::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(rgba(112, 64, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(112, 64, 255, 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, black, transparent 82%);
+}
+
+.panelLabel {
+  position: relative;
+  z-index: 1;
+  color: #a88cff;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+}
+
+.panelStack {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  margin-top: 74px;
+}
+
+.panelItem {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.panelItem span {
+  color: #8d66ff;
+  font-family: var(--font-display), sans-serif;
+  font-size: 24px;
+}
+
+.panelItem strong {
+  font-size: 12px;
+}
+
+.panelItem small {
+  color: #777580;
+  font-size: 9px;
+}
+
+.sectionHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.72fr);
+  align-items: end;
+  gap: 40px;
+  margin-bottom: clamp(38px, 5vw, 68px);
+}
+
+.sectionTitle,
+.bigTitle {
+  margin: 14px 0 0;
+  font-size: clamp(3.6rem, 6.5vw, 7rem);
+  line-height: 0.88;
+}
+
+.sectionHead > p,
+.sectionCopy {
+  margin: 0;
+  color: #68666e;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.pageSectionDark .sectionHead > p,
+.pageSectionDark .sectionCopy {
+  color: #aaa8b2;
+}
+
+.serviceGrid,
+.projectGrid,
+.valueGrid,
+.roleGrid,
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.serviceCard,
+.valueCard,
+.roleCard,
+.faqCard {
+  position: relative;
+  padding: 28px;
+  background: #faf8f2;
+  border: 1px solid rgba(18, 18, 22, 0.12);
+}
+
+.serviceCard {
+  display: grid;
+  min-height: 380px;
+  grid-template-rows: auto auto 1fr auto;
+  overflow: hidden;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.serviceCard:hover {
+  transform: translateY(-5px);
+  border-color: rgba(112, 64, 255, 0.5);
+  box-shadow: 0 24px 70px rgba(18, 18, 22, 0.1);
+}
+
+.cardTop,
+.projectTop,
+.stageTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.cardIcon,
+.stageIcon {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  color: #7040ff;
+  background: rgba(112, 64, 255, 0.08);
+  border: 1px solid rgba(112, 64, 255, 0.18);
+}
+
+.cardNumber,
+.stageNumber {
+  color: #7040ff;
+  font-family: var(--font-display), sans-serif;
+  font-size: 32px;
+}
+
+.serviceCard h2,
+.valueCard h3,
+.roleCard h3,
+.faqCard h3 {
+  margin: 32px 0 0;
+  color: #151419;
+  font-size: 25px;
+  line-height: 1.15;
+}
+
+.serviceCard > p,
+.valueCard p,
+.roleCard p,
+.faqCard p {
+  color: #6f6d75;
+  line-height: 1.7;
+}
+
+.problemList,
+.checkList,
+.stageOutputs,
+.projectFacts {
+  display: grid;
+  gap: 9px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.problemList li,
+.checkList li,
+.stageOutputs li,
+.projectFacts li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: #59575f;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.problemList svg,
+.checkList svg,
+.stageOutputs svg,
+.projectFacts svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #7040ff;
+}
+
+.cardLink,
+.textLink {
+  justify-self: start;
+  margin-top: 28px;
+  color: #7040ff;
+  padding: 0;
+  min-height: auto;
+}
+
+.decisionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.decisionCard {
+  min-height: 230px;
+  padding: 25px;
+  color: white;
+  background: #101014;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.decisionCard span {
+  color: #9d7cff;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+}
+
+.decisionCard h3 {
+  margin: 28px 0 0;
+  font-size: 24px;
+}
+
+.decisionCard p {
+  color: #96949e;
+  line-height: 1.65;
+}
+
+.stageList {
+  display: grid;
+  gap: 1px;
+  background: rgba(18, 18, 22, 0.11);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) minmax(260px, 0.62fr);
+  gap: 30px;
+  padding: 32px;
+  background: #f7f5ef;
+}
+
+.stageTitle h2 {
+  margin: 10px 0 0;
+  color: #151419;
+  font-size: 27px;
+}
+
+.stageCopy {
+  color: #6e6c74;
+  line-height: 1.75;
+}
+
+.stageOutputs {
+  margin-top: 0;
+}
+
+.communication {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+}
+
+.communicationAside,
+.communicationMain {
+  padding: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.communicationAside {
+  background: rgba(112, 64, 255, 0.12);
+}
+
+.communicationAside h2,
+.communicationMain h2 {
+  margin: 18px 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  font-weight: 400;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.communicationAside p,
+.communicationMain p {
+  color: #aaa8b2;
+  line-height: 1.7;
+}
+
+.projectGrid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.projectCard {
+  grid-column: span 6;
+  overflow: hidden;
+  color: white;
+  background: #101014;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.projectCardFeatured {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+}
+
+.projectContent {
+  padding: clamp(28px, 4vw, 48px);
+}
+
+.projectType,
+.projectStatus {
+  color: #9d7cff;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.projectStatus {
+  color: #8f8d98;
+}
+
+.projectTitle {
+  margin: 24px 0 0;
+  font-size: clamp(3rem, 5.5vw, 6.5rem);
+  line-height: 0.88;
+}
+
+.projectCard:not(.projectCardFeatured) .projectTitle {
+  font-size: clamp(2.8rem, 4vw, 4.7rem);
+}
+
+.projectDescription {
+  max-width: 680px;
+  color: #aaa8b2;
+  line-height: 1.75;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 22px;
+}
+
+.tag {
+  padding: 7px 9px;
+  color: #cfc4f5;
+  background: rgba(112, 64, 255, 0.1);
+  border: 1px solid rgba(112, 64, 255, 0.22);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.projectVisual {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 70% 28%, rgba(112, 64, 255, 0.32), transparent 34%),
+    #09090c;
+}
+
+.browserMock {
+  position: absolute;
+  inset: 11% 7%;
+  overflow: hidden;
+  background: #0e0e13;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  transform: rotate(-2deg);
+}
+
+.browserBar {
+  display: flex;
+  height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: #17171d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.browserBar i {
+  width: 7px;
+  height: 7px;
+  background: #55525d;
+  border-radius: 50%;
+}
+
+.browserBody {
+  display: grid;
+  grid-template-columns: 0.38fr 1fr;
+  min-height: 100%;
+}
+
+.browserRail {
+  padding: 18px 10px;
+  background: #0a0a0d;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.browserRail span,
+.browserCanvas span {
+  display: block;
+  height: 7px;
+  margin-bottom: 9px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.browserRail span:nth-child(2),
+.browserCanvas span:nth-child(2) {
+  width: 68%;
+}
+
+.browserCanvas {
+  padding: 24px;
+}
+
+.browserCanvas strong {
+  display: block;
+  color: #8d66ff;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.6rem, 5vw, 5.6rem);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+.browserCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.browserCards div {
+  min-height: 84px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.portfolioNotice {
+  padding: 22px;
+  color: #d8d4df;
+  background: rgba(112, 64, 255, 0.1);
+  border: 1px solid rgba(112, 64, 255, 0.24);
+  line-height: 1.7;
+}
+
+.ctaBand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px;
+  padding: clamp(36px, 5vw, 64px);
+  color: white;
+  background: #7040ff;
+}
+
+.ctaBand h2 {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(3.2rem, 6vw, 6.5rem);
+  font-weight: 400;
+  line-height: 0.88;
+  text-transform: uppercase;
+}
+
+.ctaBand p {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+}
+
+.ctaBand .secondaryButton {
+  min-width: 220px;
+  color: #151419;
+  background: white;
+  border-color: white;
+}
+
+@media (max-width: 980px) {
+  .hero,
+  .sectionHead,
+  .communication,
+  .projectCardFeatured {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .heroPanel {
+    min-height: 360px;
+  }
+
+  .decisionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stage {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .stageOutputs {
+    grid-column: 2;
+  }
+
+  .projectCard,
+  .projectCardFeatured {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 700px) {
+  .pageSection,
+  .pageSectionSoft,
+  .pageSectionDark,
+  .hero {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(4.2rem, 19vw, 6.5rem);
+  }
+
+  .serviceGrid,
+  .valueGrid,
+  .roleGrid,
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .serviceCard {
+    min-height: auto;
+  }
+
+  .stage {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 24px;
+  }
+
+  .stageOutputs {
+    grid-column: auto;
+  }
+
+  .projectGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .projectCard,
+  .projectCardFeatured {
+    grid-column: auto;
+  }
+
+  .projectVisual {
+    min-height: 280px;
+  }
+
+  .ctaBand {
+    grid-template-columns: 1fr;
+    padding: 32px 22px;
+  }
+
+  .ctaBand .secondaryButton {
+    width: 100%;
+  }
+}
