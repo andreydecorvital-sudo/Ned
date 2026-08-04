@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, CalendarDays, ExternalLink, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, ExternalLink, Palette, ShieldCheck, Users } from "lucide-react";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import styles from "./admin-home.module.css";
@@ -30,6 +30,15 @@ const modules = [
     action: "Abrir conteúdo",
     icon: CalendarDays,
   },
+  {
+    href: "/admin/marca",
+    eyebrow: "BRAND OS",
+    title: "Marca e Instagram",
+    description:
+      "Consulte logos, cores por editoria e a estrutura dos Destaques sem quebrar a identidade aprovada.",
+    action: "Abrir Brand Kit",
+    icon: Palette,
+  },
 ] as const;
 
 export default async function AdminHomePage() {
@@ -42,7 +51,7 @@ export default async function AdminHomePage() {
       <div className={styles.shell}>
         <header className={styles.header}>
           <a className={styles.brand} href="/" aria-label="Abrir o site da NED">
-            <strong>NED</strong>
+            <img src="/brand/ned-wordmark.svg" alt="NED" />
             <small>ADMIN</small>
           </a>
           <a className={styles.siteLink} href="/" target="_blank" rel="noreferrer">
