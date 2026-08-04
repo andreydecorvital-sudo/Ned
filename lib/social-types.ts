@@ -10,11 +10,33 @@ export const socialStatuses = [
 ] as const;
 export type SocialStatus = (typeof socialStatuses)[number];
 
+export const socialAudioTypes = ["music", "original_sound"] as const;
+export type SocialAudioType = (typeof socialAudioTypes)[number];
+
 export type SocialMediaAsset = {
   url: string;
   pathname: string;
   contentType: string;
   size: number;
+};
+
+export type SocialAudioSelection = {
+  id: string;
+  title: string;
+  artist: string;
+  type: SocialAudioType;
+  thumbnailUrl: string;
+  previewUrl: string;
+  musicVolume: number;
+  originalAudioVolume: number;
+};
+
+export type InstagramAudioSearchResult = Omit<
+  SocialAudioSelection,
+  "musicVolume" | "originalAudioVolume"
+> & {
+  trending: boolean;
+  usageCount: number | null;
 };
 
 export type SocialPostRecord = {
@@ -26,6 +48,14 @@ export type SocialPostRecord = {
   scheduledAt: string | null;
   status: SocialStatus;
   shareToFeed: boolean;
+  audio: SocialAudioSelection | null;
+  audioName: string;
+  coverUrl: string;
+  collaborators: string[];
+  firstComment: string;
+  locationId: string;
+  altText: string;
+  isAiGenerated: boolean;
   publishedMediaId: string;
   qstashMessageId: string;
   errorMessage: string;
@@ -43,6 +73,14 @@ export type CreateSocialPostInput = {
   scheduledAt: string | null;
   status: "draft" | "scheduled";
   shareToFeed: boolean;
+  audio: SocialAudioSelection | null;
+  audioName: string;
+  coverUrl: string;
+  collaborators: string[];
+  firstComment: string;
+  locationId: string;
+  altText: string;
+  isAiGenerated: boolean;
 };
 
 export type UpdateSocialPostInput = Partial<CreateSocialPostInput> & {
@@ -71,4 +109,8 @@ export function isSocialFormat(value: unknown): value is SocialFormat {
 
 export function isSocialStatus(value: unknown): value is SocialStatus {
   return typeof value === "string" && socialStatuses.includes(value as SocialStatus);
+}
+
+export function isSocialAudioType(value: unknown): value is SocialAudioType {
+  return typeof value === "string" && socialAudioTypes.includes(value as SocialAudioType);
 }
