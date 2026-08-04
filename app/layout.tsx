@@ -39,6 +39,10 @@ export const metadata: Metadata = {
   authors: [{ name: "Ned Marketing" }],
   creator: "Ned Marketing",
   publisher: "Ned Marketing",
+  icons: {
+    icon: [{ url: "/brand/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/brand/favicon.svg",
+  },
   keywords: [
     "agência de marketing",
     "estratégia de marketing",
