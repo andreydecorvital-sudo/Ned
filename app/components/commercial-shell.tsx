@@ -1,5 +1,6 @@
 import { ArrowRight, LockKeyhole, MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
+import CommercialDesktopNav from "./commercial-desktop-nav";
 import CommercialMobileNav from "./commercial-mobile-nav";
 import NedBrandMark from "./ned-brand-mark";
 import styles from "./brand-shell.module.css";
@@ -17,9 +18,7 @@ export function CommercialHeader() {
   return (
     <header className={styles.header}>
       <NedBrandMark />
-      <nav className={styles.headerLinks} aria-label="Navegação principal">
-        {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
-      </nav>
+      <CommercialDesktopNav />
       <a className={styles.headerCta} href="/analise-gratuita">
         Solicitar análise <ArrowRight size={15} />
       </a>
@@ -32,7 +31,7 @@ export function CommercialFooter() {
   return (
     <footer className={styles.footer}>
       <div className={styles.footerIdentity}>
-        <NedBrandMark compact />
+        <NedBrandMark />
         <div>
           <span>© {new Date().getFullYear()} NED Marketing</span>
           <span>Direção antes de ferramenta.</span>

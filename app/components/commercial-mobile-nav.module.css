@@ -41,11 +41,21 @@
   text-decoration: none;
 }
 
+.panel a[aria-current="page"] {
+  color: var(--ned-black);
+  background: var(--ned-paper);
+  border-color: var(--ned-paper);
+}
+
 .panel a span {
   color: #8b8993;
   font-family: var(--font-display), sans-serif;
   font-size: 26px;
   font-weight: 400;
+}
+
+.panel a[aria-current="page"] span {
+  color: #56535b;
 }
 
 .panel .cta {

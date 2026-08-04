@@ -136,8 +136,8 @@ export default function AboutPage() {
             A<small>ANDREY / NED</small>
           </div>
           <div className={styles.cardBottom}>
-            <span>SEM FOTO. SEM PERSONAGEM.</span>
-            <strong>UMA HISTÓRIA REAL.</strong>
+            <span>ATENDIMENTO • VENDAS • OPERAÇÃO</span>
+            <strong>UMA TRAJETÓRIA CONSTRUÍDA NA PRÁTICA.</strong>
           </div>
         </aside>
       </section>
