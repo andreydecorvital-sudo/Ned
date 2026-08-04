@@ -1,0 +1,59 @@
+.experience {
+  min-height: 100svh;
+}
+
+/* O personagem era apenas decorativo e invadia a área de instrução. */
+.experience :global([class*="customerObject"]) {
+  display: none !important;
+}
+
+.experience :global([class*="screenObject"]),
+.experience :global([class*="phoneObject"]),
+.experience :global([class*="boxObject"]),
+.experience :global([class*="desk"]),
+.experience :global([class*="sceneGrid"]) {
+  pointer-events: none;
+}
+
+.experience :global([class*="sceneHint"]) {
+  z-index: 14;
+  right: 18px;
+  bottom: 18px;
+  max-width: min(320px, calc(100% - 36px));
+  padding: 11px 13px;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(8, 8, 10, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  line-height: 1.45;
+}
+
+.experience :global([class*="sceneHint"]) svg {
+  flex: 0 0 auto;
+  color: #a98fff;
+}
+
+.experience :global(button[class*="hotspot"]) {
+  z-index: 18;
+}
+
+.experience :global([class*="problemChecklist"]) button:focus-visible,
+.experience :global(button[class*="hotspot"]):focus-visible,
+.experience :global([class*="primaryButton"]):focus-visible,
+.experience :global([class*="secondaryButton"]):focus-visible {
+  outline: 3px solid #a98fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .experience :global([class*="sceneHint"]) {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-width: none;
+    justify-content: flex-start;
+    padding: 10px 12px;
+    font-size: 9px;
+  }
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import BrokenMachineGame from "./broken-machine-game";
+import fixes from "./experience-fixes.module.css";
 import LabJourneyAnalytics from "./lab-journey-analytics";
 import ResultShareLayer from "./result-share-layer";
 
@@ -26,10 +27,10 @@ export const metadata: Metadata = {
 
 export default function BrokenMachinePage() {
   return (
-    <>
+    <div className={fixes.experience}>
       <BrokenMachineGame />
       <ResultShareLayer />
       <LabJourneyAnalytics />
-    </>
+    </div>
   );
 }
