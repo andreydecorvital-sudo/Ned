@@ -162,8 +162,8 @@ export default function ViralDashboard() {
   const [notice, setNotice] = useState("");
   const [format, setFormat] = useState<SocialFormat>("reel");
   const [topic, setTopic] = useState("");
-  const [goal, setGoal] = useState(goalPresets[3].value);
-  const [angle, setAngle] = useState(anglePresets[0].value);
+  const [goal, setGoal] = useState<string>(goalPresets[3].value);
+  const [angle, setAngle] = useState<string>(anglePresets[0].value);
   const [extraContext, setExtraContext] = useState("");
   const [generated, setGenerated] = useState<GeneratedViralContent | null>(null);
   const [generatedIdeaId, setGeneratedIdeaId] = useState<string | null>(null);
