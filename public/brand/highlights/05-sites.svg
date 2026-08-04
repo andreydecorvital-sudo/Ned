@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NED destaque Sites">
+  <rect width="512" height="512" fill="#08080a"/><circle cx="256" cy="256" r="242" fill="none" stroke="#f1eee7" stroke-width="2"/>
+  <path d="M170 352V224c0-48 38-86 86-86s86 38 86 86v128" fill="none" stroke="#f1eee7" stroke-width="34" stroke-linecap="square"/>
+  <path d="M342 352V224c0-48-38-86-86-86" fill="none" stroke="#4ea65a" stroke-width="18"/>
+  <path d="M145 352h222M132 382h248" stroke="#f1eee7" stroke-width="20"/>
+  <path d="M170 365h172M145 395h222" stroke="#4ea65a" stroke-width="10"/>
+</svg>
