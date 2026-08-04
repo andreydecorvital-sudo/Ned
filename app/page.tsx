@@ -1,254 +1,282 @@
-"use client";
+import type { Metadata } from "next";
+import {
+  ArrowRight,
+  Check,
+  Gauge,
+  Gamepad2,
+  Layers3,
+  Megaphone,
+  MessageCircle,
+  MousePointerClick,
+  Settings2,
+  ShoppingBag,
+  Sparkles,
+  Target,
+} from "lucide-react";
+import { CommercialPage } from "./components/commercial-shell";
+import styles from "./home-commercial.module.css";
 
-import { ArrowDown, ArrowRight, Menu, MessageCircle, X } from "lucide-react";
-import { useState } from "react";
-import CommercialHome from "./components/commercial-home";
-import DiagnosticForm from "./components/diagnostic-form";
-import PortfolioPreview from "./components/portfolio-preview";
+export const metadata: Metadata = {
+  title: "Ned Marketing — estratégia, conteúdo, conversão e marketplaces",
+  description:
+    "Marketing para empresas que precisam apresentar melhor sua marca, gerar oportunidades e vender com mais direção. Atendimento e investimento definidos após análise.",
+  alternates: { canonical: "/" },
+};
 
-const whatsappNumber = "5511917814612";
-
-const whatsappUrl = (message: string) =>
-  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
-const navigation = [
-  { label: "Serviços", href: "/servicos" },
-  { label: "Processo", href: "/processo" },
-  { label: "Portfólio", href: "/portfolio" },
-  { label: "NED Score", href: "/ned-score" },
+const pillars = [
+  {
+    icon: Megaphone,
+    number: "01",
+    title: "Marketing e conteúdo",
+    description:
+      "Posicionamento, campanhas e comunicação para sua marca ser entendida, lembrada e escolhida.",
+    deliverables: [
+      "Posicionamento e mensagem principal",
+      "Campanhas, conceitos e direção criativa",
+      "Criativos, textos e calendário de conteúdo",
+      "Peças para Feed, Stories e carrosséis",
+    ],
+    href: "/servicos/marketing-conteudo",
+  },
+  {
+    icon: MousePointerClick,
+    number: "02",
+    title: "Conversão e aquisição",
+    description:
+      "Páginas e campanhas conectadas para transformar atenção em contato, oportunidade e próximo passo claro.",
+    deliverables: [
+      "Sites e landing pages",
+      "Meta Ads e Google Ads",
+      "Oferta, CTA e jornada para WhatsApp",
+      "Rastreamento e otimização",
+    ],
+    href: "/servicos/sites",
+  },
+  {
+    icon: ShoppingBag,
+    number: "03",
+    title: "Marketplaces",
+    description:
+      "Comunicação, catálogo e rotina comercial para melhorar a presença da marca nos canais de venda.",
+    deliverables: [
+      "Catálogo e apresentação dos anúncios",
+      "Criativos e campanhas",
+      "Mercado Livre, Shopee, Amazon e TikTok Shop",
+      "Acompanhamento de reputação e oportunidades",
+    ],
+    href: "/servicos/marketplaces",
+  },
 ];
 
-const steps = [
-  ["01", "Diagnóstico", "Entendemos marca, público, oferta, canais, gargalos e objetivo real."],
-  ["02", "Estratégia", "Definimos prioridades, mensagem, frentes de atuação e o caminho mais coerente."],
-  ["03", "Execução", "Criamos, publicamos e conectamos as entregas com atenção aos detalhes."],
-  ["04", "Otimização", "Acompanhamos dados, aprendizados e oportunidades para melhorar a próxima decisão."],
+const works = [
+  {
+    icon: Gauge,
+    type: "DIAGNÓSTICO INTERATIVO",
+    title: "NED Score",
+    context: "Empresas chegam ao marketing sem saber qual problema atacar primeiro.",
+    decision: "Transformar perguntas estratégicas em uma leitura simples e acionável.",
+    delivery: "Experiência de diagnóstico, score, recomendações e qualificação do contato.",
+    href: "/ned-score",
+  },
+  {
+    icon: Gamepad2,
+    type: "CONTEÚDO INTERATIVO",
+    title: "A Máquina Quebrada",
+    context: "Falar de oferta, atendimento e operação sem produzir mais um post genérico.",
+    decision: "Usar narrativa e escolhas para tornar o conteúdo participativo.",
+    delivery: "Experiência gamificada, resultado dinâmico e formato compartilhável.",
+    href: "/lab/maquina-quebrada",
+  },
+  {
+    icon: Layers3,
+    type: "MÉTODO E PRODUÇÃO",
+    title: "NED Growth Studio",
+    context: "Ferramentas de conteúdo costumam depender demais de geração automática.",
+    decision: "Colocar briefing, método e revisão humana antes da inteligência artificial.",
+    delivery: "Planejamento, estrutura por formato, avaliação e fluxo até o Estúdio.",
+    href: "/portfolio#growth-studio",
+  },
 ];
 
-function StaticTarget() {
-  return (
-    <div className="target-stage" aria-hidden="true">
-      <div className="target target-back">
-        <div className="target-ring ring-one" />
-        <div className="target-ring ring-two" />
-        <div className="target-ring ring-three" />
-        <div className="target-line target-line-x" />
-        <div className="target-line target-line-y" />
-        <span className="target-word word-top">MARCA</span>
-        <span className="target-word word-right">MÍDIA</span>
-        <span className="target-word word-bottom">CRESCIMENTO</span>
-        <span className="target-word word-left">ESTRATÉGIA</span>
-        <span className="target-plus">+</span>
-        <span className="target-index">NED / MARKETING</span>
-      </div>
-    </div>
-  );
-}
+const process = [
+  ["01", "Entender", "Negócio, público, oferta, momento e objetivo antes de escolher canal ou formato."],
+  ["02", "Direcionar", "Prioridades, mensagem, entregas, investimento e critérios de aprovação."],
+  ["03", "Executar", "Conteúdo, campanha, página ou operação produzida com decisões explicadas."],
+  ["04", "Aprender", "Dados e feedback usados para corrigir a próxima ação, sem continuidade forçada."],
+];
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const contactUrl = whatsappUrl(
-    "Olá, Ned! Conheci o site e quero conversar sobre marketing para minha empresa.",
-  );
-
   return (
-    <main className="page-is-ready">
-      <header className="site-header">
-        <a className="brand" href="/" aria-label="NED Marketing — início">
-          <span className="brand-main">NED</span>
-          <span className="brand-sub">MARKETING</span>
-        </a>
-
-        <nav aria-label="Navegação principal">
-          {navigation.map((item) => (
-            <a key={item.href} href={item.href}>{item.label}</a>
-          ))}
-        </nav>
-
-        <a className="header-cta" href="/analise-gratuita">
-          <span>Solicitar análise</span> <ArrowRight size={17} />
-        </a>
-
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((current) => !current)}
-        >
-          {menuOpen ? <X /> : <Menu />}
-        </button>
-      </header>
-
-      {menuOpen && (
-        <div className="mobile-menu" data-theme="dark">
-          <span className="mobile-menu-kicker">NAVEGAÇÃO / NED</span>
-          <div className="mobile-menu-links">
-            {navigation.map((item, index) => (
-              <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
-                {item.label} <span>{String(index + 1).padStart(2, "0")}</span>
-              </a>
-            ))}
-          </div>
-          <a className="mobile-menu-cta" href="/analise-gratuita">
-            Solicitar análise <ArrowRight />
-          </a>
-        </div>
-      )}
-
-      <section className="hero paper" id="inicio">
-        <div className="hero-grid-mark" aria-hidden="true" />
-        <div className="hero-copy">
-          <span className="eyebrow">ESTRATÉGIA • CRIAÇÃO • PERFORMANCE</span>
+    <CommercialPage>
+      <section className={styles.hero}>
+        <div>
+          <span className={styles.eyebrow}>NED MARKETING / ESTRATÉGIA E EXECUÇÃO</span>
           <h1>
-            Marketing que chama atenção.
-            <br />
-            E transforma interesse em <span>crescimento.</span>
+            Sua marca não precisa de mais posts. <span>Precisa de direção.</span>
           </h1>
-          <p>
-            Estratégia, posicionamento, conteúdo, presença digital, tráfego e marketplaces para empresas que querem ser encontradas, escolhidas e lembradas.
+          <p className={styles.heroLead}>
+            A NED organiza mensagem, conteúdo, páginas, campanhas e marketplaces para sua empresa apresentar melhor o que vende e transformar interesse em oportunidades reais.
           </p>
-          <div className="hero-actions">
-            <a className="button button-primary" href="/analise-gratuita">
-              Solicitar análise <ArrowRight size={18} />
+          <div className={styles.actions}>
+            <a className={styles.primary} href="/analise-gratuita">
+              Solicitar análise <ArrowRight size={17} />
             </a>
-            <a className="button button-secondary" href="/servicos">
-              Conhecer nossos serviços
+            <a className={styles.secondary} href="/portfolio">
+              Ver trabalhos
             </a>
+          </div>
+          <div className={styles.heroProof}>
+            <span>Atendimento direto</span>
+            <span>Escopo sob análise</span>
+            <span>Projetos em todo o Brasil</span>
           </div>
         </div>
 
-        <div className="hero-visual">
-          <StaticTarget />
+        <div className={styles.heroVisual} aria-label="Marketing conectado à decisão do cliente">
+          <span className={styles.orbitLabel}>Mensagem</span>
+          <span className={styles.orbitLabel}>Aquisição</span>
+          <span className={styles.orbitLabel}>Conversão</span>
+          <div className={styles.visualCopy}>
+            <span>UMA DIREÇÃO / TRÊS FRENTES</span>
+            <strong>Marca, demanda e venda.</strong>
+          </div>
         </div>
-
-        <a className="scroll-indicator" href="#servicos">
-          <span>SCROLL PARA EXPLORAR</span>
-          <span><ArrowDown size={15} /></span>
-        </a>
       </section>
 
-      <div className="capability-strip" data-theme="dark" aria-label="Áreas de atuação">
-        <div className="capability-track">
-          {["ESTRATÉGIA", "POSICIONAMENTO", "CONTEÚDO", "TRÁFEGO", "SITES", "MARKETPLACES", "ESTRATÉGIA", "POSICIONAMENTO", "CONTEÚDO", "TRÁFEGO", "SITES", "MARKETPLACES"].map((item, index) => (
-            <span key={`${item}-${index}`}>{item}<b>+</b></span>
-          ))}
-        </div>
-      </div>
-
-      <div id="servicos">
-        <CommercialHome />
-        <PortfolioPreview />
-      </div>
-
-      <section className="process paper" id="processo">
-        <div className="section-heading dark-copy">
-          <span className="eyebrow">COMO TRABALHAMOS</span>
-          <h2>Menos achismo.<br /><span>Mais direção.</span></h2>
-          <p>Cada etapa termina com uma decisão, uma entrega ou um próximo passo claro.</p>
+      <section className={styles.section} id="servicos">
+        <div className={styles.sectionHead}>
+          <div>
+            <span className={styles.eyebrow}>O QUE A NED RESOLVE</span>
+            <h2 className={styles.sectionTitle}>
+              Três frentes. <span>Uma conversa mais simples.</span>
+            </h2>
+          </div>
+          <p>
+            Você não precisa escolher entre uma lista técnica de serviços. Começamos pelo problema e combinamos apenas as entregas necessárias para o momento da empresa.
+          </p>
         </div>
 
-        <div className="steps">
-          {steps.map(([number, title, text]) => (
-            <article className="step" key={number}>
-              <span className="step-number">{number}</span>
-              <span className="step-line" />
+        <div className={styles.pillars}>
+          {pillars.map(({ icon: Icon, number, title, description, deliverables, href }) => (
+            <article className={styles.pillar} key={number}>
+              <div className={styles.pillarTop}>
+                <span className={styles.pillarIcon}><Icon size={22} /></span>
+                <span className={styles.pillarNumber}>{number}</span>
+              </div>
               <h3>{title}</h3>
-              <p>{text}</p>
+              <p>{description}</p>
+              <ul className={styles.deliverables}>
+                {deliverables.map((item) => <li key={item}><Check size={14} /> {item}</li>)}
+              </ul>
+              <a className={styles.textLink} href={href}>
+                Ver entregas <ArrowRight size={15} />
+              </a>
             </article>
           ))}
         </div>
+
+        <div className={styles.supportNote}>
+          <Settings2 size={20} />
+          <span>
+            <strong>Tecnologia entra como apoio.</strong> CRM, automação e inteligência artificial são usados quando ajudam a organizar atendimento, reduzir perda e executar melhor — não como a promessa principal da NED.
+          </span>
+        </div>
       </section>
 
-      <section className="marketplaces dark-section" id="marketplaces" data-theme="dark">
-        <div className="market-copy">
-          <span className="eyebrow purple">MARKETPLACES</span>
-          <h2>Quem vende online precisa de presença, comunicação e operação.</h2>
-          <p>
-            Organizamos catálogo, anúncios, criativos, tráfego, reputação e rotina comercial para transformar marketplaces em um canal mais consistente para a marca.
-          </p>
-          <div className="platforms" aria-label="Plataformas atendidas">
-            <span>Mercado Livre</span><span>Shopee</span><span>Amazon</span><span>TikTok Shop</span>
+      <div className={styles.sectionSoftWrap}>
+        <section className={styles.sectionSoft}>
+          <div className={styles.sectionHead}>
+            <div>
+              <span className={styles.eyebrow}>TRABALHOS SELECIONADOS</span>
+              <h2 className={styles.sectionTitle}>
+                Raciocínio que virou <span>experiência.</span>
+              </h2>
+            </div>
+            <p>
+              Os projetos abaixo são próprios da NED e podem ser abertos ou compreendidos em detalhes. Cases de clientes só serão publicados com autorização e sem números inventados.
+            </p>
           </div>
-          <div className="hero-actions">
-            <a className="button button-primary" href="/servicos/marketplaces">
-              Conhecer o serviço <ArrowRight size={17} />
+
+          <div className={styles.workGrid}>
+            {works.map(({ icon: Icon, type, title, context, decision, delivery, href }) => (
+              <article className={styles.workCard} key={title}>
+                <div className={styles.workCardTop}><span>{type}</span><Icon size={22} /></div>
+                <h3>{title}</h3>
+                <div className={styles.caseMeta}>
+                  <div><strong>Contexto</strong><span>{context}</span></div>
+                  <div><strong>Decisão</strong><span>{decision}</span></div>
+                  <div><strong>Entrega</strong><span>{delivery}</span></div>
+                </div>
+                <a className={styles.textLink} href={href}>Abrir trabalho <ArrowRight size={15} /></a>
+              </article>
+            ))}
+          </div>
+
+          <div className={styles.actions}>
+            <a className={styles.primary} href="/portfolio">Ver portfólio completo <ArrowRight size={16} /></a>
+          </div>
+        </section>
+      </div>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHead}>
+          <div>
+            <span className={styles.eyebrow}>COMO FUNCIONA</span>
+            <h2 className={styles.sectionTitle}>Sem pacote empurrado. <span>Sem caixa-preta.</span></h2>
+          </div>
+          <p>Cada etapa termina com uma decisão ou entrega concreta. Você sabe o que está sendo feito, por que foi escolhido e qual é o próximo passo.</p>
+        </div>
+        <div className={styles.processGrid}>
+          {process.map(([number, title, text]) => (
+            <article className={styles.processStep} key={number}>
+              <span>{number}</span><h3>{title}</h3><p>{text}</p>
+            </article>
+          ))}
+        </div>
+        <div className={styles.actions}>
+          <a className={styles.secondary} href="/processo">Entender o processo <ArrowRight size={15} /></a>
+        </div>
+      </section>
+
+      <div className={styles.sectionSoftWrap}>
+        <section className={`${styles.sectionSoft} ${styles.human}`}>
+          <div className={styles.humanCard} aria-label="Atendimento direto com Ned">
+            <span className={styles.humanMonogram}>NED</span>
+            <span className={styles.humanBadge}>ATENDIMENTO DIRETO</span>
+          </div>
+          <div className={styles.humanCopy}>
+            <span className={styles.eyebrow}>QUEM CONDUZ O PROJETO</span>
+            <h2>Você conversa com <span>Ned.</span></h2>
+            <p>
+              A NED funciona como uma estrutura enxuta de marketing. O atendimento começa com contexto, as decisões importantes são explicadas e especialistas podem entrar quando o projeto exigir — sempre com transparência sobre responsabilidade e escopo.
+            </p>
+            <div className={styles.principles}>
+              <div className={styles.principle}><span>01</span><div><strong>Direção antes de ferramenta</strong><small>Canal, tecnologia e formato vêm depois do problema e do objetivo.</small></div></div>
+              <div className={styles.principle}><span>02</span><div><strong>Trabalho sem resultado inventado</strong><small>O portfólio mostra o que existe e separa demonstração própria de trabalho autorizado.</small></div></div>
+              <div className={styles.principle}><span>03</span><div><strong>Comunicação com próximo passo</strong><small>Entregas, pendências e decisões não ficam espalhadas em mensagens sem contexto.</small></div></div>
+            </div>
+            <div className={styles.actions}>
+              <a className={styles.primary} href="/sobre">Conhecer a NED <ArrowRight size={15} /></a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section className={styles.finalCta}>
+        <div>
+          <span className={styles.eyebrow}>PRÓXIMO PASSO</span>
+          <h2>Mostre o negócio. <span>A direção vem depois.</span></h2>
+        </div>
+        <div>
+          <p>Envie seu site, Instagram ou marketplace. A análise inicial organiza o cenário antes de qualquer proposta, pacote ou promessa.</p>
+          <div className={styles.actions}>
+            <a className={styles.primary} href="/analise-gratuita">Solicitar análise <ArrowRight size={17} /></a>
+            <a className={styles.secondary} href="https://wa.me/5511917814612?text=Ol%C3%A1%2C%20Ned!%20Quero%20conversar%20sobre%20marketing%20para%20minha%20empresa." target="_blank" rel="noreferrer">
+              <MessageCircle size={16} /> Falar no WhatsApp
             </a>
           </div>
         </div>
-
-        <div className="market-panel" aria-label="Frentes de atuação em marketplaces">
-          <div className="panel-orbit orbit-one" />
-          <div className="panel-orbit orbit-two" />
-          <span className="panel-kicker">MARKETING E OPERAÇÃO</span>
-          {["Posicionamento", "Catálogo", "Campanhas", "Otimização"].map((item, index) => (
-            <div className="flow-item" key={item}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{item}</strong>
-              {index < 3 && <i />}
-            </div>
-          ))}
-        </div>
       </section>
-
-      <section className="diagnostic paper" id="diagnostico">
-        <div className="diagnostic-copy">
-          <span className="eyebrow">COMECE PELA ANÁLISE</span>
-          <h2>Cinco etapas.<br /><span>Uma conversa melhor.</span></h2>
-          <p>
-            Conte sobre o negócio, o objetivo e o principal desafio. A NED usa esse contexto para identificar prioridades antes de recomendar qualquer serviço.
-          </p>
-          <div className="diagnostic-benefits">
-            <span>01</span><p>Leva poucos minutos e organiza o momento da empresa.</p>
-            <span>02</span><p>Ajuda a identificar a prioridade de marketing.</p>
-            <span>03</span><p>A conversa começa com contexto, não com pacote pronto.</p>
-          </div>
-        </div>
-
-        <div>
-          <DiagnosticForm />
-        </div>
-      </section>
-
-      <section className="cta paper">
-        <div>
-          <span className="eyebrow">NED SCORE / DIAGNÓSTICO DE MARKETING</span>
-          <h2>Descubra onde sua marca está perdendo força.</h2>
-          <p>Responda oito perguntas e receba uma leitura inicial sobre oferta, posicionamento, presença, aquisição, atendimento e consistência.</p>
-          <a className="button button-primary" href="/ned-score">
-            Calcular meu NED Score <ArrowRight size={18} />
-          </a>
-        </div>
-      </section>
-
-      <footer data-theme="dark">
-        <div className="footer-identity">
-          <a className="brand footer-brand" href="/">
-            <span className="brand-main">NED</span>
-            <span className="brand-sub">MARKETING</span>
-          </a>
-          <p>Estratégia, criação, presença digital, tráfego e marketplaces para marcas que querem crescer com mais direção.</p>
-        </div>
-        <div className="footer-links">
-          {navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
-        </div>
-        <div className="footer-meta">
-          <a href={contactUrl} target="_blank" rel="noreferrer">+55 11 91781-4612</a>
-          <span>Atendimento em todo o Brasil</span>
-          <span>© {new Date().getFullYear()} NED Marketing</span>
-        </div>
-      </footer>
-
-      <a
-        className="whatsapp-float"
-        href={contactUrl}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Falar com a NED Marketing pelo WhatsApp"
-      >
-        <MessageCircle size={21} />
-        <span>Falar com Ned</span>
-      </a>
-    </main>
+    </CommercialPage>
   );
 }
