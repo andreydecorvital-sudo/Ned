@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminLoginPage() {
   if (await isAdminAuthenticated()) {
-    redirect("/admin/leads");
+    redirect("/admin");
   }
 
   return (
@@ -23,10 +23,10 @@ export default async function AdminLoginPage() {
           <strong>NED</strong>
           <small>ADMIN</small>
         </a>
-        <span className={styles.eyebrow}>ÁREA RESTRITA / LEADS</span>
-        <h1>Controle comercial sem perder contexto.</h1>
+        <span className={styles.eyebrow}>ÁREA RESTRITA / OPERAÇÃO</span>
+        <h1>Entre e escolha onde trabalhar.</h1>
         <p>
-          Acesse os contatos gerados pelo diagnóstico, acompanhe o atendimento e exporte os dados.
+          A central administrativa reúne CRM, atendimento, conteúdo e os próximos módulos da NED.
         </p>
         <LoginForm configured={isAdminConfigured()} />
       </section>
