@@ -140,11 +140,11 @@ export async function getViralReviewSummary(): Promise<ViralReviewSummary> {
       FROM ned_viral_reviews
     `,
     sql`
-      SELECT tag, COUNT(*)::int AS count
-      FROM ned_viral_reviews,
-      LATERAL jsonb_array_elements_text(tags) AS tag
-      GROUP BY tag
-      ORDER BY count DESC, tag
+      SELECT item.tag, COUNT(*)::int AS count
+      FROM ned_viral_reviews
+      CROSS JOIN LATERAL jsonb_array_elements_text(tags) AS item(tag)
+      GROUP BY item.tag
+      ORDER BY count DESC, item.tag
       LIMIT 8
     `,
     sql`
