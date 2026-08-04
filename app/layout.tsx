@@ -9,6 +9,8 @@ import StructuredData from "./components/structured-data";
 import "./globals.css";
 import "./overrides.css";
 import "./runtime.css";
+import "./brand-tokens.css";
+import "./brand-commercial.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
 
@@ -84,7 +86,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f2f0ea" },
+    { media: "(prefers-color-scheme: light)", color: "#f1eee7" },
     { media: "(prefers-color-scheme: dark)", color: "#08080a" },
   ],
 };
