@@ -34,12 +34,12 @@
   color: #a98fff;
 }
 
-.experience :global([class*="hotspot"]) {
+.experience :global(button[class*="hotspot"]) {
   z-index: 18;
 }
 
 .experience :global([class*="problemChecklist"]) button:focus-visible,
-.experience :global([class*="hotspot"]):focus-visible,
+.experience :global(button[class*="hotspot"]):focus-visible,
 .experience :global([class*="primaryButton"]):focus-visible,
 .experience :global([class*="secondaryButton"]):focus-visible {
   outline: 3px solid #a98fff;
