@@ -6,6 +6,7 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
+  Palette,
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -29,6 +30,12 @@ const destinations = [
     label: "Conteúdo",
     icon: CalendarDays,
     active: (pathname: string) => pathname.startsWith("/admin/conteudo"),
+  },
+  {
+    href: "/admin/marca",
+    label: "Marca",
+    icon: Palette,
+    active: (pathname: string) => pathname.startsWith("/admin/marca"),
   },
 ] as const;
 
