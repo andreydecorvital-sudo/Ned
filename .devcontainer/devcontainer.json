@@ -1,0 +1,20 @@
+{
+  "name": "NED Marketing Preview",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "NED Marketing Preview",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "npm ci",
+  "postStartCommand": "nohup npm run dev -- --hostname 0.0.0.0 > /tmp/ned-next.log 2>&1 &",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}
