@@ -57,6 +57,8 @@ export type ViralIdea = {
   score: number;
   checklist: ViralChecklist;
   provider: "gemini" | "fallback" | "manual";
+  usedInStudio: boolean;
+  usedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -69,6 +71,10 @@ export type ViralStats = {
   totalMissions: number;
   ideasCount: number;
   averageIdeaScore: number;
+  readyIdeas: number;
+  studioTransfers: number;
+  executionRate: number;
+  profileCompleteness: number;
   streakDays: number;
 };
 
@@ -95,4 +101,16 @@ export type GeneratedViralContent = {
   checklist: ViralChecklist;
   improvements: string[];
   provider: "gemini" | "fallback";
+};
+
+export type ViralStudioDraft = {
+  ideaId: string | null;
+  accountName: string;
+  format: SocialFormat;
+  title: string;
+  caption: string;
+  hashtags: string[];
+  firstComment: string;
+  score: number;
+  createdAt: string;
 };
