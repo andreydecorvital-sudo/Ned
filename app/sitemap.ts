@@ -5,6 +5,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitald
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     { path: "", changeFrequency: "weekly" as const, priority: 1 },
+    { path: "/servicos", changeFrequency: "monthly" as const, priority: 0.95 },
+    { path: "/processo", changeFrequency: "monthly" as const, priority: 0.9 },
+    { path: "/portfolio", changeFrequency: "monthly" as const, priority: 0.95 },
     { path: "/maquina-de-clientes", changeFrequency: "monthly" as const, priority: 0.95 },
     { path: "/analise-gratuita", changeFrequency: "monthly" as const, priority: 0.9 },
     { path: "/ned-score", changeFrequency: "monthly" as const, priority: 0.9 },

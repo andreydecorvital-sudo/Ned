@@ -9,11 +9,11 @@ export function CommercialHeader() {
         <strong>NED</strong>
         <span>MARKETING</span>
       </a>
-      <nav className={styles.headerLinks} aria-label="Navegação comercial">
-        <a href="/maquina-de-clientes">Máquina de Clientes</a>
-        <a href="/analise-gratuita">Análise gratuita</a>
+      <nav className={styles.headerLinks} aria-label="Navegação principal">
+        <a href="/servicos">Serviços</a>
+        <a href="/processo">Processo</a>
+        <a href="/portfolio">Portfólio</a>
         <a href="/ned-score">NED Score</a>
-        <a href="/parceiros">Parceiros</a>
       </nav>
       <a className={styles.headerCta} href="/analise-gratuita">
         Solicitar análise <ArrowRight size={15} />
@@ -25,9 +25,17 @@ export function CommercialHeader() {
 export function CommercialFooter() {
   return (
     <footer className={styles.footer}>
-      <span>© {new Date().getFullYear()} NED Marketing</span>
-      <span>Estrutura digital, captação e operação comercial.</span>
-      <a href="/privacidade">Privacidade e dados</a>
+      <div>
+        <span>© {new Date().getFullYear()} NED Marketing</span>
+        <span>Estrutura digital, captação e operação comercial.</span>
+      </div>
+      <nav aria-label="Links do rodapé">
+        <a href="/servicos">Serviços</a>
+        <a href="/processo">Processo</a>
+        <a href="/portfolio">Portfólio</a>
+        <a href="/parceiros">Parceiros</a>
+        <a href="/privacidade">Privacidade</a>
+      </nav>
     </footer>
   );
 }
