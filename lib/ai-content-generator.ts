@@ -57,7 +57,7 @@ function fallbackContent(input: GenerateViralContentInput): GeneratedViralConten
     "",
     `Em ${niche}, aparecer não é suficiente. O conteúdo precisa deixar claro por que a marca merece atenção e qual transformação entrega.`,
     "",
-    `Para usar ${topic} com mais intenção:",
+    `Para usar ${topic} com mais intenção:`,
     "— comece com um problema que o público reconhece;",
     "— desenvolva uma ideia por vez;",
     "— mostre uma aplicação prática;",
