@@ -26,7 +26,8 @@
   width: 74px;
   height: 1px;
   content: "";
-  background: var(--ned-accent);
+  background: var(--ned-white);
+  opacity: .85;
 }
 
 .headerLinks {
@@ -37,6 +38,8 @@
 }
 
 .headerLinks a {
+  position: relative;
+  padding: 10px 0;
   color: #99979f;
   font-size: 9px;
   font-weight: 850;
@@ -46,8 +49,28 @@
   transition: color .2s ease;
 }
 
+.headerLinks a::after {
+  position: absolute;
+  right: 0;
+  bottom: 4px;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: var(--ned-white) !important;
+  opacity: .8;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform .25s ease;
+}
+
 .headerLinks a:hover {
   color: var(--ned-white);
+}
+
+.headerLinks a:hover::after,
+.headerLinks a:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
 }
 
 .headerCta {
@@ -91,6 +114,13 @@
   text-transform: uppercase;
 }
 
+.footerLinks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
 .footer nav {
   display: flex;
   flex-wrap: wrap;
@@ -99,17 +129,47 @@
 }
 
 .footer nav a {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 6px 0;
   color: #aaa8af;
   font-size: 9px;
   font-weight: 750;
   text-decoration: none;
 }
 
+.footer nav a::after {
+  display: none !important;
+}
+
 .footer nav a:hover {
   color: var(--ned-white);
+}
+
+.internalLink {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: #77757d;
+  background: rgba(255, 255, 255, .025);
+  border: 1px solid rgba(255, 255, 255, .1);
+  text-decoration: none;
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.internalLink::after {
+  display: none !important;
+}
+
+.internalLink:hover,
+.internalLink:focus-visible {
+  color: var(--ned-black);
+  background: var(--ned-white);
+  border-color: var(--ned-white);
 }
 
 @media (max-width: 1000px) {
@@ -126,6 +186,11 @@
   .footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .footerLinks {
+    width: 100%;
+    align-items: flex-end;
+    justify-content: space-between;
   }
   .footer nav {
     justify-content: flex-start;
