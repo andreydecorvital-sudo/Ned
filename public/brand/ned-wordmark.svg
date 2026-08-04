@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 535 145" role="img" aria-labelledby="title desc">
+  <title id="title">NED</title>
+  <desc id="desc">Wordmark reduzido da NED.</desc>
+  <g fill="#f5f2eb">
+    <path d="M20 125V20h34l72 63V20h34v105h-32L54 62v63H20Z"/>
+    <path d="M190 20h140v30H226v12h87v28h-87v5h108v30H190V20Z"/>
+    <path fill-rule="evenodd" d="M360 20h67c67 0 108 34 108 52.5S494 125 427 125h-67V20Zm36 30v45h29c43 0 72-8 72-22.5S468 50 425 50h-29Z"/>
+    <path d="m337 72 15-5v13l-15 5V72Z"/>
+  </g>
+</svg>
