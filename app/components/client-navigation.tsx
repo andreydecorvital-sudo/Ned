@@ -11,7 +11,9 @@ const homeNavigation = [
 ];
 
 function configureNavigation(container: Element | null) {
-  if (!container) return () => undefined;
+  if (!container || container.getAttribute("data-page-navigation") === "true") {
+    return () => undefined;
+  }
 
   const anchors = Array.from(container.querySelectorAll<HTMLAnchorElement>(":scope > a"));
   if (anchors.length < homeNavigation.length) return () => undefined;
@@ -40,13 +42,29 @@ export default function ClientNavigation() {
   useEffect(() => {
     const cleanups: Array<() => void> = [];
 
-    document.querySelectorAll<HTMLAnchorElement>('a[href="/#servicos"]').forEach((link) => {
-      link.href = "/servicos";
-    });
+    const rewriteOverviewLinks = () => {
+      document.querySelectorAll<HTMLAnchorElement>('a[href="/#servicos"]').forEach((link) => {
+        link.href = "/servicos";
+      });
+    };
+    rewriteOverviewLinks();
 
     if (pathname === "/") {
       cleanups.push(configureNavigation(document.querySelector(".site-header nav")));
-      cleanups.push(configureNavigation(document.querySelector(".mobile-menu-links")));
+
+      const installMobileNavigation = () => {
+        const mobile = document.querySelector(".mobile-menu-links");
+        if (!mobile || mobile.getAttribute("data-page-navigation") === "true") return;
+        cleanups.push(configureNavigation(mobile));
+      };
+      installMobileNavigation();
+
+      const menuObserver = new MutationObserver(() => {
+        installMobileNavigation();
+        rewriteOverviewLinks();
+      });
+      menuObserver.observe(document.body, { childList: true, subtree: true });
+      cleanups.push(() => menuObserver.disconnect());
     }
 
     if (pathname.startsWith("/servicos/")) {
