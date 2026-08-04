@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import ViralDashboard from "./viral-dashboard";
+import MethodDashboard from "./method-dashboard";
 
 export const metadata: Metadata = {
-  title: "NED Viral Machine",
+  title: "NED Growth Studio",
   robots: { index: false, follow: false },
 };
 
@@ -15,5 +15,5 @@ export default async function ViralMachinePage() {
     redirect("/admin/login");
   }
 
-  return <ViralDashboard />;
+  return <MethodDashboard />;
 }
