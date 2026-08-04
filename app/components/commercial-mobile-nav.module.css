@@ -1,0 +1,60 @@
+.trigger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: #fff;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.14);
+  cursor: pointer;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 76px 0 0;
+  z-index: 80;
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(8px);
+}
+
+.panel {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  background: #0d0d11;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+.panel a {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  color: #f5f2eb;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.1);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.panel a span {
+  color: #8e65ff;
+  font-family: var(--font-display), sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+}
+
+.panel .cta {
+  margin-top: 8px;
+  color: #fff;
+  background: #7040ff;
+  border-color: #7040ff;
+}
+
+@media (max-width: 1000px) {
+  .trigger { display: grid; }
+}
