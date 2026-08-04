@@ -10,8 +10,6 @@ import {
   MousePointerClick,
   Settings2,
   ShoppingBag,
-  Sparkles,
-  Target,
 } from "lucide-react";
 import { CommercialPage } from "./components/commercial-shell";
 import styles from "./home-commercial.module.css";
@@ -240,23 +238,23 @@ export default function Home() {
 
       <div className={styles.sectionSoftWrap}>
         <section className={`${styles.sectionSoft} ${styles.human}`}>
-          <div className={styles.humanCard} aria-label="Atendimento direto com Ned">
-            <span className={styles.humanMonogram}>NED</span>
-            <span className={styles.humanBadge}>ATENDIMENTO DIRETO</span>
+          <div className={styles.humanCard} aria-label="Andrey, criador da NED Marketing">
+            <span className={styles.humanMonogram}>A</span>
+            <span className={styles.humanBadge}>ANDREY / NED</span>
           </div>
           <div className={styles.humanCopy}>
             <span className={styles.eyebrow}>QUEM CONDUZ O PROJETO</span>
-            <h2>Você conversa com <span>Ned.</span></h2>
+            <h2>Você conversa com <span>Andrey.</span></h2>
             <p>
-              A NED funciona como uma estrutura enxuta de marketing. O atendimento começa com contexto, as decisões importantes são explicadas e especialistas podem entrar quando o projeto exigir — sempre com transparência sobre responsabilidade e escopo.
+              Minha trajetória começou aos 16 anos no atendimento, passou por vendas, treinamento, liderança, restaurantes e marketplaces até chegar ao marketing. Essa experiência formou a maneira como conduzo a NED: entendendo pessoas, conectando promessa à operação e explicando as decisões importantes do projeto.
             </p>
             <div className={styles.principles}>
               <div className={styles.principle}><span>01</span><div><strong>Direção antes de ferramenta</strong><small>Canal, tecnologia e formato vêm depois do problema e do objetivo.</small></div></div>
-              <div className={styles.principle}><span>02</span><div><strong>Trabalho sem resultado inventado</strong><small>O portfólio mostra o que existe e separa demonstração própria de trabalho autorizado.</small></div></div>
-              <div className={styles.principle}><span>03</span><div><strong>Comunicação com próximo passo</strong><small>Entregas, pendências e decisões não ficam espalhadas em mensagens sem contexto.</small></div></div>
+              <div className={styles.principle}><span>02</span><div><strong>Atendimento também é marketing</strong><small>A experiência depois do primeiro contato influencia a confiança e a decisão.</small></div></div>
+              <div className={styles.principle}><span>03</span><div><strong>Uma história sem personagem artificial</strong><small>A página Sobre apresenta a trajetória sem foto, avatar ou biografia corporativa inventada.</small></div></div>
             </div>
             <div className={styles.actions}>
-              <a className={styles.primary} href="/sobre">Conhecer a NED <ArrowRight size={15} /></a>
+              <a className={styles.primary} href="/sobre">Conhecer minha história <ArrowRight size={15} /></a>
             </div>
           </div>
         </section>
