@@ -1,10 +1,15 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Ned Marketing — Construímos sistemas que vendem";
+export const alt = "Ned Marketing — sua marca precisa de direção";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
+
 export default function OpenGraphImage() {
+  const logoUrl = new URL("/brand/ned-logo-dark.svg", siteUrl).toString();
+  const symbolUrl = new URL("/brand/ned-symbol-spiral.svg", siteUrl).toString();
+
   return new ImageResponse(
     (
       <div
@@ -15,9 +20,9 @@ export default function OpenGraphImage() {
           position: "relative",
           overflow: "hidden",
           color: "#08080a",
-          background: "#f2f0ea",
+          background: "#f1eee7",
           fontFamily: "Arial, sans-serif",
-          padding: "62px 70px",
+          padding: "56px 64px",
         }}
       >
         <div
@@ -25,57 +30,61 @@ export default function OpenGraphImage() {
             position: "absolute",
             inset: 0,
             display: "flex",
-            opacity: 0.12,
+            opacity: 0.08,
             backgroundImage:
               "linear-gradient(#08080a 1px, transparent 1px), linear-gradient(90deg, #08080a 1px, transparent 1px)",
-            backgroundSize: "80px 80px",
+            backgroundSize: "72px 72px",
           }}
         />
 
         <div style={{ display: "flex", flexDirection: "column", zIndex: 2, width: "72%" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 18, letterSpacing: 5, fontWeight: 800 }}>
-            <span style={{ width: 42, height: 2, background: "#7040ff" }} />
-            NED MARKETING
+          <img src={logoUrl} width="310" height="105" alt="NED Marketing" style={{ objectFit: "contain" }} />
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginTop: 54,
+              fontSize: 74,
+              lineHeight: 0.92,
+              fontWeight: 900,
+              textTransform: "uppercase",
+            }}
+          >
+            <span>Sua marca não precisa</span>
+            <span>de mais posts.</span>
+            <span style={{ textDecoration: "underline", textDecorationThickness: 2 }}>
+              Precisa de direção.
+            </span>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", marginTop: 74, fontSize: 78, lineHeight: 0.94, fontWeight: 900, textTransform: "uppercase" }}>
-            <span>Não fazemos marketing</span>
-            <span style={{ color: "#7040ff" }}>barulhento.</span>
-            <span>Construímos sistemas que vendem.</span>
-          </div>
-
-          <div style={{ display: "flex", marginTop: "auto", fontSize: 21, color: "#4c4c54" }}>
-            Sites • Automações • Tráfego • Marketplaces
+          <div style={{ display: "flex", marginTop: "auto", fontSize: 19, color: "#55525a" }}>
+            Marketing e conteúdo • Conversão e aquisição • Marketplaces
           </div>
         </div>
 
         <div
           style={{
             position: "absolute",
-            right: -44,
-            top: 108,
-            width: 390,
-            height: 390,
+            right: 64,
+            top: 56,
+            bottom: 56,
+            width: 270,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            border: "2px solid #08080a",
-            borderRadius: "50%",
+            background: "#08080a",
+            border: "1px solid rgba(8,8,10,.18)",
           }}
         >
-          <div
-            style={{
-              width: 235,
-              height: 235,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "2px dashed #08080a",
-              borderRadius: "50%",
-            }}
-          >
-            <div style={{ width: 98, height: 98, background: "#7040ff", borderRadius: "50%" }} />
-          </div>
+          <img src={symbolUrl} width="118" height="118" alt="" style={{ objectFit: "contain" }} />
+        </div>
+
+        <div style={{ position: "absolute", right: 64, bottom: 56, display: "flex", width: 270, height: 8 }}>
+          <span style={{ flex: 1, background: "#ff2b32" }} />
+          <span style={{ flex: 1, background: "#25ff74" }} />
+          <span style={{ flex: 1, background: "#1268ff" }} />
+          <span style={{ flex: 1, background: "#ff7a1a" }} />
         </div>
       </div>
     ),
