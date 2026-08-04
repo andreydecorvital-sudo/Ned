@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "", changeFrequency: "weekly" as const, priority: 1 },
     { path: "/servicos", changeFrequency: "monthly" as const, priority: 0.95 },
     { path: "/portfolio", changeFrequency: "monthly" as const, priority: 0.95 },
+    { path: "/portfolio/maquina-quebrada", changeFrequency: "monthly" as const, priority: 0.86 },
     { path: "/processo", changeFrequency: "monthly" as const, priority: 0.9 },
     { path: "/sobre", changeFrequency: "monthly" as const, priority: 0.9 },
     { path: "/analise-gratuita", changeFrequency: "monthly" as const, priority: 0.9 },
