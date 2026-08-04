@@ -3,7 +3,6 @@ import { Bebas_Neue, Space_Grotesk } from "next/font/google";
 import Analytics from "./components/analytics";
 import ClientNavigation from "./components/client-navigation";
 import DiagnosticPopup from "./components/diagnostic-popup";
-import LabLauncher from "./components/lab-launcher";
 import LegalFooter from "./components/legal-footer";
 import SiteRuntime from "./components/site-runtime";
 import StructuredData from "./components/structured-data";
@@ -100,7 +99,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <LegalFooter />
         <DiagnosticPopup />
-        <LabLauncher />
         <Analytics />
       </body>
     </html>
