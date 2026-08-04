@@ -1,0 +1,238 @@
+.page {
+  min-height: 100vh;
+  padding-bottom: 110px;
+  color: #f5f1ff;
+  background:
+    radial-gradient(circle at 10% 0, rgba(169, 143, 255, 0.2), transparent 34rem),
+    #08080a;
+  font-family: var(--font-body), sans-serif;
+}
+
+.shell {
+  width: min(1180px, 92vw);
+  margin: 0 auto;
+  padding: 34px 0 70px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 26px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand strong {
+  font: 400 2.4rem/1 var(--font-display), sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.brand small,
+.hero > div > span,
+.help > span,
+.moduleTop span {
+  color: #a98fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.siteLink {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #cbc4d5;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.siteLink:hover {
+  color: #fff;
+  border-color: rgba(169, 143, 255, 0.5);
+  background: rgba(169, 143, 255, 0.1);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 50px;
+  align-items: end;
+  padding: 72px 0 50px;
+}
+
+.hero h1 {
+  margin: 12px 0 0;
+  font: 400 clamp(4rem, 8vw, 7.5rem) / 0.84 var(--font-display), sans-serif;
+  text-transform: uppercase;
+}
+
+.hero h1 em {
+  display: block;
+  color: #a98fff;
+  font-style: normal;
+}
+
+.security {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid rgba(110, 231, 183, 0.22);
+  background: rgba(110, 231, 183, 0.06);
+  color: #a9efd6;
+}
+
+.security div {
+  display: grid;
+  gap: 5px;
+}
+
+.security strong {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.security small {
+  color: #8dbaaa;
+  line-height: 1.45;
+}
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.module {
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  color: inherit;
+  background: rgba(15, 15, 19, 0.94);
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.module:hover {
+  transform: translateY(-4px);
+  border-color: rgba(169, 143, 255, 0.55);
+  background: rgba(20, 18, 28, 0.98);
+}
+
+.moduleTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #b7a6ee;
+}
+
+.module h2 {
+  margin: auto 0 14px;
+  font: 400 clamp(2.8rem, 5vw, 4.8rem) / 0.9 var(--font-display), sans-serif;
+  text-transform: uppercase;
+}
+
+.module p {
+  max-width: 35rem;
+  margin: 0 0 28px;
+  color: #aaa4b4;
+  line-height: 1.62;
+}
+
+.module > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #d9ccff;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.help {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 18px;
+  padding: 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #918b9a;
+}
+
+.help p {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.help kbd {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 5px;
+  color: #d7d0df;
+  background: rgba(255, 255, 255, 0.05);
+  font: inherit;
+}
+
+@media (max-width: 820px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    padding-top: 50px;
+  }
+
+  .modules {
+    grid-template-columns: 1fr;
+  }
+
+  .module {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 560px) {
+  .shell {
+    width: auto;
+    padding: 24px 14px 60px;
+  }
+
+  .hero h1 {
+    font-size: clamp(3.6rem, 18vw, 5.4rem);
+  }
+
+  .siteLink {
+    padding: 0 11px;
+  }
+
+  .module {
+    min-height: 250px;
+    padding: 22px;
+  }
+
+  .help {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
