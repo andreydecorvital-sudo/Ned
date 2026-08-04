@@ -11,16 +11,27 @@ export default function CommercialGrowthRuntime() {
   useEffect(() => {
     if (window.location.pathname !== "/") return;
 
-    const services = document.getElementById("servicos");
-    if (!services) return;
+    const legacyServices = document.getElementById("servicos");
+    if (!legacyServices) return;
 
     let node = document.getElementById("ned-commercial-growth");
     if (!node) {
       node = document.createElement("div");
       node.id = "ned-commercial-growth";
-      services.parentNode?.insertBefore(node, services);
+      legacyServices.parentNode?.insertBefore(node, legacyServices);
     }
     setMountNode(node);
+
+    // The commercial home already contains the current marketing overview.
+    // Keep the legacy section mounted for React, but remove it from layout so
+    // its viewport animations cannot leave an empty 350px card grid behind.
+    const previousLegacyDisplay = legacyServices.style.display;
+    legacyServices.style.display = "none";
+    legacyServices.setAttribute("aria-hidden", "true");
+
+    const scrollIndicator = document.querySelector<HTMLAnchorElement>(".scroll-indicator");
+    const previousScrollHref = scrollIndicator?.getAttribute("href") ?? null;
+    if (scrollIndicator) scrollIndicator.href = "#ned-commercial-growth";
 
     const heroEyebrow = document.querySelector<HTMLElement>(".hero-copy > .eyebrow");
     const heroTitle = document.querySelector<HTMLElement>(".hero-copy > h1");
@@ -47,13 +58,6 @@ export default function CommercialGrowthRuntime() {
     if (heroLinks[1]) {
       heroLinks[1].href = "/servicos";
       heroLinks[1].textContent = "Conhecer nossos serviços";
-    }
-
-    const servicesTitle = document.querySelector<HTMLElement>("section.services .section-heading h2");
-    const servicesCopy = document.querySelector<HTMLElement>("section.services .section-heading p");
-    if (servicesTitle) servicesTitle.innerHTML = "Sua marca precisa aparecer.<br />E <span>ser escolhida.</span>";
-    if (servicesCopy) {
-      servicesCopy.textContent = "A NED conecta estratégia, comunicação, presença, aquisição e conversão. Cada serviço resolve uma parte do marketing, sem perder a visão do todo.";
     }
 
     const installMobileCta = () => {
@@ -97,6 +101,12 @@ export default function CommercialGrowthRuntime() {
 
     return () => {
       menuObserver.disconnect();
+      legacyServices.style.display = previousLegacyDisplay;
+      legacyServices.removeAttribute("aria-hidden");
+      if (scrollIndicator) {
+        if (previousScrollHref === null) scrollIndicator.removeAttribute("href");
+        else scrollIndicator.setAttribute("href", previousScrollHref);
+      }
       node?.remove();
     };
   }, []);
