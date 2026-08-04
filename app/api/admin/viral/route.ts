@@ -4,6 +4,7 @@ import {
   deleteViralIdea,
   getViralDashboardData,
   isViralDatabaseConfigured,
+  markViralIdeaUsed,
   saveViralProfile,
   toggleViralMission,
 } from "@/lib/viral-store";
@@ -35,6 +36,36 @@ function profileFromBody(body: Record<string, unknown>): ViralProfile {
   };
 }
 
+function emptyDashboard() {
+  return {
+    profile: {
+      instagramHandle: "",
+      niche: "",
+      audience: "",
+      tone: "claro, humano e estratégico",
+      objective: "crescimento e geração de oportunidades",
+      contentPillars: [],
+      updatedAt: null,
+    },
+    missions: [],
+    ideas: [],
+    stats: {
+      viralScore: 0,
+      missionCompletion: 0,
+      missionPoints: 0,
+      completedMissions: 0,
+      totalMissions: 0,
+      ideasCount: 0,
+      averageIdeaScore: 0,
+      readyIdeas: 0,
+      studioTransfers: 0,
+      executionRate: 0,
+      profileCompleteness: 0,
+      streakDays: 0,
+    },
+  };
+}
+
 export async function GET() {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
@@ -43,27 +74,7 @@ export async function GET() {
   const database = isViralDatabaseConfigured();
   if (!database) {
     return NextResponse.json({
-      profile: {
-        instagramHandle: "",
-        niche: "",
-        audience: "",
-        tone: "claro, humano e estratégico",
-        objective: "crescimento e geração de oportunidades",
-        contentPillars: [],
-        updatedAt: null,
-      },
-      missions: [],
-      ideas: [],
-      stats: {
-        viralScore: 0,
-        missionCompletion: 0,
-        missionPoints: 0,
-        completedMissions: 0,
-        totalMissions: 0,
-        ideasCount: 0,
-        averageIdeaScore: 0,
-        streakDays: 0,
-      },
+      ...emptyDashboard(),
       configuration: {
         database: false,
         gemini: Boolean((process.env.GEMINI_API_KEY ?? "").trim()),
@@ -105,7 +116,8 @@ export async function POST(request: Request) {
   try {
     if (body.action === "saveProfile") {
       const profile = await saveViralProfile(profileFromBody(body));
-      return NextResponse.json({ profile });
+      const data = await getViralDashboardData();
+      return NextResponse.json({ profile, stats: data.stats });
     }
 
     if (body.action === "toggleMission") {
@@ -114,6 +126,15 @@ export async function POST(request: Request) {
       await toggleViralMission(id, body.completed === true);
       const data = await getViralDashboardData();
       return NextResponse.json({ missions: data.missions, stats: data.stats });
+    }
+
+    if (body.action === "markIdeaUsed") {
+      const id = clean(body.id, 100);
+      if (!id) return NextResponse.json({ error: "Ideia inválida." }, { status: 400 });
+      const idea = await markViralIdeaUsed(id);
+      if (!idea) return NextResponse.json({ error: "Ideia não encontrada." }, { status: 404 });
+      const data = await getViralDashboardData();
+      return NextResponse.json({ idea, stats: data.stats });
     }
 
     if (body.action === "deleteIdea") {
