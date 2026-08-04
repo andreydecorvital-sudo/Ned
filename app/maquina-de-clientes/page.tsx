@@ -2,99 +2,93 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   BarChart3,
-  Bot,
   Check,
   Clock3,
+  Megaphone,
   MessageCircle,
   MonitorSmartphone,
-  Route,
-  ShieldCheck,
+  SearchCheck,
+  Target,
+  TrendingUp,
 } from "lucide-react";
 import DiagnosticForm from "../components/diagnostic-form";
 import { CommercialPage } from "../components/commercial-shell";
 import styles from "../commercial.module.css";
 
 export const metadata: Metadata = {
-  title: "Máquina de Clientes NED — captação, WhatsApp e CRM",
+  title: "Estratégia de crescimento NED — marketing integrado",
   description:
-    "Uma estrutura que conecta landing page, oferta, captura de leads, WhatsApp, CRM, rastreamento e follow-up.",
+    "Estratégia de marketing que conecta posicionamento, conteúdo, presença digital, mídia, conversão e acompanhamento conforme o momento da empresa.",
   alternates: { canonical: "/maquina-de-clientes" },
   openGraph: {
-    title: "Máquina de Clientes NED",
-    description: "Transforme descoberta em conversa e conversa em acompanhamento comercial organizado.",
+    title: "Estratégia de crescimento NED",
+    description: "Marketing integrado para atrair, posicionar, converter e evoluir com mais clareza.",
     url: "/maquina-de-clientes",
   },
 };
 
 const stages = [
-  ["01", "Descoberta", "Google, Instagram, anúncios, conteúdo ou indicação levam o público para uma oferta clara."],
-  ["02", "Conversão", "A página organiza problema, solução, diferenciais, dúvidas e um próximo passo objetivo."],
-  ["03", "Captação", "O contato entra com nome, empresa, necessidade, serviço, urgência e origem."],
-  ["04", "Atendimento", "O WhatsApp abre com contexto e o lead aparece no CRM para não depender apenas da conversa enviada."],
-  ["05", "Follow-up", "Status, histórico, prioridade e próxima ação mantêm as oportunidades visíveis."],
+  ["01", "Diagnóstico", "Entendemos marca, público, oferta, momento, concorrência e objetivo comercial."],
+  ["02", "Posicionamento", "Definimos a mensagem, os diferenciais e a percepção que a comunicação precisa construir."],
+  ["03", "Criação", "Transformamos a estratégia em conteúdo, campanhas, páginas e experiências de marca."],
+  ["04", "Distribuição", "Escolhemos canais, mídia, públicos e formatos para levar a mensagem até as pessoas certas."],
+  ["05", "Otimização", "Acompanhamos sinais de interesse, contatos e desempenho para melhorar as próximas decisões."],
 ];
 
 const deliverables = [
-  [MonitorSmartphone, "Landing page comercial", "Página responsiva com oferta, CTA, dúvidas e integração com WhatsApp."],
-  [MessageCircle, "Contato contextualizado", "Mensagem pronta e formulário para que a conversa não comece de forma vaga."],
-  [Route, "CRM com pipeline", "Leads organizados entre novo, contato, reunião, proposta, fechado ou perdido."],
-  [BarChart3, "Rastreamento", "UTMs, página de origem e contexto da campanha registrados no contato."],
-  [Bot, "Automação prática", "Regras de prioridade, deduplicação, follow-up e atividades comerciais."],
-  [ShieldCheck, "Privacidade e proteção", "Consentimento, política de privacidade, limite de tentativas e exclusão de dados."],
+  [Target, "Estratégia e posicionamento", "Direção de marca, público, proposta de valor, mensagem e prioridades de marketing."],
+  [Megaphone, "Conteúdo e direção criativa", "Campanhas, conceitos, roteiros, peças e comunicação alinhados ao posicionamento."],
+  [MonitorSmartphone, "Presença digital e conversão", "Sites e landing pages que apresentam a oferta e conduzem para uma ação clara."],
+  [TrendingUp, "Mídia e aquisição", "Campanhas pagas e distribuição conectadas ao criativo, à oferta e ao atendimento."],
+  [BarChart3, "Mensuração e aprendizado", "Leitura de origem, comportamento e qualidade das oportunidades para orientar ajustes."],
+  [MessageCircle, "Relacionamento e acompanhamento", "Organização da jornada após o interesse para que a experiência não termine no primeiro contato."],
 ] as const;
 
-const offers = [
+const engagementOptions = [
   {
-    title: "NED Presença",
-    label: "ENTRADA DIGITAL",
-    price: "R$ 1.500",
-    suffix: "a partir de",
-    description: "Para organizar presença, oferta e caminho para o WhatsApp.",
-    features: ["Landing page", "CTA e WhatsApp", "Analytics básico", "SEO técnico inicial"],
+    title: "Posicionamento e presença",
+    label: "BASE DE MARCA",
+    description: "Para empresas que precisam apresentar melhor o negócio, organizar a mensagem e fortalecer a presença digital.",
+    features: ["Diagnóstico de marca e oferta", "Direção de comunicação", "Conteúdo ou landing page", "Próximos passos definidos"],
   },
   {
-    title: "NED Conversão",
-    label: "MÁQUINA DE CLIENTES",
-    price: "R$ 2.500",
-    suffix: "a partir de",
-    description: "Para captar contatos com contexto e acompanhar o pipeline comercial.",
-    features: ["Tudo do Presença", "Formulário e diagnóstico", "CRM Kanban", "Rastreamento de origem", "Roteiros de atendimento"],
-    featured: true,
+    title: "Campanha e aquisição",
+    label: "CRESCIMENTO",
+    description: "Para empresas que já possuem uma oferta e precisam criar campanhas, alcançar públicos e melhorar conversão.",
+    features: ["Conceito e criativos", "Página ou jornada de campanha", "Planejamento de mídia", "Mensuração e otimização"],
   },
   {
-    title: "NED Automação",
-    label: "PROCESSOS SOB MEDIDA",
-    price: "Sob diagnóstico",
-    suffix: "escopo personalizado",
-    description: "Para integrar atendimento, dados, marketplace e tarefas repetitivas.",
-    features: ["Mapeamento do processo", "Integrações", "Painel ou fluxo específico", "Implantação e suporte"],
+    title: "Marketing contínuo",
+    label: "ACOMPANHAMENTO",
+    description: "Para empresas que precisam de direção recorrente, criação, campanhas e melhorias organizadas ao longo do tempo.",
+    features: ["Planejamento periódico", "Prioridades mensais", "Criação e distribuição", "Análise e próximos testes"],
   },
 ];
 
-export default function MachineOfClientsPage() {
+export default function GrowthStrategyPage() {
   return (
     <CommercialPage>
       <section className={styles.hero}>
         <div>
-          <span className={styles.eyebrow}>PRODUTO PRINCIPAL / NED CONVERSÃO</span>
-          <h1>Uma estrutura para transformar atenção em oportunidade acompanhada.</h1>
+          <span className={styles.eyebrow}>ESTRATÉGIA INTEGRADA / MARKETING E CRESCIMENTO</span>
+          <h1>Marketing para ser encontrado, escolhido e lembrado.</h1>
           <p className={styles.heroLead}>
-            A Máquina de Clientes NED conecta página, oferta, formulário, WhatsApp, CRM e follow-up. Ela não substitui uma boa venda, mas evita que o interesse se perca entre links confusos, mensagens vagas e retornos esquecidos.
+            A NED organiza estratégia, posicionamento, criação, presença digital, mídia e acompanhamento em uma direção única. Não existe pacote pronto: o trabalho começa entendendo o negócio e definindo o que realmente precisa ser feito.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.primary} href="#diagnostico">Quero estruturar meu funil <ArrowRight size={16} /></a>
-            <a className={styles.secondary} href="/analise-gratuita">Solicitar análise gratuita</a>
+            <a className={styles.primary} href="#diagnostico">Quero analisar meu marketing <ArrowRight size={16} /></a>
+            <a className={styles.secondary} href="/portfolio">Ver projetos e experiências</a>
           </div>
           <div className={styles.heroMeta}>
-            <span>Projeto a partir de R$ 2.500</span>
-            <span>Escopo definido antes do início</span>
+            <span>Investimento definido após análise</span>
+            <span>Escopo personalizado</span>
             <span>Atendimento direto</span>
           </div>
         </div>
 
         <aside className={styles.heroPanel}>
-          <span className={styles.panelKicker}>FLUXO COMERCIAL CONECTADO</span>
-          <h2 className={styles.panelTitle}>Descoberta → conversa → acompanhamento.</h2>
+          <span className={styles.panelKicker}>JORNADA DE MARKETING CONECTADA</span>
+          <h2 className={styles.panelTitle}>Estratégia → criação → distribuição → evolução.</h2>
           <div className={styles.pipeline}>
             {stages.slice(0, 4).map(([number, title, text]) => (
               <div className={styles.pipelineItem} key={number}>
@@ -110,11 +104,11 @@ export default function MachineOfClientsPage() {
       <section className={styles.sectionSoft}>
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.eyebrow}>O QUE É ENTREGUE</span>
-            <h2 className={styles.sectionTitle}>As partes precisam trabalhar <span>juntas.</span></h2>
+            <span className={styles.eyebrow}>O QUE PODE COMPOR O PROJETO</span>
+            <h2 className={styles.sectionTitle}>As ações precisam seguir a mesma <span>direção.</span></h2>
           </div>
           <p>
-            Um formulário isolado não resolve atendimento; um CRM vazio não gera demanda; tráfego para uma oferta confusa apenas acelera o desperdício. O projeto organiza a jornada completa de acordo com o momento da empresa.
+            Um anúncio não resolve uma oferta confusa. Um site não sustenta uma marca sem mensagem. Conteúdo sem distribuição pode não chegar a ninguém. O escopo combina apenas as frentes necessárias para o objetivo e para o momento da empresa.
           </p>
         </div>
         <div className={styles.grid3}>
@@ -131,19 +125,19 @@ export default function MachineOfClientsPage() {
       <section className={styles.section}>
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.eyebrow}>PROCESSO DE IMPLANTAÇÃO</span>
-            <h2 className={styles.sectionTitle}>Primeiro a lógica. Depois a <span>tecnologia.</span></h2>
+            <span className={styles.eyebrow}>COMO TRABALHAMOS</span>
+            <h2 className={styles.sectionTitle}>Primeiro a estratégia. Depois a <span>execução.</span></h2>
           </div>
           <p>
-            O projeto começa entendendo oferta, origem dos contatos, capacidade de atendimento e gargalos. Só depois são definidos páginas, automações e indicadores.
+            O projeto começa entendendo o que a empresa quer conquistar, como o público decide e quais ativos já existem. A partir disso, definimos prioridades, entregas, canais, prazo e investimento.
           </p>
         </div>
         <div className={styles.grid4}>
           {[
-            ["01", "Diagnóstico", "Mapeamento do negócio, jornada, atendimento e objetivo."],
-            ["02", "Escopo", "Entregáveis, prazo, investimento e responsabilidades definidos."],
-            ["03", "Construção", "Página, captura, CRM, integrações e testes."],
-            ["04", "Publicação", "Entrada em produção, acompanhamento e próximos ajustes."],
+            ["01", "Diagnóstico", "Leitura do negócio, marca, público, concorrência, comunicação e objetivo."],
+            ["02", "Direção", "Posicionamento, mensagem, prioridades, escopo e critérios de sucesso."],
+            ["03", "Criação e distribuição", "Produção das entregas e ativação nos canais definidos."],
+            ["04", "Análise e evolução", "Leitura dos sinais, ajustes e recomendação dos próximos movimentos."],
           ].map(([number, title, description]) => (
             <article className={styles.card} key={number}>
               <span className={styles.cardNumber}>{number}</span>
@@ -154,65 +148,64 @@ export default function MachineOfClientsPage() {
         </div>
       </section>
 
-      <section className={styles.section} id="planos">
+      <section className={styles.section} id="formas-de-atuacao">
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.eyebrow}>FORMAS DE CONTRATAÇÃO</span>
-            <h2 className={styles.sectionTitle}>Compre uma solução que faça sentido <span>agora.</span></h2>
+            <span className={styles.eyebrow}>FORMAS DE ATUAÇÃO</span>
+            <h2 className={styles.sectionTitle}>O formato depende do que sua marca precisa <span>agora.</span></h2>
           </div>
           <p>
-            Os valores são referências iniciais para projetos com escopo controlado. Funcionalidades adicionais, integrações e volume de conteúdo são definidos na proposta.
+            Todas as propostas são feitas após análise. O investimento varia conforme objetivo, entregas, quantidade de canais, volume de criação, mídia, prazo e nível de acompanhamento.
           </p>
         </div>
         <div className={styles.grid3}>
-          {offers.map((offer) => (
-            <article className={`${styles.priceCard}${offer.featured ? ` ${styles.priceCardFeatured}` : ""}`} key={offer.title}>
-              <span className={styles.priceLabel}>{offer.label}</span>
-              <h3>{offer.title}</h3>
-              <span className={styles.price}>{offer.price} <small>{offer.suffix}</small></span>
-              <p>{offer.description}</p>
+          {engagementOptions.map((option) => (
+            <article className={styles.card} key={option.title}>
+              <span className={styles.eyebrow}>{option.label}</span>
+              <h3>{option.title}</h3>
+              <p>{option.description}</p>
               <ul className={styles.featureList}>
-                {offer.features.map((feature) => <li key={feature}><Check size={14} /> {feature}</li>)}
+                {option.features.map((feature) => <li key={feature}><Check size={14} /> {feature}</li>)}
               </ul>
-              <a className={styles.textLink} href="#diagnostico">Quero conversar <ArrowRight size={15} /></a>
+              <div className={styles.heroActions}>
+                <a className={styles.textLink} href="#diagnostico">Solicitar análise <ArrowRight size={15} /></a>
+              </div>
             </article>
           ))}
         </div>
       </section>
 
-      <section className={styles.sectionSoft} id="recorrencia">
+      <section className={styles.sectionSoft} id="continuidade">
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.eyebrow}>MANUTENÇÃO E EVOLUÇÃO</span>
-            <h2 className={styles.sectionTitle}>Receita recorrente exige <span>continuidade.</span></h2>
+            <span className={styles.eyebrow}>MARKETING CONTÍNUO</span>
+            <h2 className={styles.sectionTitle}>Marcas consistentes não aparecem apenas quando precisam <span>vender.</span></h2>
           </div>
           <p>
-            Após a entrega, os planos mensais mantêm a estrutura funcionando e permitem pequenas melhorias sem abrir um novo projeto a cada necessidade.
+            A continuidade pode incluir planejamento, conteúdo, criativos, páginas, campanhas, análise de dados e reuniões de direção. Frequência e investimento são definidos de acordo com a estrutura e as metas da empresa.
           </p>
         </div>
         <div className={styles.grid2}>
-          <article className={styles.priceCard}>
-            <span className={styles.priceLabel}>MANUTENÇÃO</span>
-            <h3>NED Care</h3>
-            <span className={styles.price}>R$ 297 <small>a partir de / mês</small></span>
-            <p>Para manter site, formulários e CRM operacionais.</p>
+          <article className={styles.card}>
+            <span className={styles.eyebrow}>MARCA E CONTEÚDO</span>
+            <h3>Presença consistente</h3>
+            <p>Para organizar comunicação, campanhas, conteúdo e melhorias na presença digital ao longo do tempo.</p>
             <ul className={styles.featureList}>
-              <li><Check size={14} /> Monitoramento técnico</li>
-              <li><Check size={14} /> Pequenas alterações mensais</li>
-              <li><Check size={14} /> Revisão básica de leads e funcionamento</li>
-              <li><Check size={14} /> Suporte técnico combinado</li>
+              <li><Check size={14} /> Planejamento por prioridade</li>
+              <li><Check size={14} /> Direção criativa e conteúdo</li>
+              <li><Check size={14} /> Páginas e materiais de campanha</li>
+              <li><Check size={14} /> Reuniões e próximos movimentos</li>
             </ul>
           </article>
-          <article className={styles.priceCard}>
-            <span className={styles.priceLabel}>EVOLUÇÃO</span>
-            <h3>NED Growth</h3>
-            <span className={styles.price}>R$ 900 <small>a partir de / mês</small></span>
-            <p>Para empresas que precisam testar páginas, campanhas e melhorias no funil.</p>
+          <article className={styles.card}>
+            <span className={styles.eyebrow}>AQUISIÇÃO E CRESCIMENTO</span>
+            <h3>Campanhas em evolução</h3>
+            <p>Para empresas que precisam testar mensagens, criativos, públicos e páginas com acompanhamento recorrente.</p>
             <ul className={styles.featureList}>
-              <li><Check size={14} /> Tudo do NED Care</li>
-              <li><Check size={14} /> Novas páginas ou experimentos definidos no plano</li>
-              <li><Check size={14} /> Revisão mensal do pipeline</li>
-              <li><Check size={14} /> Reunião de evolução e próximos testes</li>
+              <li><Check size={14} /> Planejamento de campanhas</li>
+              <li><Check size={14} /> Produção e adaptação de criativos</li>
+              <li><Check size={14} /> Acompanhamento de mídia e conversão</li>
+              <li><Check size={14} /> Análise e novos testes</li>
             </ul>
           </article>
         </div>
@@ -221,30 +214,30 @@ export default function MachineOfClientsPage() {
       <section className={styles.splitSection}>
         <div>
           <span className={styles.eyebrow}>PARA QUEM FAZ SENTIDO</span>
-          <h2>Empresas que já têm algo para vender, mas perdem clareza ou acompanhamento.</h2>
+          <h2>Empresas que querem construir presença e crescimento com mais direção.</h2>
           <p>
-            A solução é indicada para negócios que dependem de Instagram, Google, anúncios ou WhatsApp e precisam organizar o caminho entre interesse e atendimento. Não é uma promessa de vendas automáticas nem substitui a capacidade de atender e entregar.
+            A estratégia é indicada para negócios que precisam melhorar posicionamento, comunicação, aquisição ou conversão. Não existe promessa automática de vendas: o trabalho cria uma base de marketing mais clara, consistente e preparada para aprender.
           </p>
         </div>
         <aside className={styles.callout}>
           <Clock3 size={28} />
           <strong>Próximo passo</strong>
-          <p>Preencha o diagnóstico. A NED avalia se o momento pede uma página, o CRM completo, automação ou uma solução menor.</p>
+          <p>Conte o momento da empresa. A NED analisa o desafio e recomenda quais frentes devem entrar primeiro.</p>
         </aside>
       </section>
 
       <section className={styles.formSection} id="diagnostico">
         <div className={styles.formIntro}>
-          <span className={styles.eyebrow}>DIAGNÓSTICO COMERCIAL</span>
-          <h2>Vamos descobrir o que sua empresa precisa <span>primeiro.</span></h2>
+          <span className={styles.eyebrow}>ANÁLISE DE MARKETING</span>
+          <h2>Vamos entender o que sua marca precisa <span>primeiro.</span></h2>
           <p>
-            As respostas entram no CRM antes de o WhatsApp abrir. Assim, a conversa já começa com serviço, necessidade, urgência e origem organizados.
+            Responda sobre o negócio, o desafio e o momento atual. A conversa começa com contexto suficiente para avaliar prioridades e preparar uma proposta sob análise.
           </p>
         </div>
         <DiagnosticForm
-          source="maquina_clientes"
-          presetService="Máquina de Clientes NED"
-          context={{ offer: "ned_conversao", landing_page: "maquina_de_clientes" }}
+          source="estrategia_crescimento"
+          presetService="Ainda não sei"
+          context={{ interest: "marketing_integrado", landing_page: "maquina_de_clientes" }}
         />
       </section>
     </CommercialPage>
