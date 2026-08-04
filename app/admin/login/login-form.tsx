@@ -29,7 +29,7 @@ export default function LoginForm({ configured }: { configured: boolean }) {
         return;
       }
 
-      window.location.assign("/admin/leads");
+      window.location.assign("/admin");
     } catch {
       setError("Falha de conexão. Tente novamente.");
     } finally {
@@ -62,7 +62,7 @@ export default function LoginForm({ configured }: { configured: boolean }) {
 
       <button className={styles.primaryButton} type="submit" disabled={!configured || loading}>
         <LockKeyhole size={17} />
-        {loading ? "Entrando..." : "Acessar painel"}
+        {loading ? "Entrando..." : "Abrir central administrativa"}
         {!loading && <ArrowRight size={16} />}
       </button>
     </form>
