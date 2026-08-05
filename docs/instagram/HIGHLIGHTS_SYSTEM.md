@@ -1,155 +1,142 @@
 # Sistema de Destaques do Instagram — NED
 
-> Status: **APROVADO COMO ESTRUTURA / FOTOS PENDENTES DE ARQUIVAMENTO**  
-> Data: 04/08/2026  
-> Perfil: `@marketing.ned`
+> **Status:** APROVADO  
+> **Última correção:** 05/08/2026  
+> **Perfil:** `@marketing.ned`
 
 ## Objetivo
 
-Os Destaques devem funcionar como uma navegação rápida do perfil, não como uma coleção de capas decorativas.
+Os Destaques funcionam como uma navegação rápida do perfil. A pessoa deve entender quem é a NED, o que ela oferece, como trabalha e onde encontrar provas e próximos passos.
 
-A pessoa precisa entender em poucos segundos:
+## Ordem oficial e arquivos canônicos
 
-- quem é a NED;
-- o que ela resolve;
-- o que já foi construído;
-- como trabalha;
-- como iniciar uma conversa.
+### 01 — Comece
 
-## Ordem oficial
+Arquivo: `public/brand/highlights/01-comece.svg`
 
-### 01 — NED
+Função:
 
-Conteúdo:
-
-- posicionamento;
-- ideia central;
-- história curta;
-- quem conduz os projetos;
-- princípios da marca.
-
-Arquivo esperado: `public/brand/instagram/highlights/01-ned.webp`
+- porta de entrada da marca;
+- apresentar a ideia central;
+- orientar quem chegou ao perfil pela primeira vez.
 
 ### 02 — Serviços
 
-Conteúdo:
+Arquivo: `public/brand/highlights/02-servicos.svg`
+
+Função:
 
 - Marketing e conteúdo;
 - Conversão e aquisição;
 - Marketplaces;
 - tecnologia como apoio.
 
-Arquivo esperado: `public/brand/instagram/highlights/02-servicos.webp`
+### 03 — Trabalhos
 
-### 03 — Cases
+Arquivo: `public/brand/highlights/03-trabalhos.svg`
 
-Conteúdo:
+Função:
 
-- projetos para clientes autorizados;
+- cases autorizados;
 - projetos próprios;
 - contexto, decisão, entrega e evidência;
 - antes e depois somente quando verificável.
 
-Arquivo esperado: `public/brand/instagram/highlights/03-cases.webp`
+### 04 — Processo
 
-### 04 — Lab
+Arquivo: `public/brand/highlights/04-processo.svg`
 
-Conteúdo:
+Função:
 
-- NED Score;
-- A Máquina Quebrada;
-- experiências interativas;
-- protótipos e conceitos em desenvolvimento.
+- briefing;
+- entendimento do problema;
+- direção;
+- execução;
+- revisão e aprendizado.
 
-Arquivo esperado: `public/brand/instagram/highlights/04-lab.webp`
+### 05 — Sites
 
-### 05 — Resultados
+Arquivo: `public/brand/highlights/05-sites.svg`
 
-Conteúdo:
+Função:
 
-- evidências reais;
-- métricas autorizadas;
-- feedbacks verificáveis;
-- melhorias observáveis;
-- nenhuma promessa ou número inventado.
+- sites;
+- landing pages;
+- experiência;
+- conversão;
+- mobile e clareza digital.
 
-Arquivo esperado: `public/brand/instagram/highlights/05-resultados.webp`
+### 06 — Market
 
-### 06 — Bastidores
+Arquivo: `public/brand/highlights/06-market.svg`
 
-Conteúdo:
+Função:
 
-- raciocínio;
-- pesquisa;
-- processo;
-- decisões de design;
-- operação e produção real;
-- sem exposição pessoal forçada.
+- marketplaces;
+- catálogo;
+- anúncios;
+- operação;
+- reputação e conversão.
 
-Arquivo esperado: `public/brand/instagram/highlights/06-bastidores.webp`
+### 07 — NED
 
-### 07 — Contato
+Arquivo: `public/brand/highlights/07-ned.svg`
 
-Conteúdo:
+Função:
 
-- como funciona a análise inicial;
-- WhatsApp;
-- o que enviar no primeiro contato;
-- expectativas de atendimento;
-- próximo passo claro.
+- marca;
+- filosofia;
+- bastidores;
+- história;
+- princípios.
 
-Arquivo esperado: `public/brand/instagram/highlights/07-contato.webp`
+## Direção visual das capas
 
-## Direção das capas
+As capas aprovadas usam:
 
-As capas utilizam as fotografias já escolhidas pelo responsável da NED.
+- base preta profunda;
+- off-white como estrutura;
+- círculo externo fino;
+- composição simples;
+- símbolo legível em tamanho pequeno;
+- cor apenas como acento semântico;
+- verde reservado a Sites;
+- laranja reservado a Market;
+- demais capas prioritariamente neutras.
 
-### Regras de enquadramento
+## Fotografias
 
-- formato de trabalho: 1080 × 1920 px;
-- assunto principal dentro do centro seguro;
-- verificar o recorte circular em tamanho real;
-- evitar detalhes importantes nas extremidades;
-- contraste suficiente para leitura em 32–64 px;
-- não colocar títulos longos dentro da fotografia;
-- o nome do Destaque já aparece abaixo da capa no Instagram;
-- preservar a aparência real da fotografia;
-- não aplicar filtro que transforme todas as imagens na mesma cor.
+Fotografias reais podem ser usadas dentro dos Stories salvos em cada Destaque. Elas não substituem automaticamente os SVGs das capas.
 
-## Tratamento comum
+Uma mudança das capas para fotografia exige nova aprovação e deve preservar:
 
-Pode ser usado:
-
-- vinheta leve;
-- contraste moderado;
-- grão discreto;
-- preto profundo;
-- branco quebrado;
-- espiral pequena como assinatura;
-- uma cor editorial apenas quando o conteúdo exigir.
-
-Arquivo opcional de tratamento:
-
-`public/brand/instagram/highlights/highlight-overlay.svg`
+- leitura no recorte circular;
+- centro seguro;
+- contraste;
+- aparência real;
+- ausência de texto pequeno;
+- coerência com a função do Destaque.
 
 ## O que não fazer
 
-- não gerar fotos substitutas;
-- não usar ícones genéricos como capa principal;
-- não montar mosaicos;
-- não inserir várias imagens na mesma capa;
-- não usar neon em todos os Destaques;
-- não usar roxo como assinatura automática;
-- não alterar as fotos escolhidas sem nova aprovação;
-- não expor dados internos, clientes ou resultados sem autorização.
+- não criar uma segunda estrutura paralela de capas;
+- não substituir os SVGs por imagens geradas sem aprovação;
+- não usar ícones genéricos fora do sistema aprovado;
+- não transformar todas as capas em roxo;
+- não alterar ordem, nome ou função silenciosamente;
+- não expor clientes, métricas ou dados internos sem autorização.
 
 ## Checklist antes de publicar
 
-- [ ] O arquivo está no caminho canônico?
-- [ ] A imagem continua legível no recorte circular?
-- [ ] A fotografia parece real e preservada?
-- [ ] O Destaque possui função clara?
-- [ ] A ordem do perfil continua coerente?
-- [ ] Não existe informação sensível?
-- [ ] A capa não depende de texto pequeno?
-- [ ] O tratamento parece NED sem depender apenas da cor?
+- [ ] O arquivo vem de `public/brand/highlights`?
+- [ ] O nome abaixo da capa corresponde à ordem oficial?
+- [ ] O símbolo continua legível no recorte circular?
+- [ ] A cor possui função semântica?
+- [ ] O conteúdo interno do Destaque corresponde à capa?
+- [ ] Não existe informação sensível ou inventada?
+
+## Fonte técnica
+
+Consulte também:
+
+`public/brand/highlights/README.md`

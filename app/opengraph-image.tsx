@@ -4,12 +4,7 @@ export const alt = "Ned Marketing — sua marca precisa de direção";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
-
 export default function OpenGraphImage() {
-  const logoUrl = new URL("/brand/ned-logo-dark.svg", siteUrl).toString();
-  const symbolUrl = new URL("/brand/ned-symbol-spiral.svg", siteUrl).toString();
-
   return new ImageResponse(
     (
       <div
@@ -37,14 +32,26 @@ export default function OpenGraphImage() {
           }}
         />
 
-        <div style={{ display: "flex", flexDirection: "column", zIndex: 2, width: "72%" }}>
-          <img src={logoUrl} width="310" height="105" alt="NED Marketing" style={{ objectFit: "contain" }} />
+        <div style={{ display: "flex", flexDirection: "column", zIndex: 2, width: "74%" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 16,
+              color: "#08080a",
+            }}
+          >
+            <strong style={{ fontSize: 64, lineHeight: 0.8, letterSpacing: 1 }}>NED</strong>
+            <span style={{ paddingBottom: 6, fontSize: 15, fontWeight: 800, letterSpacing: 5 }}>
+              MARKETING
+            </span>
+          </div>
 
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              marginTop: 54,
+              marginTop: 62,
               fontSize: 74,
               lineHeight: 0.92,
               fontWeight: 900,
@@ -69,18 +76,21 @@ export default function OpenGraphImage() {
             right: 64,
             top: 56,
             bottom: 56,
-            width: 270,
+            width: 246,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: 26,
+            color: "#f1eee7",
             background: "#08080a",
-            border: "1px solid rgba(8,8,10,.18)",
           }}
         >
-          <img src={symbolUrl} width="118" height="118" alt="" style={{ objectFit: "contain" }} />
+          <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 3 }}>DIREÇÃO</span>
+          <span style={{ fontSize: 66, lineHeight: 0.85, fontWeight: 900 }}>ANTES DE FERRAMENTA.</span>
+          <span style={{ fontSize: 13, color: "#aaa8af" }}>NED / 2026</span>
         </div>
 
-        <div style={{ position: "absolute", right: 64, bottom: 56, display: "flex", width: 270, height: 8 }}>
+        <div style={{ position: "absolute", right: 64, bottom: 56, display: "flex", width: 246, height: 8 }}>
           <span style={{ flex: 1, background: "#ff2b32" }} />
           <span style={{ flex: 1, background: "#25ff74" }} />
           <span style={{ flex: 1, background: "#1268ff" }} />

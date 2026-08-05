@@ -11,7 +11,6 @@ import "./overrides.css";
 import "./runtime.css";
 import "./brand-tokens.css";
 import "./brand-commercial.css";
-import "./admin-brand.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
 
@@ -41,8 +40,8 @@ export const metadata: Metadata = {
   creator: "Ned Marketing",
   publisher: "Ned Marketing",
   icons: {
-    icon: [{ url: "/brand/favicon.svg", type: "image/svg+xml" }],
-    shortcut: "/brand/favicon.svg",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
   },
   keywords: [
     "agência de marketing",

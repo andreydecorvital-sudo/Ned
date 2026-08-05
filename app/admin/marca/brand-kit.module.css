@@ -98,82 +98,6 @@
   text-transform: uppercase;
 }
 
-.logoGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap: 14px;
-}
-
-.logoCard {
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.12);
-}
-
-.darkCard { background: #0d0d10; }
-.lightCard { color: var(--ned-black); background: var(--ned-paper); border-color: rgba(8,8,10,.15); }
-
-.logoStage {
-  display: grid;
-  min-height: 300px;
-  place-items: center;
-  padding: 28px;
-  background-image:
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: 46px 46px;
-}
-
-.lightCard .logoStage {
-  background-image:
-    linear-gradient(rgba(8,8,10,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(8,8,10,.04) 1px, transparent 1px);
-}
-
-.logoStage img {
-  display: block;
-  width: min(100%, 420px);
-  max-height: 230px;
-  object-fit: contain;
-}
-
-.logoCard:first-child .logoStage img {
-  width: min(100%, 280px);
-  max-height: 280px;
-}
-
-.logoMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 20px;
-  border-top: 1px solid rgba(255,255,255,.1);
-}
-
-.lightCard .logoMeta { border-top-color: rgba(8,8,10,.12); }
-
-.logoMeta > div {
-  display: grid;
-  gap: 6px;
-}
-
-.logoMeta strong { font-size: 12px; }
-.logoMeta small { color: #83808a; font-size: 10px; line-height: 1.45; }
-
-.logoMeta a {
-  display: inline-flex;
-  min-height: 38px;
-  align-items: center;
-  gap: 7px;
-  padding: 0 12px;
-  color: inherit;
-  border: 1px solid currentColor;
-  font-size: 9px;
-  font-weight: 850;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
 .colorGrid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0,1fr));
@@ -223,9 +147,7 @@
   aspect-ratio: 1;
   place-items: center;
   overflow: hidden;
-  background:
-    linear-gradient(145deg, rgba(255,255,255,.06), transparent 45%),
-    #17171c center/cover no-repeat;
+  background: #08080a;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,.16);
 }
@@ -239,37 +161,39 @@
 }
 
 .highlightPreview span {
-  position: relative;
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
   z-index: 2;
-  color: rgba(255,255,255,.5);
-  font: 400 32px/1 var(--font-display), sans-serif;
+  color: rgba(255,255,255,.32);
+  font: 400 18px/1 var(--font-display), sans-serif;
 }
 
 .highlightCard > strong,
 .highlightCard > small,
 .highlightCard > code,
-.pending {
+.approved {
   display: block;
 }
 
 .highlightCard > strong { margin-top: 13px; font-size: 11px; }
 .highlightCard > small { margin-top: 4px; color: #898691; font-size: 9px; }
 .highlightCard > code { margin-top: 12px; overflow: hidden; color: #66636c; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
-.pending { margin-top: 10px; color: #ffc879; font-size: 7px; font-weight: 850; letter-spacing: .1em; }
+.approved { margin-top: 10px; color: #8ce9bd; font-size: 7px; font-weight: 850; letter-spacing: .1em; }
 
 .rules {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 14px;
+  gap: 18px;
   align-items: center;
   margin-top: 14px;
-  padding: 18px;
+  padding: 20px;
   color: #c9c6bf;
   background: rgba(255,255,255,.025);
   border: 1px solid rgba(255,255,255,.1);
 }
 
-.rules div { display: grid; gap: 4px; }
+.rules div { display: grid; gap: 5px; }
 .rules strong { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
 .rules span { color: #85828c; font-size: 10px; line-height: 1.55; }
 
@@ -285,8 +209,15 @@
     gap: 22px;
   }
 
-  .logoGrid { grid-template-columns: 1fr; }
   .highlightGrid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+  .rules {
+    grid-template-columns: auto 1fr;
+  }
+
+  .rules > :last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 520px) {
@@ -295,6 +226,4 @@
   .header > span { display: none; }
   .hero { padding-top: 46px; }
   .colorGrid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .logoMeta { align-items: flex-start; flex-direction: column; }
-  .logoStage { min-height: 230px; }
 }
