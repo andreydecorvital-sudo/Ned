@@ -24,15 +24,17 @@
 
 .brand {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
   color: inherit;
   text-decoration: none;
 }
 
-.brand strong {
-  font: 400 2.4rem/1 var(--font-display), sans-serif;
-  letter-spacing: .04em;
+.brand img {
+  display: block;
+  width: 116px;
+  height: auto;
+  object-fit: contain;
 }
 
 .brand small,
@@ -229,6 +231,10 @@
   .shell {
     width: auto;
     padding: 24px 14px 60px;
+  }
+
+  .brand img {
+    width: 104px;
   }
 
   .hero h1 {
