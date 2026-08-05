@@ -5,6 +5,7 @@
 - [NED Brand OS](NED_BRAND_OS.md) — fonte canônica de posicionamento, identidade visual, logo, editorias, NED OS, histórico, governança e roadmap.
 - [Atualização Brand OS 1.1](NED_BRAND_OS_1.1_UPDATE.md) — estado atual de implementação da logo, site, Brand Kit e Destaques do Instagram.
 - [Atualização Brand OS 1.2](NED_BRAND_OS_1.2_UPDATE.md) — sistema editorial autoral, variedade visual, carrosséis, Stories, territórios criativos, fotografia e matriz antirrepetição.
+- [Atualização Brand OS 1.3](NED_BRAND_OS_1.3_UPDATE.md) — sistema oficial de selos editoriais, significados, arquivos canônicos, aplicação no site e regras de governança.
 - [StyleSeed](../STYLESEED.md) — bloqueio visual permanente para interface, criativos, carrosséis, Stories e apresentações.
 - [NED OS — 30 carrosséis autorais + 30 Stories](instagram/NED_OS_30_CARROSSEIS_AUTORAIS_PROMPT.md) — documento operacional canônico para planejar e produzir a nova fase do Instagram.
 - [Sistema de Destaques do Instagram](instagram/HIGHLIGHTS_SYSTEM.md) — ordem, função, enquadramento e caminhos canônicos das fotografias escolhidas.
@@ -15,12 +16,13 @@
 1. Ler o `NED_BRAND_OS.md` para entender estratégia, decisões aprovadas e regras permanentes.
 2. Ler `NED_BRAND_OS_1.1_UPDATE.md` para saber o que já foi implementado tecnicamente.
 3. Ler `NED_BRAND_OS_1.2_UPDATE.md` antes de criar ou aprovar posts, carrosséis, Stories, campanhas, criativos ou sistemas de conteúdo.
-4. Ler o `STYLESEED.md` antes de qualquer alteração visual, interface ou material de apresentação.
-5. Ler `instagram/NED_OS_30_CARROSSEIS_AUTORAIS_PROMPT.md` ao planejar ou produzir os 30 carrosséis e seus Stories.
-6. Consultar `instagram/HIGHLIGHTS_SYSTEM.md` ao trabalhar com o perfil, as capas ou os Destaques.
-7. Ler o registro histórico quando for necessário entender a origem, o motivo ou o contexto de uma decisão.
-8. Verificar o estado real do repositório antes de afirmar que uma recomendação já foi implementada.
-9. Consultar PRs e commits mais recentes para decisões posteriores aos documentos.
+4. Ler `NED_BRAND_OS_1.3_UPDATE.md` antes de criar, substituir ou aplicar selos, símbolos secundários ou marcadores editoriais.
+5. Ler o `STYLESEED.md` antes de qualquer alteração visual, interface ou material de apresentação.
+6. Ler `instagram/NED_OS_30_CARROSSEIS_AUTORAIS_PROMPT.md` ao planejar ou produzir os 30 carrosséis e seus Stories.
+7. Consultar `instagram/HIGHLIGHTS_SYSTEM.md` ao trabalhar com o perfil, as capas ou os Destaques.
+8. Ler o registro histórico quando for necessário entender a origem, o motivo ou o contexto de uma decisão.
+9. Verificar o estado real do repositório antes de afirmar que uma recomendação já foi implementada.
+10. Consultar PRs e commits mais recentes para decisões posteriores aos documentos.
 
 ## Regra
 
