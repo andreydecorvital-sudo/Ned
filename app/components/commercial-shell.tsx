@@ -1,4 +1,4 @@
-import { ArrowRight, LockKeyhole, MessageCircle } from "lucide-react";
+import { ArrowRight, Instagram, LockKeyhole, MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import CommercialDesktopNav from "./commercial-desktop-nav";
 import CommercialMobileNav from "./commercial-mobile-nav";
@@ -34,6 +34,7 @@ export function CommercialFooter() {
         <NedBrandMark />
         <div>
           <span>© {new Date().getFullYear()} NED Marketing</span>
+          <span>CNPJ 68.380.253/0001-71</span>
           <span>Direção antes de ferramenta.</span>
         </div>
       </div>
@@ -41,6 +42,14 @@ export function CommercialFooter() {
         <nav aria-label="Links do rodapé">
           {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
           <a href="/privacidade">Privacidade</a>
+          <a
+            href="https://www.instagram.com/marketing.ned/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram da NED Marketing"
+          >
+            <Instagram size={12} /> Instagram
+          </a>
           <a href="https://wa.me/5511917814612?text=Ol%C3%A1%2C%20Ned!%20Quero%20conversar%20sobre%20marketing%20para%20minha%20empresa." target="_blank" rel="noreferrer">
             <MessageCircle size={12} /> WhatsApp
           </a>
