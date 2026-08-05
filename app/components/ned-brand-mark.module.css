@@ -17,6 +17,31 @@
   width: 112px;
 }
 
+.headerMark {
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.word {
+  font-family: var(--font-display), sans-serif;
+  font-size: 39px;
+  font-weight: 400;
+  letter-spacing: .02em;
+  line-height: .82;
+}
+
+.signature {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-bottom: 3px;
+  color: #c8c5bd;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .21em;
+  text-transform: uppercase;
+}
+
 .spiral {
   width: 15px;
   height: 15px;
@@ -40,5 +65,14 @@
 
   .compact .logo {
     width: 104px;
+  }
+
+  .word {
+    font-size: 34px;
+  }
+
+  .signature {
+    font-size: 6px;
+    letter-spacing: .17em;
   }
 }

@@ -13,13 +13,33 @@ export function NedSpiral({ className = "" }: { className?: string }) {
   );
 }
 
+type NedBrandMarkProps = {
+  compact?: boolean;
+  href?: string;
+  variant?: "full" | "header";
+};
+
 export default function NedBrandMark({
   compact = false,
   href = "/",
-}: {
-  compact?: boolean;
-  href?: string;
-}) {
+  variant = "full",
+}: NedBrandMarkProps) {
+  if (variant === "header") {
+    return (
+      <a
+        className={`${styles.mark} ${styles.headerMark}`}
+        href={href}
+        aria-label="NED Marketing — início"
+        data-brand-status="header-lockup"
+      >
+        <strong className={styles.word}>NED</strong>
+        <span className={styles.signature}>
+          Marketing <NedSpiral />
+        </span>
+      </a>
+    );
+  }
+
   return (
     <a
       className={`${styles.mark} ${compact ? styles.compact : ""}`}
