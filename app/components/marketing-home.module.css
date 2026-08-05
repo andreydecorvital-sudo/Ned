@@ -2,7 +2,8 @@
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 14% 10%, rgba(112, 64, 255, 0.16), transparent 28rem),
+    radial-gradient(circle at 13% 9%, rgba(244, 238, 226, 0.08), transparent 29rem),
+    radial-gradient(circle at 87% 78%, rgba(255, 122, 0, 0.035), transparent 26rem),
     #08080a;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -23,6 +24,15 @@
   align-self: start;
 }
 
+.marketingEditorialSeal {
+  display: block;
+  width: 116px;
+  height: 116px;
+  margin: 0 0 28px;
+  border-radius: 50%;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+
 .marketingEditorialIntro h2 {
   max-width: 530px;
   margin: 18px 0 0;
@@ -34,7 +44,7 @@
 }
 
 .marketingEditorialIntro h2 span {
-  color: #8e65ff;
+  color: #f0e9dc;
 }
 
 .marketingEditorialIntro p {
@@ -50,33 +60,61 @@
 }
 
 .marketingDirection {
+  --seal-accent: 244, 238, 226;
+
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) 44px;
+  grid-template-columns: 76px minmax(0, 1fr) 44px;
   align-items: start;
-  gap: 20px;
+  gap: 22px;
   padding: 30px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.13);
   transition: background 180ms ease, padding 180ms ease;
 }
 
+.marketingDirection[data-accent="sites"] {
+  --seal-accent: 133, 191, 66;
+}
+
+.marketingDirection[data-accent="automation"] {
+  --seal-accent: 133, 102, 255;
+}
+
+.marketingDirection[data-accent="marketplaces"] {
+  --seal-accent: 255, 122, 0;
+}
+
+.marketingDirection[data-accent="content"] {
+  --seal-accent: 218, 73, 73;
+}
+
+.marketingDirection[data-accent="systems"] {
+  --seal-accent: 184, 184, 184;
+}
+
 .marketingDirection:hover {
   padding-right: 16px;
   padding-left: 16px;
-  background: linear-gradient(90deg, rgba(112, 64, 255, 0.12), transparent 75%);
+  background: linear-gradient(90deg, rgba(var(--seal-accent), 0.115), transparent 78%);
 }
 
 .marketingDirectionIcon {
-  display: grid;
-  width: 46px;
-  height: 46px;
-  place-items: center;
-  color: #cfc4ff;
-  background: rgba(112, 64, 255, 0.1);
-  border: 1px solid rgba(142, 101, 255, 0.3);
+  display: block;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px);
+}
+
+.marketingDirectionIcon img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .marketingDirectionLabel {
-  color: #8d8997;
+  color: rgb(var(--seal-accent));
   font-size: 8px;
   font-weight: 900;
   letter-spacing: 0.16em;
@@ -128,12 +166,13 @@
   color: #f4f0ff;
   border: 1px solid rgba(255, 255, 255, 0.16);
   text-decoration: none;
-  transition: background 180ms ease, border-color 180ms ease;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
 }
 
 .marketingDirectionLink:hover {
-  background: #7040ff;
-  border-color: #7040ff;
+  color: #08080a;
+  background: rgb(var(--seal-accent));
+  border-color: rgb(var(--seal-accent));
 }
 
 @media (max-width: 960px) {
@@ -153,8 +192,14 @@
     padding: 74px 0;
   }
 
+  .marketingEditorialSeal {
+    width: 92px;
+    height: 92px;
+    margin-bottom: 22px;
+  }
+
   .marketingDirection {
-    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-columns: 54px minmax(0, 1fr);
     gap: 14px;
     padding: 24px 0;
   }
@@ -166,8 +211,9 @@
   }
 
   .marketingDirectionIcon {
-    width: 42px;
-    height: 42px;
+    width: 52px;
+    height: 52px;
+    transform: none;
   }
 
   .marketingDirectionLink {
