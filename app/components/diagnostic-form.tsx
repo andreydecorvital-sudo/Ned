@@ -9,10 +9,11 @@ const whatsappNumber = "5511917814612";
 const attributionStorageKey = "ned_lead_attribution";
 
 const serviceOptions = [
+  "Marketing e conteúdo",
   "Site ou landing page",
   "Marketplaces",
-  "Automações",
   "Tráfego pago",
+  "Automações",
   "Ainda não sei",
 ];
 
@@ -52,29 +53,24 @@ type Attribution = {
 
 const questions = [
   {
-    kicker: "01 / CONTATO",
-    title: "Com quem a NED vai conversar?",
-    description: "Esses dados permitem salvar o diagnóstico antes de abrir o WhatsApp.",
+    kicker: "01 / NEGÓCIO",
+    title: "O que sua empresa oferece?",
+    description: "Explique de forma simples o que você vende ou qual serviço presta.",
   },
   {
-    kicker: "02 / NEGÓCIO",
-    title: "Qual é o seu negócio?",
-    description: "Conte de forma simples o que sua empresa vende ou oferece.",
+    kicker: "02 / DESAFIO",
+    title: "O que você quer melhorar agora?",
+    description: "Pode ser vender mais, melhorar o site, organizar marketplace ou gerar contatos.",
   },
   {
-    kicker: "03 / DESAFIO",
-    title: "O que precisa melhorar?",
-    description: "Qual é o principal problema ou oportunidade que você enxerga hoje?",
+    kicker: "03 / DIREÇÃO",
+    title: "Qual frente parece mais próxima?",
+    description: "Escolha o caminho mais parecido com sua necessidade e o momento do projeto.",
   },
   {
-    kicker: "04 / SERVIÇO",
-    title: "Qual serviço procura?",
-    description: "Escolha o caminho mais próximo do que você precisa agora.",
-  },
-  {
-    kicker: "05 / URGÊNCIA",
-    title: "Quando isso precisa avançar?",
-    description: "Isso ajuda a NED a preparar uma conversa objetiva e priorizar corretamente.",
+    kicker: "04 / CONTATO",
+    title: "Onde continuamos essa conversa?",
+    description: "A NED salva o diagnóstico e prepara seu WhatsApp. Você decide se envia a mensagem.",
   },
 ];
 
@@ -148,17 +144,15 @@ export default function DiagnosticForm({
   }, []);
 
   const currentValid = useMemo(() => {
-    if (step === 0) {
-      return (
-        answers.name.trim().length >= 2 &&
-        answers.company.trim().length >= 2 &&
-        phoneDigits(answers.whatsapp).length >= 10
-      );
-    }
-    if (step === 1) return Boolean(answers.business.trim());
-    if (step === 2) return Boolean(answers.challenge.trim());
-    if (step === 3) return Boolean(answers.service);
-    return Boolean(answers.urgency && answers.consent);
+    if (step === 0) return Boolean(answers.business.trim());
+    if (step === 1) return Boolean(answers.challenge.trim());
+    if (step === 2) return Boolean(answers.service && answers.urgency);
+    return (
+      answers.name.trim().length >= 2 &&
+      answers.company.trim().length >= 2 &&
+      phoneDigits(answers.whatsapp).length >= 10 &&
+      answers.consent
+    );
   }, [answers, step]);
 
   const updateAnswer = <Key extends keyof Answers>(key: Key, value: Answers[Key]) => {
@@ -281,7 +275,7 @@ export default function DiagnosticForm({
       <div className="diagnostic-progress" aria-label={`Etapa ${step + 1} de ${questions.length}`}>
         <div className="diagnostic-progress-copy">
           <span>DIAGNÓSTICO NED</span>
-          <strong>{String(step + 1).padStart(2, "0")} / 05</strong>
+          <strong>{String(step + 1).padStart(2, "0")} / 04</strong>
         </div>
         <div className="diagnostic-progress-track">
           <motion.span
@@ -295,67 +289,19 @@ export default function DiagnosticForm({
         <motion.div
           key={step}
           className="diagnostic-question"
-          initial={{ opacity: 0, x: 28 }}
+          initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -28 }}
-          transition={{ duration: 0.35 }}
+          exit={{ opacity: 0, x: -24 }}
+          transition={{ duration: 0.28 }}
         >
           <span className="diagnostic-kicker">{questions[step].kicker}</span>
           <h3>{questions[step].title}</h3>
           <p>{questions[step].description}</p>
 
           {step === 0 && (
-            <div className={styles.contactGrid}>
-              <label>
-                <span>SEU NOME</span>
-                <input
-                  autoFocus
-                  value={answers.name}
-                  onChange={(event) => updateAnswer("name", event.target.value)}
-                  placeholder="Como podemos chamar você?"
-                  maxLength={120}
-                  autoComplete="name"
-                />
-              </label>
-              <label>
-                <span>EMPRESA</span>
-                <input
-                  value={answers.company}
-                  onChange={(event) => updateAnswer("company", event.target.value)}
-                  placeholder="Nome da empresa ou Autônomo"
-                  maxLength={160}
-                  autoComplete="organization"
-                />
-              </label>
-              <label>
-                <span>WHATSAPP COM DDD</span>
-                <input
-                  value={answers.whatsapp}
-                  onChange={(event) => updateAnswer("whatsapp", event.target.value)}
-                  onKeyDown={(event) => { if (event.key === "Enter") goNext(); }}
-                  placeholder="Ex.: (13) 99999-9999"
-                  maxLength={24}
-                  inputMode="tel"
-                  autoComplete="tel"
-                />
-              </label>
-              <label className={styles.honeypot} aria-hidden="true">
-                Site
-                <input
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={answers.website}
-                  onChange={(event) => updateAnswer("website", event.target.value)}
-                />
-              </label>
-            </div>
-          )}
-
-          {step === 1 && (
             <label className="diagnostic-field">
               <span>TIPO DE NEGÓCIO</span>
               <input
-                autoFocus
                 value={answers.business}
                 onChange={(event) => updateAnswer("business", event.target.value)}
                 onKeyDown={(event) => { if (event.key === "Enter") goNext(); }}
@@ -365,55 +311,106 @@ export default function DiagnosticForm({
             </label>
           )}
 
-          {step === 2 && (
+          {step === 1 && (
             <label className="diagnostic-field">
               <span>PRINCIPAL DESAFIO</span>
               <textarea
-                autoFocus
                 value={answers.challenge}
                 onChange={(event) => updateAnswer("challenge", event.target.value)}
-                placeholder="Ex.: organizar catálogo, vender mais, automatizar atendimento..."
+                placeholder="Ex.: vender mais, melhorar o site, organizar marketplace..."
                 rows={4}
                 maxLength={1000}
               />
             </label>
           )}
 
-          {step === 3 && (
-            <div className="diagnostic-options" role="radiogroup" aria-label="Serviço desejado">
-              {serviceOptions.map((option) => (
-                <button
-                  key={option}
-                  className={answers.service === option ? "is-selected" : ""}
-                  type="button"
-                  role="radio"
-                  aria-checked={answers.service === option}
-                  onClick={() => updateAnswer("service", option)}
-                >
-                  <span>{option}</span>
-                  <Check size={17} />
-                </button>
-              ))}
+          {step === 2 && (
+            <div className={styles.directionGrid}>
+              <div className={styles.optionGroup}>
+                <span className={styles.optionLabel}>FRENTE MAIS PRÓXIMA</span>
+                <div className="diagnostic-options" role="radiogroup" aria-label="Serviço desejado">
+                  {serviceOptions.map((option) => (
+                    <button
+                      key={option}
+                      className={answers.service === option ? "is-selected" : ""}
+                      type="button"
+                      role="radio"
+                      aria-checked={answers.service === option}
+                      onClick={() => updateAnswer("service", option)}
+                    >
+                      <span>{option}</span>
+                      <Check size={17} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.optionGroup}>
+                <span className={styles.optionLabel}>MOMENTO DO PROJETO</span>
+                <div className="diagnostic-options" role="radiogroup" aria-label="Urgência do projeto">
+                  {urgencyOptions.map((option) => (
+                    <button
+                      key={option}
+                      className={answers.urgency === option ? "is-selected" : ""}
+                      type="button"
+                      role="radio"
+                      aria-checked={answers.urgency === option}
+                      onClick={() => updateAnswer("urgency", option)}
+                    >
+                      <span>{option}</span>
+                      <Check size={17} />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <>
-              <div className="diagnostic-options" role="radiogroup" aria-label="Urgência do projeto">
-                {urgencyOptions.map((option) => (
-                  <button
-                    key={option}
-                    className={answers.urgency === option ? "is-selected" : ""}
-                    type="button"
-                    role="radio"
-                    aria-checked={answers.urgency === option}
-                    onClick={() => updateAnswer("urgency", option)}
-                  >
-                    <span>{option}</span>
-                    <Check size={17} />
-                  </button>
-                ))}
+              <div className={styles.contactGrid}>
+                <label>
+                  <span>SEU NOME</span>
+                  <input
+                    value={answers.name}
+                    onChange={(event) => updateAnswer("name", event.target.value)}
+                    placeholder="Como podemos chamar você?"
+                    maxLength={120}
+                    autoComplete="name"
+                  />
+                </label>
+                <label>
+                  <span>EMPRESA OU ATUAÇÃO</span>
+                  <input
+                    value={answers.company}
+                    onChange={(event) => updateAnswer("company", event.target.value)}
+                    placeholder="Nome da empresa ou Autônomo"
+                    maxLength={160}
+                    autoComplete="organization"
+                  />
+                </label>
+                <label className={styles.contactWide}>
+                  <span>WHATSAPP COM DDD</span>
+                  <input
+                    value={answers.whatsapp}
+                    onChange={(event) => updateAnswer("whatsapp", event.target.value)}
+                    placeholder="Ex.: (13) 99999-9999"
+                    maxLength={24}
+                    inputMode="tel"
+                    autoComplete="tel"
+                  />
+                </label>
+                <label className={styles.honeypot} aria-hidden="true">
+                  Site
+                  <input
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={answers.website}
+                    onChange={(event) => updateAnswer("website", event.target.value)}
+                  />
+                </label>
               </div>
+
               <label className={styles.consent}>
                 <input
                   type="checkbox"
