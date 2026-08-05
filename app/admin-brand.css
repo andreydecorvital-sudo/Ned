@@ -11,6 +11,7 @@ a[aria-label="NED Marketing"] > img {
   width: 122px;
   height: auto;
   object-fit: contain;
+  mix-blend-mode: screen;
 }
 
 header a[aria-label="NED Marketing"]::before {
@@ -19,6 +20,7 @@ header a[aria-label="NED Marketing"]::before {
   flex: 0 0 auto;
   content: "";
   background: url("/brand/ned-logo-official.webp") center / contain no-repeat;
+  mix-blend-mode: screen;
 }
 
 header a[aria-label="NED Marketing"] > strong {
