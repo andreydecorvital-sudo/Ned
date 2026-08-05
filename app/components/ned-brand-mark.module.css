@@ -17,6 +17,22 @@
   width: 112px;
 }
 
+.spiral {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  overflow: visible;
+  color: currentColor;
+}
+
+.spiral path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 @media (max-width: 520px) {
   .logo {
     width: 128px;
