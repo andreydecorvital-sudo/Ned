@@ -17,7 +17,7 @@ type BrandAccent = "institutional" | "misterios" | "sites" | "ia" | "automacao" 
 export function CommercialHeader() {
   return (
     <header className={styles.header}>
-      <NedBrandMark />
+      <NedBrandMark variant="wordmark" />
       <CommercialDesktopNav />
       <a className={styles.headerCta} href="/analise-gratuita">
         Solicitar análise <ArrowRight size={15} />
@@ -31,7 +31,7 @@ export function CommercialFooter() {
   return (
     <footer className={styles.footer}>
       <div className={styles.footerIdentity}>
-        <NedBrandMark />
+        <NedBrandMark variant="signature" />
         <div>
           <span>© {new Date().getFullYear()} NED Marketing</span>
           <span>Direção antes de ferramenta.</span>
