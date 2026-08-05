@@ -27,6 +27,11 @@ header a[aria-label="NED Marketing"] > strong {
   display: none !important;
 }
 
+a[aria-label="Abrir o site da NED"] > img,
+img[alt="Logo oficial NED Marketing"] {
+  mix-blend-mode: screen;
+}
+
 @media (max-width: 520px) {
   a[aria-label="NED Marketing"] > img,
   header a[aria-label="NED Marketing"]::before {
