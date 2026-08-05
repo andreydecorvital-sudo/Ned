@@ -2,38 +2,41 @@
 
 Esta pasta reúne os arquivos de marca e suas regras de uso.
 
-## Logo
+## Logo — OFICIAL PARA USO DIGITAL
 
-**Status: DIREÇÃO VISUAL APROVADA / ARQUIVO FINAL EXATO PENDENTE**
+Arquivo em uso:
 
-A direção escolhida possui:
+`ned-logo-official.webp`
 
-- palavra `NED` forte, branca ou off-white;
-- leitura simples e profissional;
-- `MARKETING` menor e espaçado;
-- espiral discreta como símbolo secundário;
-- base institucional preta;
-- textura somente em aplicações editoriais maiores.
+Origem:
 
-O arquivo limpo e exato ainda não está arquivado no repositório. O site utiliza uma assinatura tipográfica temporária, identificada como provisória no código.
+- imagem enviada diretamente pelo responsável da NED em 05/08/2026;
+- desenho preservado sem reconstrução por fonte;
+- margem preta excedente removida;
+- redimensionamento técnico para uso web;
+- proporção original preservada.
 
-### Correção de 05/08/2026
+A aplicação contém:
 
-Foram retirados da aplicação:
+- palavra `NED` branca com textura sutil;
+- detalhe próprio no encontro entre `E` e `D`;
+- `MARKETING` leve e espaçado;
+- espiral ao final da assinatura;
+- composição horizontal sobre base preta.
 
-- um render metálico que não era um arquivo limpo da logo;
-- vetores produzidos por aproximação a partir da descrição textual;
-- favicon e wordmark derivados desses vetores.
+### Estado dos formatos
 
-Esses arquivos não correspondiam com fidelidade ao desenho escolhido.
+- WebP oficial para site, painel e compartilhamento digital: disponível;
+- arquivo vetorial para impressão e ampliações extremas: ainda pendente;
+- favicon reduzido: permanece neutro até existir uma versão validada do símbolo isolado.
 
 ### Regra
 
 - não redesenhar a logo por aproximação;
-- não tratar render ou mockup como arquivo oficial;
-- não reconstruir a versão definitiva apenas com uma fonte;
-- aplicar a logo final somente quando o arquivo exato estiver disponível;
-- manter um fallback simples e claramente provisório até lá.
+- não trocar o arquivo por uma fonte parecida;
+- não alterar proporção, detalhe do `D`, espaçamento ou espiral;
+- não aplicar cores editoriais na marca-mãe;
+- qualquer vetor futuro deve ser comparado com esta imagem antes de ser aprovado.
 
 ## Destaques do Instagram — APROVADO
 
@@ -48,6 +51,14 @@ As capas oficiais estão em:
 7. `highlights/07-ned.svg`
 
 A especificação completa está em `highlights/README.md`.
+
+Correções de apresentação aplicadas em 05/08/2026:
+
+- remoção do filtro de grão que deformava a capa Comece;
+- remoção do filtro que apagava o símbolo de Serviços;
+- prévias sem círculo duplicado;
+- SVGs exibidos inteiros com `object-fit: contain`;
+- grade ampliada para facilitar inspeção visual.
 
 Esses SVGs são os ativos canônicos das capas. Fotografias podem aparecer dentro dos Stories, mas não substituem automaticamente as capas aprovadas.
 

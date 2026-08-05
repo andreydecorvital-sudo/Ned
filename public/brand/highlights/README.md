@@ -1,7 +1,8 @@
 # Destaques do Instagram — padrão aprovado
 
 Status: **APROVADO**  
-Data: **04/08/2026**
+Data: **04/08/2026**  
+Última correção técnica: **05/08/2026**
 
 Estas capas formam o sistema oficial dos Destaques fixados da NED Marketing.
 
@@ -29,6 +30,22 @@ Estas capas formam o sistema oficial dos Destaques fixados da NED Marketing.
 - os demais permanecem institucionais e neutros;
 - evitar transformar os Destaques em uma sequência de serviços técnicos.
 
+## Correções técnicas
+
+Em 05/08/2026 foram corrigidos dois problemas de renderização:
+
+- o filtro de grão de `01-comece.svg` criava um quadrado cinza sobre a espiral;
+- o filtro de `02-servicos.svg` substituía os blocos por uma camada praticamente invisível.
+
+Os filtros foram removidos sem alterar os símbolos aprovados.
+
+Na tela `/admin/marca`, os SVGs devem ser apresentados:
+
+- sem círculo adicional;
+- sem `object-fit: cover`;
+- com `object-fit: contain`;
+- em grade ampla o suficiente para inspeção visual.
+
 ## Observação
 
-Os arquivos em SVG são os assets canônicos para uso e manutenção. Eles preservam a direção visual das capas aprovadas e permitem exportação em PNG/WebP sem perda de qualidade.
+Os arquivos em SVG são os ativos canônicos para uso e manutenção. Eles preservam a direção visual das capas aprovadas e permitem exportação em PNG/WebP sem perda de qualidade.

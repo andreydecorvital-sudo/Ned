@@ -4,7 +4,11 @@ export const alt = "Ned Marketing — sua marca precisa de direção";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
+
 export default function OpenGraphImage() {
+  const logoUrl = new URL("/brand/ned-logo-official.webp", siteUrl).toString();
+
   return new ImageResponse(
     (
       <div
@@ -36,22 +40,21 @@ export default function OpenGraphImage() {
           <div
             style={{
               display: "flex",
-              alignItems: "flex-end",
-              gap: 16,
-              color: "#08080a",
+              width: 310,
+              height: 148,
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#08080a",
             }}
           >
-            <strong style={{ fontSize: 64, lineHeight: 0.8, letterSpacing: 1 }}>NED</strong>
-            <span style={{ paddingBottom: 6, fontSize: 15, fontWeight: 800, letterSpacing: 5 }}>
-              MARKETING
-            </span>
+            <img src={logoUrl} width="300" height="144" alt="NED Marketing" style={{ objectFit: "contain" }} />
           </div>
 
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              marginTop: 62,
+              marginTop: 38,
               fontSize: 74,
               lineHeight: 0.92,
               fontWeight: 900,

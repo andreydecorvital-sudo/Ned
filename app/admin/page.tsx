@@ -35,7 +35,7 @@ const modules = [
     eyebrow: "BRAND OS",
     title: "Marca e Instagram",
     description:
-      "Consulte cores, editorias e a estrutura dos Destaques sem tratar arquivos provisórios como oficiais.",
+      "Consulte a logo oficial, as cores por editoria e as capas dos Destaques em seus arquivos reais.",
     action: "Abrir Brand Kit",
     icon: Palette,
   },
@@ -51,7 +51,7 @@ export default async function AdminHomePage() {
       <div className={styles.shell}>
         <header className={styles.header}>
           <a className={styles.brand} href="/" aria-label="Abrir o site da NED">
-            <strong>NED</strong>
+            <img src="/brand/ned-logo-official.webp" alt="NED Marketing" />
             <small>ADMIN</small>
           </a>
           <a className={styles.siteLink} href="/" target="_blank" rel="noreferrer">

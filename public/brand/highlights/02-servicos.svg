@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NED destaque Serviços">
-  <defs><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="12"/><feComponentTransfer><feFuncA type="table" tableValues="0 .07"/></feComponentTransfer></filter></defs>
-  <rect width="512" height="512" fill="#08080a"/><circle cx="256" cy="256" r="242" fill="none" stroke="#f1eee7" stroke-width="2"/>
-  <g stroke="#08080a" stroke-width="7" stroke-linejoin="round" filter="url(#grain)">
+  <rect width="512" height="512" fill="#08080a"/>
+  <circle cx="256" cy="256" r="242" fill="none" stroke="#f1eee7" stroke-width="2"/>
+  <g stroke="#08080a" stroke-width="7" stroke-linejoin="round">
     <polygon points="256,122 316,157 256,193 196,157" fill="#f1eee7"/>
     <polygon points="196,157 256,193 256,263 196,227" fill="#eee9df"/>
     <polygon points="316,157 256,193 256,263 316,227" fill="#f7f3eb"/>
