@@ -17,7 +17,7 @@ type BrandAccent = "institutional" | "misterios" | "sites" | "ia" | "automacao" 
 export function CommercialHeader() {
   return (
     <header className={styles.header}>
-      <NedBrandMark />
+      <NedBrandMark variant="header" />
       <CommercialDesktopNav />
       <a className={styles.headerCta} href="/analise-gratuita">
         Solicitar análise <ArrowRight size={15} />
