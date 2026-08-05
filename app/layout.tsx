@@ -13,7 +13,7 @@ import "./brand-tokens.css";
 import "./brand-commercial.css";
 import "./admin-brand.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nedmarketing.com.br";
 
 const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
