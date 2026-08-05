@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { ArrowLeft, Check, Download, Instagram } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, Instagram } from "lucide-react";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
+import NedBrandMark from "@/app/components/ned-brand-mark";
 import styles from "./brand-kit.module.css";
 
 export const metadata: Metadata = {
@@ -10,33 +11,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const logos = [
-  {
-    name: "Referência visual oficial",
-    file: "/brand/ned-logo-primary.webp",
-    note: "Imagem final aprovada, preservada sem redesenho.",
-    dark: true,
-  },
-  {
-    name: "Marca vetorial para interface",
-    file: "/brand/ned-logo-flat.svg",
-    note: "Versão técnica branca, sem textura e escalável.",
-    dark: true,
-  },
-  {
-    name: "Marca para fundos claros",
-    file: "/brand/ned-logo-dark.svg",
-    note: "Versão preta para papel, documentos e superfícies claras.",
-    dark: false,
-  },
-  {
-    name: "Símbolo reduzido",
-    file: "/brand/ned-symbol-spiral.svg",
-    note: "Uso pontual em favicon, selo, loading e microinterações.",
-    dark: true,
-  },
-] as const;
 
 const highlights = [
   ["01", "NED", "/brand/instagram/highlights/01-ned.webp", "Institucional"],
@@ -74,10 +48,10 @@ export default async function BrandKitPage() {
         <section className={styles.hero}>
           <div>
             <span className={styles.eyebrow}>MARCA E INSTAGRAM</span>
-            <h1>Uma fonte visual. <em>Aplicações consistentes.</em></h1>
+            <h1>Decisões aprovadas. <em>Sem ativos inventados.</em></h1>
           </div>
           <p>
-            Este painel centraliza a logo aprovada, as versões técnicas, as cores por editoria e a estrutura dos Destaques. Arquivos ausentes continuam marcados como pendentes, sem substituição por imagens genéricas.
+            Este painel organiza cores, editorias e Destaques. A logo final continua aprovada como direção, mas o arquivo limpo e exato ainda precisa ser recuperado antes de qualquer aplicação definitiva.
           </p>
         </section>
 
@@ -85,23 +59,18 @@ export default async function BrandKitPage() {
           <div className={styles.sectionHead}>
             <div>
               <span>01 / LOGO</span>
-              <h2>Marca oficial e derivados</h2>
+              <h2>Status real da marca</h2>
             </div>
-            <p>A referência WebP é a fonte visual aprovada. Os SVGs existem para interface, escala e aplicações técnicas.</p>
+            <p>O render metálico e os vetores aproximados foram removidos da interface. Eles não representam com fidelidade a logo escolhida.</p>
           </div>
 
-          <div className={styles.logoGrid}>
-            {logos.map((logo) => (
-              <article className={`${styles.logoCard} ${logo.dark ? styles.darkCard : styles.lightCard}`} key={logo.file}>
-                <div className={styles.logoStage}>
-                  <img src={logo.file} alt={logo.name} />
-                </div>
-                <div className={styles.logoMeta}>
-                  <div><strong>{logo.name}</strong><small>{logo.note}</small></div>
-                  <a href={logo.file} download><Download size={14} /> Abrir arquivo</a>
-                </div>
-              </article>
-            ))}
+          <div className={styles.rules}>
+            <AlertTriangle size={20} />
+            <div>
+              <strong>Assinatura temporária em uso</strong>
+              <span>O site usa uma composição limpa de NED + Marketing + espiral apenas para não deixar a marca ausente. Ela não é apresentada como logo oficial.</span>
+            </div>
+            <NedBrandMark />
           </div>
         </section>
 
@@ -111,7 +80,7 @@ export default async function BrandKitPage() {
               <span>02 / CORES</span>
               <h2>Marca neutra. Editorias contextuais.</h2>
             </div>
-            <p>O roxo representa Automação. Ele não volta a funcionar como cor automática da NED inteira.</p>
+            <p>O roxo representa Automação. Ele não funciona como cor automática da NED inteira.</p>
           </div>
           <div className={styles.colorGrid}>
             {colors.map(([name, value, use]) => (
@@ -130,20 +99,19 @@ export default async function BrandKitPage() {
               <span>03 / INSTAGRAM</span>
               <h2>Destaques organizados como sistema</h2>
             </div>
-            <p>As capas usam as fotografias já escolhidas. Como os arquivos não estão no repositório, os espaços abaixo mostram o nome e o caminho exato esperado.</p>
+            <p>As capas devem usar as fotografias já escolhidas. Enquanto os arquivos não estiverem no repositório, os espaços abaixo mostram somente ordem, nome e caminho esperado.</p>
           </div>
 
           <div className={styles.highlightGrid}>
             {highlights.map(([number, name, file, purpose]) => (
               <article className={styles.highlightCard} key={file}>
-                <div className={styles.highlightPreview} style={{ backgroundImage: `url(${file})` }}>
-                  <img src="/brand/instagram/highlights/highlight-overlay.svg" alt="" />
+                <div className={styles.highlightPreview}>
                   <span>{number}</span>
                 </div>
                 <strong>{name}</strong>
                 <small>{purpose}</small>
                 <code>{file}</code>
-                <span className={styles.pending}>ARQUIVO PENDENTE</span>
+                <span className={styles.pending}>FOTO ORIGINAL PENDENTE</span>
               </article>
             ))}
           </div>
@@ -152,7 +120,7 @@ export default async function BrandKitPage() {
             <Instagram size={20} />
             <div>
               <strong>Regra de aplicação</strong>
-              <span>Fotografia real, assunto centralizado, leitura no recorte circular e espiral usada somente como assinatura discreta.</span>
+              <span>Fotografia real, assunto centralizado, leitura no recorte circular e tratamento discreto. Nenhuma imagem gerada entra como substituta.</span>
             </div>
             <Check size={18} />
           </div>
