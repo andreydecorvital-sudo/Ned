@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-labelledby="title desc">
+  <title id="title">NED</title>
+  <desc id="desc">Wordmark vetorial NED em off-white.</desc>
+  <g fill="#f1eee7">
+    <path d="M18 108V12h42l75 60V12h42v96h-40L60 48v60H18Z"/>
+    <path d="M206 12h142v28H248v10h83v26h-83v4h105v28H206V12Z"/>
+    <path fill-rule="evenodd" d="M378 12h54c53 0 82 19 82 48s-29 48-82 48h-54V12Zm40 28v40h13c27 0 42-6 42-20s-15-20-42-20h-13Z"/>
+    <path d="m353 54 17-5v14l-17 5V54Z"/>
+  </g>
+</svg>
