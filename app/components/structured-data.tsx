@@ -1,4 +1,4 @@
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ned-git-main-vitaldecor.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nedmarketing.com.br";
 
 export default function StructuredData() {
   const data = {
