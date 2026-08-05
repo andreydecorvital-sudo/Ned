@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { AlertTriangle, ArrowLeft, Check, Instagram } from "lucide-react";
+import { ArrowLeft, Check, Download, Instagram } from "lucide-react";
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import NedBrandMark from "@/app/components/ned-brand-mark";
 import styles from "./brand-kit.module.css";
 
 export const metadata: Metadata = {
@@ -48,10 +47,10 @@ export default async function BrandKitPage() {
         <section className={styles.hero}>
           <div>
             <span className={styles.eyebrow}>MARCA E INSTAGRAM</span>
-            <h1>Decisões aprovadas. <em>Sem ativos inventados.</em></h1>
+            <h1>Arquivos reais. <em>Aplicação sem distorção.</em></h1>
           </div>
           <p>
-            Este painel organiza o estado real da marca, as cores por editoria e as capas oficiais dos Destaques. Um arquivo só aparece como oficial quando existe e corresponde ao material aprovado.
+            A logo abaixo é exatamente a imagem enviada e aprovada. O único tratamento aplicado foi remover a margem preta excedente para ela funcionar no site sem ficar minúscula ou espremida.
           </p>
         </section>
 
@@ -59,19 +58,25 @@ export default async function BrandKitPage() {
           <div className={styles.sectionHead}>
             <div>
               <span>01 / LOGO</span>
-              <h2>Status real da marca</h2>
+              <h2>Logo oficial da NED</h2>
             </div>
-            <p>O render metálico e os vetores aproximados foram retirados da aplicação. Eles não representam com fidelidade a logo escolhida.</p>
+            <p>Arquivo raster oficial para uso digital. Nenhum vetor aproximado ou reconstrução por fonte está sendo usado.</p>
           </div>
 
-          <div className={styles.rules}>
-            <AlertTriangle size={20} />
-            <div>
-              <strong>Assinatura temporária em uso</strong>
-              <span>O site usa uma composição limpa de NED + Marketing + espiral apenas para não deixar a marca ausente. Ela não é apresentada como logo oficial.</span>
+          <article className={styles.logoCard}>
+            <div className={styles.logoStage}>
+              <img src="/brand/ned-logo-official.webp" alt="Logo oficial NED Marketing" />
             </div>
-            <NedBrandMark />
-          </div>
+            <div className={styles.logoMeta}>
+              <div>
+                <strong>NED Marketing</strong>
+                <small>Imagem enviada pelo responsável da marca • recorte técnico sem redesenho</small>
+              </div>
+              <a href="/brand/ned-logo-official.webp" download>
+                <Download size={14} /> Baixar arquivo
+              </a>
+            </div>
+          </article>
         </section>
 
         <section className={styles.section}>
@@ -97,9 +102,9 @@ export default async function BrandKitPage() {
           <div className={styles.sectionHead}>
             <div>
               <span>03 / INSTAGRAM</span>
-              <h2>Capas oficiais dos Destaques</h2>
+              <h2>Capas dos Destaques</h2>
             </div>
-            <p>Estes sete SVGs já estavam aprovados e arquivados no repositório. Eles são os arquivos canônicos para exportação e publicação.</p>
+            <p>As capas agora aparecem inteiras, sem um segundo círculo cortando os SVGs e sem filtros que apagam ou deformam os símbolos.</p>
           </div>
 
           <div className={styles.highlightGrid}>
@@ -107,12 +112,17 @@ export default async function BrandKitPage() {
               <article className={styles.highlightCard} key={file}>
                 <div className={styles.highlightPreview}>
                   <img src={file} alt={`Capa do destaque ${name}`} />
-                  <span>{number}</span>
                 </div>
-                <strong>{name}</strong>
-                <small>{purpose}</small>
-                <code>{file}</code>
-                <span className={styles.approved}>APROVADO</span>
+                <div className={styles.highlightMeta}>
+                  <span className={styles.highlightNumber}>{number}</span>
+                  <div>
+                    <strong>{name}</strong>
+                    <small>{purpose}</small>
+                  </div>
+                </div>
+                <a className={styles.assetLink} href={file} download>
+                  <Download size={12} /> Baixar SVG
+                </a>
               </article>
             ))}
           </div>
@@ -121,7 +131,7 @@ export default async function BrandKitPage() {
             <Instagram size={20} />
             <div>
               <strong>Regra de aplicação</strong>
-              <span>Base preta, off-white estrutural, ícones legíveis e cor usada apenas como acento semântico.</span>
+              <span>Base preta, off-white estrutural, símbolos centralizados e cor usada apenas como acento semântico.</span>
             </div>
             <Check size={18} />
           </div>
