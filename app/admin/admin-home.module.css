@@ -24,16 +24,15 @@
 
 .brand {
   display: inline-flex;
-  align-items: center;
-  gap: 12px;
+  align-items: baseline;
+  gap: 10px;
   color: inherit;
   text-decoration: none;
 }
 
-.brand img {
-  display: block;
-  width: 96px;
-  height: auto;
+.brand strong {
+  font: 400 2.4rem/1 var(--font-display), sans-serif;
+  letter-spacing: .04em;
 }
 
 .brand small,
