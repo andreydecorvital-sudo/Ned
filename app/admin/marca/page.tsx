@@ -13,13 +13,13 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const highlights = [
-  ["01", "NED", "/brand/instagram/highlights/01-ned.webp", "Institucional"],
-  ["02", "Serviços", "/brand/instagram/highlights/02-servicos.webp", "Visão geral"],
-  ["03", "Cases", "/brand/instagram/highlights/03-cases.webp", "Trabalhos"],
-  ["04", "Lab", "/brand/instagram/highlights/04-lab.webp", "Experiências"],
-  ["05", "Resultados", "/brand/instagram/highlights/05-resultados.webp", "Evidências"],
-  ["06", "Bastidores", "/brand/instagram/highlights/06-bastidores.webp", "Processo"],
-  ["07", "Contato", "/brand/instagram/highlights/07-contato.webp", "Próximo passo"],
+  ["01", "Comece", "/brand/highlights/01-comece.svg", "Porta de entrada"],
+  ["02", "Serviços", "/brand/highlights/02-servicos.svg", "Frentes comerciais"],
+  ["03", "Trabalhos", "/brand/highlights/03-trabalhos.svg", "Cases e portfólio"],
+  ["04", "Processo", "/brand/highlights/04-processo.svg", "Como a NED trabalha"],
+  ["05", "Sites", "/brand/highlights/05-sites.svg", "UX e conversão"],
+  ["06", "Market", "/brand/highlights/06-market.svg", "Marketplaces"],
+  ["07", "NED", "/brand/highlights/07-ned.svg", "Marca e bastidores"],
 ] as const;
 
 const colors = [
@@ -51,7 +51,7 @@ export default async function BrandKitPage() {
             <h1>Decisões aprovadas. <em>Sem ativos inventados.</em></h1>
           </div>
           <p>
-            Este painel organiza cores, editorias e Destaques. A logo final continua aprovada como direção, mas o arquivo limpo e exato ainda precisa ser recuperado antes de qualquer aplicação definitiva.
+            Este painel organiza o estado real da marca, as cores por editoria e as capas oficiais dos Destaques. Um arquivo só aparece como oficial quando existe e corresponde ao material aprovado.
           </p>
         </section>
 
@@ -61,7 +61,7 @@ export default async function BrandKitPage() {
               <span>01 / LOGO</span>
               <h2>Status real da marca</h2>
             </div>
-            <p>O render metálico e os vetores aproximados foram removidos da interface. Eles não representam com fidelidade a logo escolhida.</p>
+            <p>O render metálico e os vetores aproximados foram retirados da aplicação. Eles não representam com fidelidade a logo escolhida.</p>
           </div>
 
           <div className={styles.rules}>
@@ -97,21 +97,22 @@ export default async function BrandKitPage() {
           <div className={styles.sectionHead}>
             <div>
               <span>03 / INSTAGRAM</span>
-              <h2>Destaques organizados como sistema</h2>
+              <h2>Capas oficiais dos Destaques</h2>
             </div>
-            <p>As capas devem usar as fotografias já escolhidas. Enquanto os arquivos não estiverem no repositório, os espaços abaixo mostram somente ordem, nome e caminho esperado.</p>
+            <p>Estes sete SVGs já estavam aprovados e arquivados no repositório. Eles são os arquivos canônicos para exportação e publicação.</p>
           </div>
 
           <div className={styles.highlightGrid}>
             {highlights.map(([number, name, file, purpose]) => (
               <article className={styles.highlightCard} key={file}>
                 <div className={styles.highlightPreview}>
+                  <img src={file} alt={`Capa do destaque ${name}`} />
                   <span>{number}</span>
                 </div>
                 <strong>{name}</strong>
                 <small>{purpose}</small>
                 <code>{file}</code>
-                <span className={styles.pending}>FOTO ORIGINAL PENDENTE</span>
+                <span className={styles.approved}>APROVADO</span>
               </article>
             ))}
           </div>
@@ -120,7 +121,7 @@ export default async function BrandKitPage() {
             <Instagram size={20} />
             <div>
               <strong>Regra de aplicação</strong>
-              <span>Fotografia real, assunto centralizado, leitura no recorte circular e tratamento discreto. Nenhuma imagem gerada entra como substituta.</span>
+              <span>Base preta, off-white estrutural, ícones legíveis e cor usada apenas como acento semântico.</span>
             </div>
             <Check size={18} />
           </div>
