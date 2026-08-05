@@ -7,6 +7,8 @@ export default function StructuredData() {
     name: "Ned Marketing",
     url: siteUrl,
     telephone: "+55 11 91781-4612",
+    taxID: "68.380.253/0001-71",
+    sameAs: ["https://www.instagram.com/marketing.ned/"],
     description:
       "Estrutura de marketing para posicionamento, conteúdo, campanhas, conversão, tráfego pago e marketplaces.",
     areaServed: {
