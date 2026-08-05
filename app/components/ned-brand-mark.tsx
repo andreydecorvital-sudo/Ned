@@ -13,27 +13,56 @@ export function NedSpiral({ className = "" }: { className?: string }) {
   );
 }
 
-export default function NedBrandMark({
-  compact = false,
-  href = "/",
-}: {
-  compact?: boolean;
+type NedBrandMarkProps = {
   href?: string;
-}) {
+  variant?: "wordmark" | "signature";
+  vector?: boolean;
+};
+
+export default function NedBrandMark({
+  href = "/",
+  variant = "wordmark",
+  vector = false,
+}: NedBrandMarkProps) {
+  const isWordmark = variant === "wordmark";
+
   return (
     <a
-      className={`${styles.mark} ${compact ? styles.compact : ""}`}
+      className={`${styles.mark} ${isWordmark ? styles.wordmark : styles.signature}`}
       href={href}
       aria-label="NED Marketing — início"
       data-brand-status="official-user-supplied-logo"
+      data-brand-variant={variant}
     >
-      <img
-        className={styles.logo}
-        src="/brand/ned-logo-official.webp"
-        alt="NED Marketing"
-        width={420}
-        height={201}
-      />
+      {isWordmark ? (
+        vector ? (
+          <img
+            className={styles.vectorWordmark}
+            src="/brand/ned-wordmark-vector.svg"
+            alt="NED"
+            width={520}
+            height={120}
+          />
+        ) : (
+          <span className={styles.rasterCrop} aria-hidden="true">
+            <img
+              className={styles.rasterLogo}
+              src="/brand/ned-logo-official.webp"
+              alt=""
+              width={420}
+              height={201}
+            />
+          </span>
+        )
+      ) : (
+        <img
+          className={styles.fullLogo}
+          src="/brand/ned-logo-official.webp"
+          alt="NED Marketing"
+          width={420}
+          height={201}
+        />
+      )}
     </a>
   );
 }
