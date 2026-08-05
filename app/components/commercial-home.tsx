@@ -1,16 +1,13 @@
 import {
   ArrowRight,
-  BarChart3,
   Gauge,
   Handshake,
   Megaphone,
   MessageSquareText,
-  MonitorSmartphone,
   SearchCheck,
-  ShoppingBag,
-  Target,
   TrendingUp,
 } from "lucide-react";
+import Image from "next/image";
 import styles from "../commercial.module.css";
 import marketingStyles from "./marketing-home.module.css";
 
@@ -23,7 +20,8 @@ const marketingJourney = [
 
 const marketingFronts = [
   {
-    icon: Target,
+    seal: "/brand/seals/ned-seal-focus.webp",
+    accent: "institutional",
     number: "01",
     label: "ESTRATÉGIA E POSICIONAMENTO",
     title: "Definir o que sua marca precisa representar.",
@@ -33,7 +31,8 @@ const marketingFronts = [
     href: "/analise-gratuita",
   },
   {
-    icon: Megaphone,
+    seal: "/brand/seals/ned-seal-spiral.webp",
+    accent: "content",
     number: "02",
     label: "CONTEÚDO E CRIAÇÃO",
     title: "Transformar estratégia em comunicação que chama atenção.",
@@ -43,7 +42,8 @@ const marketingFronts = [
     href: "/portfolio",
   },
   {
-    icon: MonitorSmartphone,
+    seal: "/brand/seals/ned-seal-sites.webp",
+    accent: "sites",
     number: "03",
     label: "PRESENÇA DIGITAL E CONVERSÃO",
     title: "Facilitar a decisão de quem já demonstrou interesse.",
@@ -53,7 +53,8 @@ const marketingFronts = [
     href: "/servicos/sites",
   },
   {
-    icon: TrendingUp,
+    seal: "/brand/seals/ned-seal-automation-flow.webp",
+    accent: "automation",
     number: "04",
     label: "TRÁFEGO E AQUISIÇÃO",
     title: "Levar a mensagem certa para pessoas com potencial real.",
@@ -63,7 +64,8 @@ const marketingFronts = [
     href: "/servicos/trafego-pago",
   },
   {
-    icon: ShoppingBag,
+    seal: "/brand/seals/ned-seal-marketplaces.webp",
+    accent: "marketplaces",
     number: "05",
     label: "MARKETPLACES E VENDAS",
     title: "Melhorar presença, comunicação e desempenho nos canais de venda.",
@@ -73,7 +75,8 @@ const marketingFronts = [
     href: "/servicos/marketplaces",
   },
   {
-    icon: BarChart3,
+    seal: "/brand/seals/ned-seal-systems.webp",
+    accent: "systems",
     number: "06",
     label: "MENSURAÇÃO E OTIMIZAÇÃO",
     title: "Usar dados para melhorar a próxima decisão de marketing.",
@@ -167,6 +170,14 @@ export default function CommercialHome() {
       <section className={marketingStyles.marketingSection} id="frentes" data-theme="dark">
         <div className={marketingStyles.marketingEditorial}>
           <div className={marketingStyles.marketingEditorialIntro}>
+            <Image
+              className={marketingStyles.marketingEditorialSeal}
+              src="/brand/seals/ned-seal-wordmark.webp"
+              alt=""
+              width={132}
+              height={132}
+              aria-hidden="true"
+            />
             <span className={styles.eyebrow}>COMO A NED PODE ATUAR</span>
             <h2>Uma estratégia. Diferentes frentes de <span>marketing.</span></h2>
             <p>
@@ -178,9 +189,11 @@ export default function CommercialHome() {
           </div>
 
           <div className={marketingStyles.marketingDirectionList}>
-            {marketingFronts.map(({ icon: Icon, number, label, title, description, tags, href }) => (
-              <article className={marketingStyles.marketingDirection} key={number}>
-                <span className={marketingStyles.marketingDirectionIcon}><Icon size={22} /></span>
+            {marketingFronts.map(({ seal, accent, number, label, title, description, tags, href }) => (
+              <article className={marketingStyles.marketingDirection} data-accent={accent} key={number}>
+                <span className={marketingStyles.marketingDirectionIcon} aria-hidden="true">
+                  <Image src={seal} alt="" width={72} height={72} />
+                </span>
                 <div className={marketingStyles.marketingDirectionBody}>
                   <span className={marketingStyles.marketingDirectionLabel}>{number} / {label}</span>
                   <h3>{title}</h3>
