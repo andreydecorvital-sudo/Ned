@@ -5,16 +5,43 @@
   text-decoration: none;
 }
 
-.logo {
+.wordmark {
+  width: 148px;
+  height: 48px;
+  overflow: hidden;
+}
+
+.rasterCrop {
+  position: relative;
   display: block;
-  width: 150px;
+  width: 148px;
+  height: 48px;
+  overflow: hidden;
+}
+
+.rasterLogo {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  display: block;
+  width: 148px;
   height: auto;
   object-fit: contain;
   mix-blend-mode: screen;
 }
 
-.compact .logo {
-  width: 112px;
+.vectorWordmark {
+  display: block;
+  width: 148px;
+  height: auto;
+}
+
+.signature .fullLogo {
+  display: block;
+  width: 148px;
+  height: auto;
+  object-fit: contain;
+  mix-blend-mode: screen;
 }
 
 .spiral {
@@ -34,11 +61,18 @@
 }
 
 @media (max-width: 520px) {
-  .logo {
+  .wordmark,
+  .rasterCrop {
+    width: 128px;
+    height: 42px;
+  }
+
+  .rasterLogo,
+  .vectorWordmark {
     width: 128px;
   }
 
-  .compact .logo {
-    width: 104px;
+  .signature .fullLogo {
+    width: 132px;
   }
 }
