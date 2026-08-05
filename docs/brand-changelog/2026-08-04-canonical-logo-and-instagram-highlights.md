@@ -1,62 +1,40 @@
-# Aplicação canônica da logo e dos Destaques
+# Tentativa de aplicação canônica da logo — SUPERADA
 
-**Data:** 04/08/2026  
-**Brand OS:** atualização 1.1.0
+**Data original:** 04/08/2026  
+**Correção:** 05/08/2026  
+**Status:** SUPERADO / NÃO USAR COMO ESTADO ATUAL
 
-## Problema
+## O que aconteceu
 
-O site já havia absorvido a base neutra e as cores por editoria, mas ainda utilizava uma marca digital provisória construída por texto. A referência visual aprovada existia no repositório, porém não estava conectada ao header, rodapé, metadata ou painel.
+Uma imagem WebP com acabamento metálico foi interpretada incorretamente como a referência oficial da logo. A partir dela e da descrição do Brand OS, foram criados vetores aproximados e aplicações para header, rodapé, favicon, metadata e painel.
 
-As fotografias escolhidas para os Destaques do Instagram também não possuíam caminhos canônicos nem regras documentadas de aplicação.
+A tela administrativa também apresentou o render como “Referência visual oficial”, o que gerou uma aplicação confusa e visualmente diferente da logo escolhida.
 
-## Decisões
+## Por que a decisão foi revertida
 
-- preservar `public/brand/ned-logo-primary.webp` como referência visual soberana;
-- criar versões SVG técnicas para interface e escala;
-- substituir a marca tipográfica provisória por arquivos de marca;
-- manter a espiral como símbolo secundário e pouco frequente;
-- preparar o sistema de Destaques sem gerar fotos substitutas;
-- centralizar os ativos em um Brand Kit administrativo;
-- atualizar navegação, favicon, manifest e imagem social.
+- o WebP era um render de apresentação, não um arquivo limpo da marca;
+- os SVGs foram construídos por aproximação;
+- os vetores não reproduziam com fidelidade a logo escolhida;
+- chamar esses arquivos de oficiais contrariava a regra de não substituir decisões aprovadas silenciosamente;
+- as capas de Destaques aprovadas já existiam em outra pasta e foram ignoradas por engano.
 
-## Implementação
+## Correção aplicada
 
-### Marca
+- render metálico retirado do repositório público;
+- vetores aproximados removidos;
+- favicon derivado removido;
+- assinatura tipográfica temporária restaurada;
+- Brand Kit refeito para explicar o status real;
+- capas oficiais recuperadas de `public/brand/highlights`;
+- sistema duplicado de Destaques removido;
+- Brand OS atualizado para a versão 1.1.1.
 
-- `public/brand/ned-logo-primary.svg`
-- `public/brand/ned-logo-flat.svg`
-- `public/brand/ned-logo-dark.svg`
-- `public/brand/ned-wordmark.svg`
-- `public/brand/ned-symbol-spiral.svg`
-- `public/brand/favicon.svg`
+## Estado válido
 
-### Instagram
+Consulte:
 
-- `public/brand/instagram/highlights/highlight-overlay.svg`
-- `docs/instagram/HIGHLIGHTS_SYSTEM.md`
+- `docs/NED_BRAND_OS_1.1_UPDATE.md`;
+- `docs/brand-changelog/2026-08-05-correction-logo-and-highlights.md`;
+- `public/brand/highlights/README.md`.
 
-### Site
-
-- logo canônica no header e rodapé;
-- estado ativo na navegação desktop e mobile;
-- favicon e manifest neutros;
-- Open Graph alinhado à mensagem atual;
-- hierarquia do menu refinada;
-- texto da página Sobre menos defensivo.
-
-### Administração
-
-- nova rota `/admin/marca`;
-- Brand Kit no painel principal;
-- acesso pelo dock administrativo;
-- visualização da referência oficial, derivados, cores e Destaques.
-
-## Limite preservado
-
-As sete fotografias aprovadas para os Destaques não estavam disponíveis no GitHub nem na File Library durante a implementação. Nenhuma imagem genérica ou gerada foi usada para ocupar o lugar delas.
-
-Os caminhos foram preparados para receber os arquivos reais sem exigir nova reforma da interface.
-
-## Reversão
-
-As mudanças estão isoladas em componentes de marca, assets públicos e documentação. A referência WebP original não foi alterada.
+Este arquivo permanece somente para registrar a origem do erro e a reversão.
