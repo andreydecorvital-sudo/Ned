@@ -2,30 +2,32 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px 18px;
-  margin-top: 30px;
+  margin-top: 26px;
 }
 
 .contactGrid label {
   display: block;
 }
 
-.contactGrid label:last-child {
+.contactWide {
   grid-column: 1 / -1;
 }
 
 .contactGrid label > span,
+.optionLabel,
 .consent span {
   display: block;
   margin-bottom: 8px;
-  color: #a98fff;
+  color: #c9c6bf;
   font-size: 8px;
   font-weight: 850;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
 }
 
 .contactGrid input {
   width: 100%;
-  padding: 13px 0;
+  min-height: 46px;
+  padding: 11px 0;
   color: white;
   background: transparent;
   border: 0;
@@ -37,11 +39,26 @@
 }
 
 .contactGrid input:focus {
-  border-color: #7040ff;
+  border-color: #f1eee7;
 }
 
 .contactGrid input::placeholder {
   color: #74747e;
+}
+
+.directionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.optionGroup {
+  min-width: 0;
+}
+
+.optionLabel {
+  margin-bottom: 10px;
 }
 
 .consent {
@@ -49,21 +66,21 @@
   grid-template-columns: 20px 1fr;
   align-items: start;
   gap: 11px;
-  margin-top: 20px;
-  padding: 14px;
+  margin-top: 18px;
+  padding: 13px;
   color: #b7b5bf;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.11);
   font-size: 11px;
-  line-height: 1.55;
+  line-height: 1.5;
   cursor: pointer;
 }
 
 .consent input {
   width: 17px;
   height: 17px;
-  margin-top: 2px;
-  accent-color: #7040ff;
+  margin-top: 1px;
+  accent-color: #f1eee7;
 }
 
 .consent span {
@@ -75,8 +92,8 @@
 }
 
 .error {
-  margin-top: 14px;
-  padding: 11px 13px;
+  margin-top: 12px;
+  padding: 10px 12px;
   color: #ffc0c8;
   background: rgba(255, 83, 102, 0.08);
   border: 1px solid rgba(255, 83, 102, 0.2);
@@ -93,14 +110,31 @@
   white-space: nowrap !important;
 }
 
+@media (max-width: 720px) {
+  .directionGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
 @media (max-width: 620px) {
   .contactGrid {
     grid-template-columns: 1fr;
-    gap: 10px;
-    margin-top: 24px;
+    gap: 9px;
+    margin-top: 20px;
   }
 
-  .contactGrid label:last-child {
+  .contactWide {
     grid-column: auto;
+  }
+
+  .directionGrid {
+    margin-top: 18px;
+  }
+
+  .consent {
+    margin-top: 14px;
+    padding: 12px;
+    font-size: 10px;
   }
 }
