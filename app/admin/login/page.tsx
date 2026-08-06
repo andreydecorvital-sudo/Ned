@@ -20,7 +20,7 @@ export default async function AdminLoginPage() {
     <main className={styles.loginPage}>
       <section className={styles.loginCard}>
         <a className={styles.brand} href="/" aria-label="NED Marketing">
-          <img src="/brand/ned-logo-official.webp" alt="NED Marketing" />
+          <strong>NED</strong>
           <small>ADMIN</small>
         </a>
         <span className={styles.eyebrow}>ÁREA RESTRITA / OPERAÇÃO</span>
