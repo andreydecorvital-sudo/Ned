@@ -21,7 +21,17 @@ const messages: Record<string, string> = {
   "professional-account-required":
     "Nenhuma conta profissional vinculada a uma Página do Facebook foi encontrada.",
   "permissions-required":
-    "Autorize todas as permissões solicitadas para publicar, comentar e carregar a conta.",
+    "Ainda faltam permissões obrigatórias no app Meta. Autorize novamente após adicioná-las.",
+  "permissions-check-failed":
+    "A Meta autorizou o login, mas não permitiu consultar as permissões concedidas.",
+  "pages-read-failed":
+    "A Meta não permitiu carregar as Páginas administradas por esta conta.",
+  "token-exchange-failed":
+    "A Meta recusou a troca do código de login pelo token. Confira App ID, App Secret e callback de produção.",
+  "long-token-failed":
+    "O login foi aceito, mas a Meta recusou a geração do token de longa duração.",
+  "storage-failed":
+    "A autorização funcionou, mas o NED não conseguiu salvar a conexão no banco de dados.",
   "missing-config": "A configuração do Instagram ainda está incompleta.",
   error: "Não foi possível concluir a conexão com o Instagram.",
 };
