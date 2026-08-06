@@ -163,14 +163,18 @@ export async function GET() {
   }
 
   const databaseConfigured = isSocialDatabaseConfigured();
+  const [instagramConfigured, audioConfigured] = await Promise.all([
+    isInstagramPublishingConfigured(),
+    isInstagramAudioConfigured(),
+  ]);
   const posts = databaseConfigured ? await listSocialPosts() : [];
   return NextResponse.json({
     posts,
     configuration: {
       database: databaseConfigured,
       blob: Boolean((process.env.BLOB_READ_WRITE_TOKEN ?? "").trim()),
-      instagram: isInstagramPublishingConfigured(),
-      audio: isInstagramAudioConfigured(),
+      instagram: instagramConfigured,
+      audio: audioConfigured,
       scheduler: isSocialSchedulerConfigured(),
     },
   });
