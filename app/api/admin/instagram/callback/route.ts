@@ -13,14 +13,37 @@ function contentUrl(status: string) {
 
 function callbackStatus(error: unknown) {
   if (!(error instanceof Error)) return "error";
-  if (error.message === "INSTAGRAM_PROFESSIONAL_ACCOUNT_NOT_FOUND") {
+  const message = error.message;
+
+  if (message === "INSTAGRAM_PROFESSIONAL_ACCOUNT_NOT_FOUND") {
     return "professional-account-required";
   }
-  if (error.message.startsWith("INSTAGRAM_PERMISSIONS_MISSING:")) {
+  if (message.startsWith("INSTAGRAM_PERMISSIONS_MISSING:")) {
     return "permissions-required";
   }
-  if (error.message === "INSTAGRAM_OAUTH_NOT_CONFIGURED") {
+  if (message === "INSTAGRAM_OAUTH_NOT_CONFIGURED") {
     return "missing-config";
+  }
+  if (
+    message.startsWith("INSTAGRAM_META_AUTHORIZATION_CODE_FAILED:") ||
+    message === "INSTAGRAM_AUTHORIZATION_TOKEN_MISSING"
+  ) {
+    return "token-exchange-failed";
+  }
+  if (
+    message.startsWith("INSTAGRAM_META_LONG_LIVED_TOKEN_FAILED:") ||
+    message === "INSTAGRAM_LONG_LIVED_TOKEN_MISSING"
+  ) {
+    return "long-token-failed";
+  }
+  if (message.startsWith("INSTAGRAM_META_PERMISSIONS_FAILED:")) {
+    return "permissions-check-failed";
+  }
+  if (message.startsWith("INSTAGRAM_META_MANAGED_PAGES_FAILED:")) {
+    return "pages-read-failed";
+  }
+  if (message === "INSTAGRAM_CONNECTION_STORAGE_FAILED") {
+    return "storage-failed";
   }
   return "error";
 }
