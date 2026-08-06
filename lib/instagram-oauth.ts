@@ -13,15 +13,17 @@ const INSTAGRAM_PERMISSIONS = [
   "instagram_manage_comments",
 ] as const;
 
+type GraphError = {
+  message?: string;
+  type?: string;
+  code?: number;
+};
+
 type OAuthTokenResponse = {
   access_token?: string;
   token_type?: string;
   expires_in?: number;
-  error?: {
-    message?: string;
-    type?: string;
-    code?: number;
-  };
+  error?: GraphError;
 };
 
 type InstagramAccount = {
@@ -38,7 +40,13 @@ type ManagedPage = {
 
 type ManagedPagesResponse = {
   data?: ManagedPage[];
-  error?: OAuthTokenResponse["error"];
+  paging?: { next?: string };
+  error?: GraphError;
+};
+
+type PermissionsResponse = {
+  data?: Array<{ permission?: string; status?: string }>;
+  error?: GraphError;
 };
 
 function text(value: string | undefined) {
@@ -101,10 +109,7 @@ async function readJson<T>(response: Response) {
   return data;
 }
 
-function graphError(
-  data: { error?: OAuthTokenResponse["error"] },
-  fallback: string,
-) {
+function graphError(data: { error?: GraphError }, fallback: string) {
   return new Error(data.error?.message ?? fallback);
 }
 
@@ -144,23 +149,57 @@ async function exchangeLongLivedToken(shortLivedToken: string) {
   return data;
 }
 
-async function managedPages(userAccessToken: string) {
+async function grantedPermissions(userAccessToken: string) {
   const config = instagramOAuthConfiguration();
   const url = new URL(
-    `https://graph.facebook.com/${config.apiVersion}/me/accounts`,
-  );
-  url.searchParams.set(
-    "fields",
-    "id,name,access_token,tasks,instagram_business_account{id,username}",
+    `https://graph.facebook.com/${config.apiVersion}/me/permissions`,
   );
   url.searchParams.set("access_token", userAccessToken);
 
   const response = await fetch(url, { cache: "no-store" });
-  const data = await readJson<ManagedPagesResponse>(response);
+  const data = await readJson<PermissionsResponse>(response);
   if (data.error) {
-    throw graphError(data, "Não foi possível localizar as páginas administradas.");
+    throw graphError(data, "Não foi possível validar as permissões concedidas.");
   }
-  return data.data ?? [];
+  return (data.data ?? [])
+    .filter((permission) => permission.status === "granted")
+    .map((permission) => permission.permission ?? "")
+    .filter(Boolean);
+}
+
+function assertRequiredPermissions(granted: string[]) {
+  const missing = INSTAGRAM_PERMISSIONS.filter(
+    (permission) => !granted.includes(permission),
+  );
+  if (missing.length) {
+    throw new Error(`INSTAGRAM_PERMISSIONS_MISSING:${missing.join(",")}`);
+  }
+}
+
+async function managedPages(userAccessToken: string) {
+  const config = instagramOAuthConfiguration();
+  const start = new URL(
+    `https://graph.facebook.com/${config.apiVersion}/me/accounts`,
+  );
+  start.searchParams.set(
+    "fields",
+    "id,name,access_token,tasks,instagram_business_account{id,username}",
+  );
+  start.searchParams.set("limit", "100");
+  start.searchParams.set("access_token", userAccessToken);
+
+  const pages: ManagedPage[] = [];
+  let nextUrl: string | undefined = start.toString();
+  while (nextUrl) {
+    const response = await fetch(nextUrl, { cache: "no-store" });
+    const data = await readJson<ManagedPagesResponse>(response);
+    if (data.error) {
+      throw graphError(data, "Não foi possível localizar as páginas administradas.");
+    }
+    pages.push(...(data.data ?? []));
+    nextUrl = data.paging?.next;
+  }
+  return pages;
 }
 
 function chooseInstagramPage(pages: ManagedPage[]) {
@@ -192,6 +231,9 @@ export async function connectInstagramWithAuthorizationCode(code: string) {
 
   const shortLived = await exchangeAuthorizationCode(code);
   const longLived = await exchangeLongLivedToken(shortLived.access_token!);
+  const permissions = await grantedPermissions(longLived.access_token!);
+  assertRequiredPermissions(permissions);
+
   const pages = await managedPages(longLived.access_token!);
   const page = chooseInstagramPage(pages);
   const instagram = page.instagram_business_account!;
@@ -207,8 +249,9 @@ export async function connectInstagramWithAuthorizationCode(code: string) {
     pageId: page.id!,
     pageName: page.name ?? "",
     accessToken: page.access_token!,
+    userAccessToken: longLived.access_token!,
     expiresAt,
-    scopes: [...INSTAGRAM_PERMISSIONS],
+    scopes: permissions,
   });
 
   if (!saved) throw new Error("INSTAGRAM_CONNECTION_NOT_SAVED");
@@ -216,12 +259,23 @@ export async function connectInstagramWithAuthorizationCode(code: string) {
 }
 
 export async function getInstagramConnectionSummary() {
-  const stored = await getStoredInstagramConnection();
-  return {
-    connected: Boolean(stored),
-    oauthConfigured: isInstagramOAuthConfigured(),
-    username: stored?.username ?? "",
-    pageName: stored?.pageName ?? "",
-    expiresAt: stored?.expiresAt ?? null,
-  };
+  try {
+    const stored = await getStoredInstagramConnection();
+    return {
+      connected: Boolean(stored),
+      oauthConfigured: isInstagramOAuthConfigured(),
+      username: stored?.username ?? "",
+      pageName: stored?.pageName ?? "",
+      expiresAt: stored?.expiresAt ?? null,
+    };
+  } catch (error) {
+    console.error("Unable to load Instagram connection summary", error);
+    return {
+      connected: false,
+      oauthConfigured: isInstagramOAuthConfigured(),
+      username: "",
+      pageName: "",
+      expiresAt: null,
+    };
+  }
 }
