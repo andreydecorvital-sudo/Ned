@@ -12,6 +12,7 @@ export type StoredInstagramConnection = {
   pageId: string;
   pageName: string;
   accessToken: string;
+  userAccessToken: string;
   expiresAt: string | null;
   scopes: string[];
   connectedAt: string;
@@ -23,6 +24,7 @@ type InstagramConnectionRow = {
   page_id: string | null;
   page_name: string | null;
   encrypted_access_token: string;
+  encrypted_user_access_token: string | null;
   token_expires_at: string | Date | null;
   scopes: string[] | string | null;
   connected_at: string | Date;
@@ -137,11 +139,16 @@ async function ensureInstagramConnectionSchema() {
         page_id text NOT NULL DEFAULT '',
         page_name varchar(180) NOT NULL DEFAULT '',
         encrypted_access_token text NOT NULL,
+        encrypted_user_access_token text,
         token_expires_at timestamptz,
         scopes jsonb NOT NULL DEFAULT '[]'::jsonb,
         connected_at timestamptz NOT NULL DEFAULT now(),
         updated_at timestamptz NOT NULL DEFAULT now()
       )
+    `;
+    await sql`
+      ALTER TABLE ned_instagram_connections
+      ADD COLUMN IF NOT EXISTS encrypted_user_access_token text
     `;
   })().catch((error) => {
     schemaReady = null;
@@ -166,6 +173,7 @@ export async function getStoredInstagramConnection() {
       page_id,
       page_name,
       encrypted_access_token,
+      encrypted_user_access_token,
       token_expires_at,
       scopes,
       connected_at
@@ -180,12 +188,16 @@ export async function getStoredInstagramConnection() {
   }
 
   try {
+    const pageToken = decryptToken(row.encrypted_access_token);
     const connection: StoredInstagramConnection = {
       igUserId: row.ig_user_id,
       username: row.username ?? "",
       pageId: row.page_id ?? "",
       pageName: row.page_name ?? "",
-      accessToken: decryptToken(row.encrypted_access_token),
+      accessToken: pageToken,
+      userAccessToken: row.encrypted_user_access_token
+        ? decryptToken(row.encrypted_user_access_token)
+        : pageToken,
       expiresAt: iso(row.token_expires_at),
       scopes: parseScopes(row.scopes),
       connectedAt: iso(row.connected_at) ?? new Date().toISOString(),
@@ -207,12 +219,14 @@ export async function saveInstagramConnection(input: {
   pageId: string;
   pageName: string;
   accessToken: string;
+  userAccessToken: string;
   expiresAt: string | null;
   scopes: string[];
 }) {
   await ensureInstagramConnectionSchema();
   const sql = database();
   const encryptedAccessToken = encryptToken(input.accessToken);
+  const encryptedUserAccessToken = encryptToken(input.userAccessToken);
   const scopes = JSON.stringify(input.scopes);
   await sql`
     INSERT INTO ned_instagram_connections (
@@ -222,6 +236,7 @@ export async function saveInstagramConnection(input: {
       page_id,
       page_name,
       encrypted_access_token,
+      encrypted_user_access_token,
       token_expires_at,
       scopes,
       connected_at,
@@ -233,6 +248,7 @@ export async function saveInstagramConnection(input: {
       ${input.pageId},
       ${input.pageName},
       ${encryptedAccessToken},
+      ${encryptedUserAccessToken},
       ${input.expiresAt},
       ${scopes}::jsonb,
       now(),
@@ -244,6 +260,7 @@ export async function saveInstagramConnection(input: {
       page_id = EXCLUDED.page_id,
       page_name = EXCLUDED.page_name,
       encrypted_access_token = EXCLUDED.encrypted_access_token,
+      encrypted_user_access_token = EXCLUDED.encrypted_user_access_token,
       token_expires_at = EXCLUDED.token_expires_at,
       scopes = EXCLUDED.scopes,
       connected_at = now(),
