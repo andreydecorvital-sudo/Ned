@@ -191,8 +191,9 @@ async function managedPages(userAccessToken: string) {
   const pages: ManagedPage[] = [];
   let nextUrl: string | undefined = start.toString();
   while (nextUrl) {
-    const response = await fetch(nextUrl, { cache: "no-store" });
-    const data = await readJson<ManagedPagesResponse>(response);
+    const response: Response = await fetch(nextUrl, { cache: "no-store" });
+    const data: ManagedPagesResponse =
+      await readJson<ManagedPagesResponse>(response);
     if (data.error) {
       throw graphError(data, "Não foi possível localizar as páginas administradas.");
     }
