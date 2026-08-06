@@ -4,8 +4,19 @@ import type {
   SocialMediaAsset,
   SocialPostRecord,
 } from "@/lib/social-types";
+import { getStoredInstagramConnection } from "@/lib/instagram-connection";
 
-function credentials() {
+type InstagramCredentials = {
+  accessToken: string;
+  igUserId: string;
+  apiVersion: string;
+};
+
+let credentialCache:
+  | { expiresAt: number; value: InstagramCredentials }
+  | null = null;
+
+function environmentCredentials(): InstagramCredentials {
   return {
     accessToken: (process.env.INSTAGRAM_ACCESS_TOKEN ?? "").trim(),
     igUserId: (process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID ?? "").trim(),
@@ -13,8 +24,30 @@ function credentials() {
   };
 }
 
-export function isInstagramPublishingConfigured() {
-  const value = credentials();
+async function credentials() {
+  if (credentialCache && credentialCache.expiresAt > Date.now()) {
+    return credentialCache.value;
+  }
+
+  const stored = await getStoredInstagramConnection();
+  const fallback = environmentCredentials();
+  const value: InstagramCredentials = stored
+    ? {
+        accessToken: stored.accessToken,
+        igUserId: stored.igUserId,
+        apiVersion: fallback.apiVersion,
+      }
+    : fallback;
+
+  credentialCache = {
+    expiresAt: Date.now() + 15_000,
+    value,
+  };
+  return value;
+}
+
+export async function isInstagramPublishingConfigured() {
+  const value = await credentials();
   return Boolean(value.accessToken && value.igUserId && value.apiVersion);
 }
 
@@ -41,7 +74,7 @@ function graphError(data: GraphObject, status: number) {
 }
 
 async function graphPost(path: string, params: Record<string, string | boolean | number>) {
-  const { accessToken, apiVersion } = credentials();
+  const { accessToken, apiVersion } = await credentials();
   const body = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => body.set(key, String(value)));
   body.set("access_token", accessToken);
@@ -57,7 +90,7 @@ async function graphPost(path: string, params: Record<string, string | boolean |
 }
 
 async function graphGet(path: string, params: Record<string, string>) {
-  const { accessToken, apiVersion } = credentials();
+  const { accessToken, apiVersion } = await credentials();
   const query = new URLSearchParams(params);
   query.set("access_token", accessToken);
   const response = await fetch(
@@ -129,7 +162,7 @@ export async function searchInstagramAudio(options: {
   type: SocialAudioType;
   limit?: number;
 }) {
-  if (!isInstagramAudioConfigured()) throw new Error("INSTAGRAM_NOT_CONFIGURED");
+  if (!(await isInstagramAudioConfigured())) throw new Error("INSTAGRAM_NOT_CONFIGURED");
   const params: Record<string, string> = {
     audio_type: options.type,
     limit: String(Math.max(1, Math.min(options.limit ?? 24, 50))),
@@ -163,14 +196,14 @@ async function waitUntilReady(containerId: string) {
 }
 
 async function createMediaContainer(params: Record<string, string | boolean | number>) {
-  const { igUserId } = credentials();
+  const { igUserId } = await credentials();
   const data = await graphPost(`${igUserId}/media`, params);
   if (!data.id) throw new Error("O Instagram não retornou o contêiner da mídia.");
   return data.id;
 }
 
 async function publishContainer(containerId: string) {
-  const { igUserId } = credentials();
+  const { igUserId } = await credentials();
   const data = await graphPost(`${igUserId}/media_publish`, { creation_id: containerId });
   if (!data.id) throw new Error("O Instagram não retornou o ID da publicação.");
   return data.id;
@@ -277,7 +310,7 @@ async function publishCarousel(post: SocialPostRecord) {
 }
 
 export async function publishInstagramPost(post: SocialPostRecord) {
-  if (!isInstagramPublishingConfigured()) throw new Error("INSTAGRAM_NOT_CONFIGURED");
+  if (!(await isInstagramPublishingConfigured())) throw new Error("INSTAGRAM_NOT_CONFIGURED");
   if (!post.media.length) throw new Error("A publicação não possui mídia.");
 
   if (post.format === "feed") return publishFeed(post);
