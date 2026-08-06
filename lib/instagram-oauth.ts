@@ -8,6 +8,7 @@ import {
 const INSTAGRAM_PERMISSIONS = [
   "pages_show_list",
   "pages_read_engagement",
+  "business_management",
   "instagram_basic",
   "instagram_content_publish",
   "instagram_manage_comments",
@@ -17,6 +18,7 @@ type GraphError = {
   message?: string;
   type?: string;
   code?: number;
+  error_subcode?: number;
 };
 
 type OAuthTokenResponse = {
@@ -48,6 +50,12 @@ type PermissionsResponse = {
   data?: Array<{ permission?: string; status?: string }>;
   error?: GraphError;
 };
+
+type GraphStage =
+  | "AUTHORIZATION_CODE"
+  | "LONG_LIVED_TOKEN"
+  | "PERMISSIONS"
+  | "MANAGED_PAGES";
 
 function text(value: string | undefined) {
   return value?.trim() ?? "";
@@ -128,16 +136,30 @@ export function buildInstagramAuthorizationUrl(state: string) {
   return url.toString();
 }
 
-async function readJson<T>(response: Response) {
-  const data = (await response.json().catch(() => null)) as T | null;
-  if (!response.ok || !data) {
-    throw new Error(`META_API_${response.status}`);
-  }
-  return data;
+function metaFailure(stage: GraphStage, response: Response, error?: GraphError) {
+  const code = error?.code ?? response.status;
+  const subcode = error?.error_subcode ? `:${error.error_subcode}` : "";
+  console.error("Instagram Meta API request failed", {
+    stage,
+    httpStatus: response.status,
+    code: error?.code,
+    subcode: error?.error_subcode,
+    type: error?.type,
+    message: error?.message,
+  });
+  return new Error(`INSTAGRAM_META_${stage}_FAILED:${code}${subcode}`);
 }
 
-function graphError(data: { error?: GraphError }, fallback: string) {
-  return new Error(data.error?.message ?? fallback);
+async function readGraphJson<T extends { error?: GraphError }>(
+  response: Response,
+  stage: GraphStage,
+) {
+  const data = (await response.json().catch(() => null)) as T | null;
+  if (!data) throw metaFailure(stage, response);
+  if (!response.ok || data.error) {
+    throw metaFailure(stage, response, data.error);
+  }
+  return data;
 }
 
 async function exchangeAuthorizationCode(code: string) {
@@ -151,9 +173,12 @@ async function exchangeAuthorizationCode(code: string) {
   url.searchParams.set("code", code);
 
   const response = await fetch(url, { cache: "no-store" });
-  const data = await readJson<OAuthTokenResponse>(response);
-  if (data.error || !data.access_token) {
-    throw graphError(data, "O Meta não retornou o token de acesso.");
+  const data = await readGraphJson<OAuthTokenResponse>(
+    response,
+    "AUTHORIZATION_CODE",
+  );
+  if (!data.access_token) {
+    throw new Error("INSTAGRAM_AUTHORIZATION_TOKEN_MISSING");
   }
   return data;
 }
@@ -169,9 +194,12 @@ async function exchangeLongLivedToken(shortLivedToken: string) {
   url.searchParams.set("fb_exchange_token", shortLivedToken);
 
   const response = await fetch(url, { cache: "no-store" });
-  const data = await readJson<OAuthTokenResponse>(response);
-  if (data.error || !data.access_token) {
-    throw graphError(data, "Não foi possível gerar o token de longa duração.");
+  const data = await readGraphJson<OAuthTokenResponse>(
+    response,
+    "LONG_LIVED_TOKEN",
+  );
+  if (!data.access_token) {
+    throw new Error("INSTAGRAM_LONG_LIVED_TOKEN_MISSING");
   }
   return data;
 }
@@ -184,10 +212,7 @@ async function grantedPermissions(userAccessToken: string) {
   url.searchParams.set("access_token", userAccessToken);
 
   const response = await fetch(url, { cache: "no-store" });
-  const data = await readJson<PermissionsResponse>(response);
-  if (data.error) {
-    throw graphError(data, "Não foi possível validar as permissões concedidas.");
-  }
+  const data = await readGraphJson<PermissionsResponse>(response, "PERMISSIONS");
   return (data.data ?? [])
     .filter((permission) => permission.status === "granted")
     .map((permission) => permission.permission ?? "")
@@ -219,11 +244,10 @@ async function managedPages(userAccessToken: string) {
   let nextUrl: string | undefined = start.toString();
   while (nextUrl) {
     const response: Response = await fetch(nextUrl, { cache: "no-store" });
-    const data: ManagedPagesResponse =
-      await readJson<ManagedPagesResponse>(response);
-    if (data.error) {
-      throw graphError(data, "Não foi possível localizar as páginas administradas.");
-    }
+    const data = await readGraphJson<ManagedPagesResponse>(
+      response,
+      "MANAGED_PAGES",
+    );
     pages.push(...(data.data ?? []));
     nextUrl = data.paging?.next;
   }
@@ -271,19 +295,24 @@ export async function connectInstagramWithAuthorizationCode(code: string) {
       ? new Date(Date.now() + longLived.expires_in * 1000).toISOString()
       : null;
 
-  const saved = await saveInstagramConnection({
-    igUserId: instagram.id!,
-    username: instagram.username ?? "",
-    pageId: page.id!,
-    pageName: page.name ?? "",
-    accessToken: page.access_token!,
-    userAccessToken: longLived.access_token!,
-    expiresAt,
-    scopes: permissions,
-  });
+  try {
+    const saved = await saveInstagramConnection({
+      igUserId: instagram.id!,
+      username: instagram.username ?? "",
+      pageId: page.id!,
+      pageName: page.name ?? "",
+      accessToken: page.access_token!,
+      userAccessToken: longLived.access_token!,
+      expiresAt,
+      scopes: permissions,
+    });
 
-  if (!saved) throw new Error("INSTAGRAM_CONNECTION_NOT_SAVED");
-  return saved;
+    if (!saved) throw new Error("INSTAGRAM_CONNECTION_NOT_SAVED");
+    return saved;
+  } catch (error) {
+    console.error("Unable to persist Instagram connection", error);
+    throw new Error("INSTAGRAM_CONNECTION_STORAGE_FAILED");
+  }
 }
 
 export async function getInstagramConnectionSummary() {
