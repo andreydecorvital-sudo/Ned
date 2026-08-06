@@ -12,13 +12,13 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const highlights = [
-  ["01", "Comece", "/brand/highlights/01-comece.svg", "Porta de entrada"],
-  ["02", "Serviços", "/brand/highlights/02-servicos.svg", "Frentes comerciais"],
-  ["03", "Trabalhos", "/brand/highlights/03-trabalhos.svg", "Cases e portfólio"],
-  ["04", "Processo", "/brand/highlights/04-processo.svg", "Como a NED trabalha"],
-  ["05", "Sites", "/brand/highlights/05-sites.svg", "UX e conversão"],
-  ["06", "Market", "/brand/highlights/06-market.svg", "Marketplaces"],
-  ["07", "NED", "/brand/highlights/07-ned.svg", "Marca e bastidores"],
+  ["01", "Comece", "/brand/seals/ned-seal-spiral.webp", "Porta de entrada"],
+  ["02", "Serviços", "/brand/seals/ned-seal-systems.webp", "Frentes comerciais"],
+  ["03", "Trabalhos", "/brand/seals/ned-seal-automation-flow.webp", "Cases e portfólio"],
+  ["04", "Processo", "/brand/seals/ned-seal-focus.webp", "Como a NED trabalha"],
+  ["05", "Sites", "/brand/seals/ned-seal-sites.webp", "UX e conversão"],
+  ["06", "Market", "/brand/seals/ned-seal-marketplaces.webp", "Marketplaces"],
+  ["07", "NED", "/brand/seals/ned-seal-wordmark.webp", "Marca e bastidores"],
 ] as const;
 
 const colors = [
@@ -50,7 +50,7 @@ export default async function BrandKitPage() {
             <h1>Arquivos reais. <em>Aplicação sem distorção.</em></h1>
           </div>
           <p>
-            A logo abaixo é exatamente a imagem enviada e aprovada. O único tratamento aplicado foi remover a margem preta excedente para ela funcionar no site sem ficar minúscula ou espremida.
+            A logo e os sete selos abaixo usam os arquivos aprovados da marca. Nenhuma versão aproximada, reconstruída por fonte ou desenhada novamente em SVG é exibida nesta página.
           </p>
         </section>
 
@@ -104,7 +104,7 @@ export default async function BrandKitPage() {
               <span>03 / INSTAGRAM</span>
               <h2>Capas dos Destaques</h2>
             </div>
-            <p>As capas agora aparecem inteiras, sem um segundo círculo cortando os SVGs e sem filtros que apagam ou deformam os símbolos.</p>
+            <p>Os previews agora exibem os sete arquivos enviados e aprovados, preservando textura, composição circular, símbolos e acentos cromáticos.</p>
           </div>
 
           <div className={styles.highlightGrid}>
@@ -121,7 +121,7 @@ export default async function BrandKitPage() {
                   </div>
                 </div>
                 <a className={styles.assetLink} href={file} download>
-                  <Download size={12} /> Baixar SVG
+                  <Download size={12} /> Baixar WebP
                 </a>
               </article>
             ))}
@@ -131,7 +131,7 @@ export default async function BrandKitPage() {
             <Instagram size={20} />
             <div>
               <strong>Regra de aplicação</strong>
-              <span>Base preta, off-white estrutural, símbolos centralizados e cor usada apenas como acento semântico.</span>
+              <span>Usar os arquivos aprovados sem redesenhar, recolorir, deformar, recortar o círculo ou substituir por SVG aproximado.</span>
             </div>
             <Check size={18} />
           </div>
