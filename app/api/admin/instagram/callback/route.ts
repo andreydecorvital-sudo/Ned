@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { setAdminSession } from "@/lib/admin-auth";
 import { connectInstagramWithAuthorizationCode } from "@/lib/instagram-oauth";
 
 const STATE_COOKIE = "ned_instagram_oauth_state";
@@ -33,10 +34,12 @@ export async function GET(request: NextRequest) {
     request.nextUrl.searchParams.get("error_message") ||
     request.nextUrl.searchParams.get("error");
 
+  const validState = Boolean(state && expectedState && state === expectedState);
+
   let status = "error";
   if (providerError) {
     status = "cancelled";
-  } else if (!state || !expectedState || state !== expectedState) {
+  } else if (!validState) {
     status = "invalid-state";
   } else if (!code) {
     status = "missing-code";
@@ -48,6 +51,13 @@ export async function GET(request: NextRequest) {
       console.error("Instagram OAuth callback failed", error);
       status = callbackStatus(error);
     }
+  }
+
+  // O fluxo foi iniciado dentro de uma sessão administrativa autenticada.
+  // Após validar o state, renovamos a sessão no retorno da Meta para evitar
+  // que navegadores descartem o cookie durante a navegação cross-site.
+  if (validState) {
+    await setAdminSession();
   }
 
   const response = NextResponse.redirect(contentUrl(status));
