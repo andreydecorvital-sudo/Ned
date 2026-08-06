@@ -18,7 +18,9 @@ const messages: Record<string, string> = {
   "invalid-state": "A validação de segurança expirou. Tente conectar novamente.",
   "missing-code": "O Meta não retornou a autorização esperada.",
   "professional-account-required":
-    "Nenhuma conta profissional do Instagram vinculada a uma Página foi encontrada.",
+    "Nenhuma conta profissional vinculada a uma Página do Facebook foi encontrada.",
+  "permissions-required":
+    "Autorize todas as permissões solicitadas para publicar, comentar e carregar a conta.",
   "missing-config":
     "Faltam as credenciais do aplicativo Meta nas variáveis da Vercel.",
   error: "Não foi possível concluir a conexão com o Instagram.",
@@ -88,7 +90,7 @@ export default function InstagramConnectionControl({
           <>
             <strong>Conecte a conta profissional</strong>
             <small>
-              O login salva o acesso com criptografia e elimina o token colado manualmente.
+              O login salva os tokens de usuário e Página com criptografia, sem colar credenciais manualmente.
             </small>
           </>
         )}
