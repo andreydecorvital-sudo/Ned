@@ -5,6 +5,11 @@ import type {
   SocialPostRecord,
 } from "@/lib/social-types";
 import { getStoredInstagramConnection } from "@/lib/instagram-connection";
+import {
+  getOrCreateInstagramPublishState,
+  saveInstagramPublishState,
+  type InstagramPublishState,
+} from "@/lib/instagram-publish-state";
 
 type InstagramCredentials = {
   accessToken: string;
@@ -80,6 +85,28 @@ type GraphObject = Record<string, unknown> & {
 
 type GraphAudioResponse = GraphObject & {
   audio?: GraphObject[];
+};
+
+type ContainerStatusCode =
+  | "IN_PROGRESS"
+  | "FINISHED"
+  | "PUBLISHED"
+  | "ERROR"
+  | "EXPIRED"
+  | "UNKNOWN";
+
+type PublishResult = {
+  mediaId: string;
+  canPublishFirstComment: boolean;
+};
+
+type PublishStatePatch = Partial<
+  Omit<InstagramPublishState, "postId" | "fingerprint" | "updatedAt">
+>;
+
+type PublishingSession = {
+  current: () => InstagramPublishState;
+  checkpoint: (patch: PublishStatePatch) => Promise<InstagramPublishState>;
 };
 
 function friendlyGraphMessage(data: GraphObject, status: number) {
@@ -244,18 +271,43 @@ function clampVolume(value: number) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function containerStatusCode(value: unknown): ContainerStatusCode {
+  const normalized = text(value).toUpperCase();
+  if (
+    normalized === "IN_PROGRESS" ||
+    normalized === "FINISHED" ||
+    normalized === "PUBLISHED" ||
+    normalized === "ERROR" ||
+    normalized === "EXPIRED"
+  ) {
+    return normalized;
+  }
+  return "UNKNOWN";
+}
+
+async function getContainerStatus(containerId: string) {
+  const status = await graphGet(containerId, {
+    fields: "id,status_code,status",
+  });
+  return {
+    code: containerStatusCode(status.status_code),
+    message: text(status.status),
+  };
+}
+
 async function waitUntilReady(containerId: string) {
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    const status = await graphGet(containerId, { fields: "status_code,status" });
-    if (status.status_code === "FINISHED") return;
-    if (status.status_code === "PUBLISHED") return;
-    if (status.status_code === "ERROR" || status.status_code === "EXPIRED") {
-      throw new Error(text(status.status) || `CONTAINER_${status.status_code}`);
+    const status = await getContainerStatus(containerId);
+    if (status.code === "FINISHED" || status.code === "PUBLISHED") {
+      return status.code;
+    }
+    if (status.code === "ERROR" || status.code === "EXPIRED") {
+      throw new Error(status.message || `CONTAINER_${status.code}`);
     }
     await new Promise((resolve) => setTimeout(resolve, 3000));
   }
   throw new Error(
-    "A mídia ainda está sendo processada pelo Instagram. Tente publicar novamente em alguns minutos.",
+    "A mídia ainda está sendo processada pelo Instagram. O contêiner foi salvo e será reaproveitado na próxima tentativa.",
   );
 }
 
@@ -277,6 +329,101 @@ async function publishContainer(containerId: string) {
   return data.id;
 }
 
+async function createPublishingSession(post: SocialPostRecord): Promise<PublishingSession> {
+  let state = await getOrCreateInstagramPublishState(post);
+  return {
+    current: () => state,
+    checkpoint: async (patch) => {
+      state = await saveInstagramPublishState({
+        ...state,
+        ...patch,
+        updatedAt: new Date().toISOString(),
+      });
+      return state;
+    },
+  };
+}
+
+async function ensureMainContainer(
+  session: PublishingSession,
+  params: Record<string, string | boolean | number>,
+) {
+  const existing = session.current().containerId;
+  if (existing) return existing;
+
+  const containerId = await createMediaContainer(params);
+  await session.checkpoint({
+    containerId,
+    phase: "container_created",
+  });
+  return containerId;
+}
+
+async function recoverPublishedContainer(
+  session: PublishingSession,
+  containerId: string,
+): Promise<PublishResult> {
+  const current = session.current();
+  const recoveredWithoutMediaId = !current.publishedMediaId;
+  const mediaId = current.publishedMediaId || containerId;
+  await session.checkpoint({
+    phase: "published",
+    publishedMediaId: mediaId,
+    recoveredWithoutMediaId,
+  });
+
+  if (recoveredWithoutMediaId) {
+    console.warn(
+      "Instagram confirmed the container was published, but the media ID response was lost. The post was not published again.",
+      { postId: current.postId, containerId },
+    );
+  }
+
+  return {
+    mediaId,
+    canPublishFirstComment: !recoveredWithoutMediaId,
+  };
+}
+
+async function finalizeContainer(
+  session: PublishingSession,
+  containerId: string,
+): Promise<PublishResult> {
+  const current = session.current();
+  if (current.phase === "published" && current.publishedMediaId) {
+    return {
+      mediaId: current.publishedMediaId,
+      canPublishFirstComment: !current.recoveredWithoutMediaId,
+    };
+  }
+
+  const readyStatus = await waitUntilReady(containerId);
+  if (readyStatus === "PUBLISHED") {
+    return recoverPublishedContainer(session, containerId);
+  }
+
+  await session.checkpoint({ phase: "publishing" });
+  try {
+    const mediaId = await publishContainer(containerId);
+    await session.checkpoint({
+      phase: "published",
+      publishedMediaId: mediaId,
+      recoveredWithoutMediaId: false,
+    });
+    return { mediaId, canPublishFirstComment: true };
+  } catch (error) {
+    try {
+      const status = await getContainerStatus(containerId);
+      if (status.code === "PUBLISHED") {
+        return recoverPublishedContainer(session, containerId);
+      }
+    } catch (statusError) {
+      console.error("Could not verify Instagram container after publish failure", statusError);
+    }
+    throw error;
+  }
+}
+
 function commonPublishingParams(
   post: SocialPostRecord,
   allowCollaborators = false,
@@ -290,32 +437,47 @@ function commonPublishingParams(
   return params;
 }
 
-async function publishFirstComment(post: SocialPostRecord, mediaId: string) {
-  if (!post.firstComment.trim()) return;
+async function publishFirstComment(
+  post: SocialPostRecord,
+  result: PublishResult,
+  session: PublishingSession,
+) {
+  if (!post.firstComment.trim() || session.current().firstCommentPublished) return;
+  if (!result.canPublishFirstComment) {
+    console.warn(
+      "First Instagram comment was skipped because the media ID response was unavailable after recovery.",
+      { postId: post.id, containerId: session.current().containerId },
+    );
+    return;
+  }
+
   try {
-    await graphPost(`${mediaId}/comments`, { message: post.firstComment.trim() });
+    await graphPost(`${result.mediaId}/comments`, {
+      message: post.firstComment.trim(),
+    });
+    await session.checkpoint({ firstCommentPublished: true });
   } catch (error) {
     console.error("Instagram post published, but first comment failed", error);
   }
 }
 
-async function publishFeed(post: SocialPostRecord) {
+async function publishFeed(post: SocialPostRecord, session: PublishingSession) {
   const asset = post.media[0];
   if (!asset || isVideo(asset)) {
     throw new Error("Feed precisa de uma imagem. Use Reel para vídeos.");
   }
-  const containerId = await createMediaContainer({
+  const containerId = await ensureMainContainer(session, {
     image_url: asset.url,
     caption: post.caption,
     ...(post.altText ? { alt_text: post.altText } : {}),
     ...commonPublishingParams(post, true),
   });
-  const mediaId = await publishContainer(containerId);
-  await publishFirstComment(post, mediaId);
-  return mediaId;
+  const result = await finalizeContainer(session, containerId);
+  await publishFirstComment(post, result, session);
+  return result.mediaId;
 }
 
-async function publishReel(post: SocialPostRecord) {
+async function publishReel(post: SocialPostRecord, session: PublishingSession) {
   const asset = post.media[0];
   if (!asset || !isVideo(asset)) throw new Error("Reel precisa de um vídeo.");
   const params: Record<string, string | boolean | number> = {
@@ -335,14 +497,13 @@ async function publishReel(post: SocialPostRecord) {
   } else if (post.audioName) {
     params.audio_name = post.audioName;
   }
-  const containerId = await createMediaContainer(params);
-  await waitUntilReady(containerId);
-  const mediaId = await publishContainer(containerId);
-  await publishFirstComment(post, mediaId);
-  return mediaId;
+  const containerId = await ensureMainContainer(session, params);
+  const result = await finalizeContainer(session, containerId);
+  await publishFirstComment(post, result, session);
+  return result.mediaId;
 }
 
-async function publishStory(post: SocialPostRecord) {
+async function publishStory(post: SocialPostRecord, session: PublishingSession) {
   const asset = post.media[0];
   if (!asset) throw new Error("Story precisa de uma imagem ou vídeo.");
   const params: Record<string, string | boolean | number> = {
@@ -351,18 +512,24 @@ async function publishStory(post: SocialPostRecord) {
   };
   if (isVideo(asset)) params.video_url = asset.url;
   else params.image_url = asset.url;
-  const containerId = await createMediaContainer(params);
-  if (isVideo(asset)) await waitUntilReady(containerId);
-  return publishContainer(containerId);
+  const containerId = await ensureMainContainer(session, params);
+  const result = await finalizeContainer(session, containerId);
+  return result.mediaId;
 }
 
-async function publishCarousel(post: SocialPostRecord) {
-  if (post.media.length < 2 || post.media.length > 10) {
-    throw new Error("Carrossel precisa ter entre 2 e 10 mídias.");
-  }
+async function ensureCarouselChildren(
+  post: SocialPostRecord,
+  session: PublishingSession,
+) {
+  const childIds = [...session.current().childContainerIds];
+  for (let index = 0; index < post.media.length; index += 1) {
+    const asset = post.media[index];
+    const existing = childIds[index];
+    if (existing) {
+      await waitUntilReady(existing);
+      continue;
+    }
 
-  const childIds: string[] = [];
-  for (const asset of post.media) {
     const params: Record<string, string | boolean | number> = {
       is_carousel_item: true,
     };
@@ -372,21 +539,38 @@ async function publishCarousel(post: SocialPostRecord) {
     } else {
       params.image_url = asset.url;
     }
+
     const childId = await createMediaContainer(params);
-    if (isVideo(asset)) await waitUntilReady(childId);
-    childIds.push(childId);
+    childIds[index] = childId;
+    await session.checkpoint({ childContainerIds: [...childIds] });
+    await waitUntilReady(childId);
+  }
+  return childIds;
+}
+
+async function publishCarousel(post: SocialPostRecord, session: PublishingSession) {
+  if (post.media.length < 2 || post.media.length > 10) {
+    throw new Error("Carrossel precisa ter entre 2 e 10 mídias.");
   }
 
-  const parentId = await createMediaContainer({
-    media_type: "CAROUSEL",
-    children: childIds.join(","),
-    caption: post.caption,
-    ...commonPublishingParams(post, false),
-  });
-  await waitUntilReady(parentId);
-  const mediaId = await publishContainer(parentId);
-  await publishFirstComment(post, mediaId);
-  return mediaId;
+  let parentId = session.current().containerId;
+  if (!parentId) {
+    const childIds = await ensureCarouselChildren(post, session);
+    parentId = await createMediaContainer({
+      media_type: "CAROUSEL",
+      children: childIds.join(","),
+      caption: post.caption,
+      ...commonPublishingParams(post, false),
+    });
+    await session.checkpoint({
+      containerId: parentId,
+      phase: "container_created",
+    });
+  }
+
+  const result = await finalizeContainer(session, parentId);
+  await publishFirstComment(post, result, session);
+  return result.mediaId;
 }
 
 export async function publishInstagramPost(post: SocialPostRecord) {
@@ -395,8 +579,9 @@ export async function publishInstagramPost(post: SocialPostRecord) {
   }
   if (!post.media.length) throw new Error("A publicação não possui mídia.");
 
-  if (post.format === "feed") return publishFeed(post);
-  if (post.format === "reel") return publishReel(post);
-  if (post.format === "story") return publishStory(post);
-  return publishCarousel(post);
+  const session = await createPublishingSession(post);
+  if (post.format === "feed") return publishFeed(post, session);
+  if (post.format === "reel") return publishReel(post, session);
+  if (post.format === "story") return publishStory(post, session);
+  return publishCarousel(post, session);
 }
