@@ -8,6 +8,7 @@ import { getStoredInstagramConnection } from "@/lib/instagram-connection";
 
 type InstagramCredentials = {
   accessToken: string;
+  userAccessToken: string;
   igUserId: string;
   apiVersion: string;
 };
@@ -17,8 +18,12 @@ let credentialCache:
   | null = null;
 
 function environmentCredentials(): InstagramCredentials {
+  const accessToken = (process.env.INSTAGRAM_ACCESS_TOKEN ?? "").trim();
   return {
-    accessToken: (process.env.INSTAGRAM_ACCESS_TOKEN ?? "").trim(),
+    accessToken,
+    userAccessToken: (
+      process.env.INSTAGRAM_USER_ACCESS_TOKEN ?? accessToken
+    ).trim(),
     igUserId: (process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID ?? "").trim(),
     apiVersion: (process.env.META_GRAPH_API_VERSION ?? "").trim(),
   };
@@ -34,6 +39,7 @@ async function credentials() {
   const value: InstagramCredentials = stored
     ? {
         accessToken: stored.accessToken,
+        userAccessToken: stored.userAccessToken,
         igUserId: stored.igUserId,
         apiVersion: fallback.apiVersion,
       }
@@ -51,7 +57,12 @@ export async function isInstagramPublishingConfigured() {
   return Boolean(value.accessToken && value.igUserId && value.apiVersion);
 }
 
-export const isInstagramAudioConfigured = isInstagramPublishingConfigured;
+export async function isInstagramAudioConfigured() {
+  const value = await credentials();
+  return Boolean(
+    value.userAccessToken && value.igUserId && value.apiVersion,
+  );
+}
 
 type GraphError = {
   message?: string;
@@ -67,13 +78,50 @@ type GraphObject = Record<string, unknown> & {
   error?: GraphError;
 };
 
-type GraphList = GraphObject & { data?: GraphObject[] };
+type GraphAudioResponse = GraphObject & {
+  audio?: GraphObject[];
+};
 
-function graphError(data: GraphObject, status: number) {
-  return new Error(data.error?.message ?? `META_API_${status}`);
+function friendlyGraphMessage(data: GraphObject, status: number) {
+  const serialized = JSON.stringify(data);
+  if (serialized.includes("REVOKED_ACCESS_TOKEN") || data.error?.code === 190) {
+    return "A conexão com o Instagram expirou. Reconecte a conta no painel.";
+  }
+  if (serialized.includes("2207009") || serialized.includes("36003")) {
+    return "A proporção da imagem não é aceita pelo Instagram. Use entre 4:5 e 1,91:1.";
+  }
+  if (serialized.includes("2207010")) {
+    return "A legenda ultrapassa o limite aceito pelo Instagram.";
+  }
+  if (serialized.includes("2207026")) {
+    return "O formato do vídeo não é compatível com o Instagram.";
+  }
+  if (serialized.includes("2207004")) {
+    return "A imagem é maior do que o Instagram aceita.";
+  }
+  if (serialized.includes("2207005")) {
+    return "O formato da imagem não é compatível com o Instagram.";
+  }
+  if (serialized.includes("2207001")) {
+    return "O Instagram classificou o conteúdo como possível spam. Revise o conteúdo antes de tentar novamente.";
+  }
+  if (serialized.includes("2207042") || serialized.includes("Page request limit reached")) {
+    return "O limite diário de publicações do Instagram foi atingido.";
+  }
+  if (serialized.includes("param collaborators is not allowed")) {
+    return "O Instagram não permite colaboradores nesse formato de publicação.";
+  }
+  return data.error?.message ?? `META_API_${status}`;
 }
 
-async function graphPost(path: string, params: Record<string, string | boolean | number>) {
+function graphError(data: GraphObject, status: number) {
+  return new Error(friendlyGraphMessage(data, status));
+}
+
+async function graphPost(
+  path: string,
+  params: Record<string, string | boolean | number>,
+) {
   const { accessToken, apiVersion } = await credentials();
   const body = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => body.set(key, String(value)));
@@ -89,10 +137,17 @@ async function graphPost(path: string, params: Record<string, string | boolean |
   return data;
 }
 
-async function graphGet(path: string, params: Record<string, string>) {
-  const { accessToken, apiVersion } = await credentials();
+async function graphGet(
+  path: string,
+  params: Record<string, string>,
+  tokenType: "page" | "user" = "page",
+) {
+  const { accessToken, userAccessToken, apiVersion } = await credentials();
   const query = new URLSearchParams(params);
-  query.set("access_token", accessToken);
+  query.set(
+    "access_token",
+    tokenType === "user" ? userAccessToken : accessToken,
+  );
   const response = await fetch(
     `https://graph.facebook.com/${apiVersion}/${path}?${query.toString()}`,
     { cache: "no-store" },
@@ -126,31 +181,32 @@ function normalizeAudio(
   item: GraphObject,
   fallbackType: SocialAudioType,
 ): InstagramAudioSearchResult | null {
-  const id = text(item.id) || text(item.audio_id) || text(item.ig_audio_id);
+  const id = firstText(item, ["audio_id", "id", "ig_audio_id"]);
   if (!id) return null;
   const rawType = firstText(item, ["audio_type", "type"]).toLowerCase();
-  const type: SocialAudioType = rawType === "original_sound" ? "original_sound" : fallbackType;
+  const type: SocialAudioType =
+    rawType === "original_sound" ? "original_sound" : fallbackType;
   const title =
     firstText(item, ["title", "audio_title", "name", "display_name"]) ||
-    (type === "music" ? "Música da Sound Collection" : "Áudio original");
+    (type === "music" ? "Música do Instagram" : "Áudio original");
   const artist = firstText(item, [
+    "display_artist",
+    "ig_username",
     "artist",
     "artist_name",
-    "audio_artist",
-    "owner_name",
     "username",
   ]);
   const thumbnailUrl = firstText(item, [
+    "cover_artwork_thumbnail_uri",
+    "cover_artwork_thumbnail_url",
+    "profile_picture_url",
     "thumbnail_url",
     "cover_url",
-    "image_url",
-    "artwork_url",
   ]);
   const previewUrl = firstText(item, [
+    "download_url",
     "preview_url",
     "audio_url",
-    "progressive_download_url",
-    "music_url",
   ]);
   const usageCount = number(item.usage_count ?? item.reels_count ?? item.use_count);
   const trending = Boolean(item.is_trending ?? item.trending ?? item.is_popular);
@@ -162,17 +218,22 @@ export async function searchInstagramAudio(options: {
   type: SocialAudioType;
   limit?: number;
 }) {
-  if (!(await isInstagramAudioConfigured())) throw new Error("INSTAGRAM_NOT_CONFIGURED");
+  if (!(await isInstagramAudioConfigured())) {
+    throw new Error("INSTAGRAM_NOT_CONFIGURED");
+  }
+  const { igUserId } = await credentials();
   const params: Record<string, string> = {
     audio_type: options.type,
-    limit: String(Math.max(1, Math.min(options.limit ?? 24, 50))),
+    user_id: igUserId,
   };
   const query = options.query?.trim();
-  if (query) params.q = query.slice(0, 120);
-  const data = (await graphGet("ig_audio", params)) as GraphList;
-  return (data.data ?? [])
+  if (query) params.search_query = query.slice(0, 120);
+
+  const data = (await graphGet("ig_audio", params, "user")) as GraphAudioResponse;
+  return (data.audio ?? [])
     .map((item) => normalizeAudio(item, options.type))
-    .filter((item): item is InstagramAudioSearchResult => Boolean(item));
+    .filter((item): item is InstagramAudioSearchResult => Boolean(item))
+    .slice(0, Math.max(1, Math.min(options.limit ?? 24, 50)));
 }
 
 function isVideo(asset: SocialMediaAsset) {
@@ -184,18 +245,23 @@ function clampVolume(value: number) {
 }
 
 async function waitUntilReady(containerId: string) {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
+  for (let attempt = 0; attempt < 30; attempt += 1) {
     const status = await graphGet(containerId, { fields: "status_code,status" });
     if (status.status_code === "FINISHED") return;
+    if (status.status_code === "PUBLISHED") return;
     if (status.status_code === "ERROR" || status.status_code === "EXPIRED") {
       throw new Error(text(status.status) || `CONTAINER_${status.status_code}`);
     }
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
   }
-  throw new Error("A mídia ainda está sendo processada pelo Instagram. Uma nova tentativa será feita.");
+  throw new Error(
+    "A mídia ainda está sendo processada pelo Instagram. Tente publicar novamente em alguns minutos.",
+  );
 }
 
-async function createMediaContainer(params: Record<string, string | boolean | number>) {
+async function createMediaContainer(
+  params: Record<string, string | boolean | number>,
+) {
   const { igUserId } = await credentials();
   const data = await graphPost(`${igUserId}/media`, params);
   if (!data.id) throw new Error("O Instagram não retornou o contêiner da mídia.");
@@ -204,15 +270,22 @@ async function createMediaContainer(params: Record<string, string | boolean | nu
 
 async function publishContainer(containerId: string) {
   const { igUserId } = await credentials();
-  const data = await graphPost(`${igUserId}/media_publish`, { creation_id: containerId });
+  const data = await graphPost(`${igUserId}/media_publish`, {
+    creation_id: containerId,
+  });
   if (!data.id) throw new Error("O Instagram não retornou o ID da publicação.");
   return data.id;
 }
 
-function commonPublishingParams(post: SocialPostRecord) {
+function commonPublishingParams(
+  post: SocialPostRecord,
+  allowCollaborators = false,
+) {
   const params: Record<string, string | boolean | number> = {};
   if (post.locationId) params.location_id = post.locationId;
-  if (post.collaborators.length) params.collaborators = post.collaborators.join(",");
+  if (allowCollaborators && post.collaborators.length) {
+    params.collaborators = JSON.stringify(post.collaborators);
+  }
   if (post.isAiGenerated) params.is_ai_generated = true;
   return params;
 }
@@ -228,12 +301,14 @@ async function publishFirstComment(post: SocialPostRecord, mediaId: string) {
 
 async function publishFeed(post: SocialPostRecord) {
   const asset = post.media[0];
-  if (!asset || isVideo(asset)) throw new Error("Feed precisa de uma imagem. Use Reel para vídeos.");
+  if (!asset || isVideo(asset)) {
+    throw new Error("Feed precisa de uma imagem. Use Reel para vídeos.");
+  }
   const containerId = await createMediaContainer({
     image_url: asset.url,
     caption: post.caption,
     ...(post.altText ? { alt_text: post.altText } : {}),
-    ...commonPublishingParams(post),
+    ...commonPublishingParams(post, true),
   });
   const mediaId = await publishContainer(containerId);
   await publishFirstComment(post, mediaId);
@@ -248,13 +323,15 @@ async function publishReel(post: SocialPostRecord) {
     video_url: asset.url,
     caption: post.caption,
     share_to_feed: post.shareToFeed,
-    ...commonPublishingParams(post),
+    ...commonPublishingParams(post, true),
   };
   if (post.coverUrl) params.cover_url = post.coverUrl;
   if (post.audio) {
-    params.audio_id = post.audio.id;
-    params.audio_volume = clampVolume(post.audio.musicVolume);
-    params.video_volume = clampVolume(post.audio.originalAudioVolume);
+    params.audio_configuration = JSON.stringify({
+      audio_id: post.audio.id,
+      audio_volume: clampVolume(post.audio.musicVolume),
+      video_volume: clampVolume(post.audio.originalAudioVolume),
+    });
   } else if (post.audioName) {
     params.audio_name = post.audioName;
   }
@@ -286,7 +363,9 @@ async function publishCarousel(post: SocialPostRecord) {
 
   const childIds: string[] = [];
   for (const asset of post.media) {
-    const params: Record<string, string | boolean | number> = { is_carousel_item: true };
+    const params: Record<string, string | boolean | number> = {
+      is_carousel_item: true,
+    };
     if (isVideo(asset)) {
       params.media_type = "VIDEO";
       params.video_url = asset.url;
@@ -302,15 +381,18 @@ async function publishCarousel(post: SocialPostRecord) {
     media_type: "CAROUSEL",
     children: childIds.join(","),
     caption: post.caption,
-    ...commonPublishingParams(post),
+    ...commonPublishingParams(post, false),
   });
+  await waitUntilReady(parentId);
   const mediaId = await publishContainer(parentId);
   await publishFirstComment(post, mediaId);
   return mediaId;
 }
 
 export async function publishInstagramPost(post: SocialPostRecord) {
-  if (!(await isInstagramPublishingConfigured())) throw new Error("INSTAGRAM_NOT_CONFIGURED");
+  if (!(await isInstagramPublishingConfigured())) {
+    throw new Error("INSTAGRAM_NOT_CONFIGURED");
+  }
   if (!post.media.length) throw new Error("A publicação não possui mídia.");
 
   if (post.format === "feed") return publishFeed(post);
