@@ -1,4 +1,5 @@
 import { publishInstagramPost } from "@/lib/instagram-publisher";
+import { releaseStaleInstagramPublishingClaim } from "@/lib/instagram-publish-state";
 import {
   claimSocialPost,
   getSocialPost,
@@ -7,6 +8,7 @@ import {
 } from "@/lib/social-store";
 
 export async function processSocialPost(postId: string, includeDraft = false) {
+  await releaseStaleInstagramPublishingClaim(postId);
   const claimed = await claimSocialPost(postId, includeDraft);
   if (!claimed) {
     const existing = await getSocialPost(postId);
