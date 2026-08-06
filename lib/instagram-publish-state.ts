@@ -125,7 +125,6 @@ export function instagramPublishFingerprint(post: SocialPostRecord) {
     audioName: post.audioName,
     coverUrl: post.coverUrl,
     collaborators: post.collaborators,
-    firstComment: post.firstComment,
     locationId: post.locationId,
     altText: post.altText,
     isAiGenerated: post.isAiGenerated,
@@ -134,55 +133,62 @@ export function instagramPublishFingerprint(post: SocialPostRecord) {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
-export async function getOrCreateInstagramPublishState(post: SocialPostRecord) {
+export async function getInstagramPublishState(postId: string) {
+  await ensureInstagramPublishStateSchema();
+  const sql = database();
+  const rows = await sql`
+    SELECT *
+    FROM ned_instagram_publish_states
+    WHERE post_id = ${postId}
+    LIMIT 1
+  `;
+  const row = (rows as InstagramPublishStateRow[])[0];
+  return row ? mapState(row) : null;
+}
+
+export async function resetInstagramPublishState(post: SocialPostRecord) {
   await ensureInstagramPublishStateSchema();
   const sql = database();
   const fingerprint = instagramPublishFingerprint(post);
   const rows = await sql`
     INSERT INTO ned_instagram_publish_states (
       post_id,
-      fingerprint
+      fingerprint,
+      container_id,
+      child_container_ids,
+      published_media_id,
+      phase,
+      recovered_without_media_id,
+      first_comment_published,
+      updated_at
     ) VALUES (
       ${post.id},
-      ${fingerprint}
+      ${fingerprint},
+      NULL,
+      '[]'::jsonb,
+      NULL,
+      'pending',
+      false,
+      false,
+      now()
     )
     ON CONFLICT (post_id) DO UPDATE SET
       fingerprint = EXCLUDED.fingerprint,
-      container_id = CASE
-        WHEN ned_instagram_publish_states.fingerprint = EXCLUDED.fingerprint
-          THEN ned_instagram_publish_states.container_id
-        ELSE NULL
-      END,
-      child_container_ids = CASE
-        WHEN ned_instagram_publish_states.fingerprint = EXCLUDED.fingerprint
-          THEN ned_instagram_publish_states.child_container_ids
-        ELSE '[]'::jsonb
-      END,
-      published_media_id = CASE
-        WHEN ned_instagram_publish_states.fingerprint = EXCLUDED.fingerprint
-          THEN ned_instagram_publish_states.published_media_id
-        ELSE NULL
-      END,
-      phase = CASE
-        WHEN ned_instagram_publish_states.fingerprint = EXCLUDED.fingerprint
-          THEN ned_instagram_publish_states.phase
-        ELSE 'pending'
-      END,
-      recovered_without_media_id = CASE
-        WHEN ned_instagram_publish_states.fingerprint = EXCLUDED.fingerprint
-          THEN ned_instagram_publish_states.recovered_without_media_id
-        ELSE false
-      END,
-      first_comment_published = CASE
-        WHEN ned_instagram_publish_states.fingerprint = EXCLUDED.fingerprint
-          THEN ned_instagram_publish_states.first_comment_published
-        ELSE false
-      END,
+      container_id = NULL,
+      child_container_ids = '[]'::jsonb,
+      published_media_id = NULL,
+      phase = 'pending',
+      recovered_without_media_id = false,
+      first_comment_published = false,
       updated_at = now()
     RETURNING *
   `;
-
   return mapState((rows as InstagramPublishStateRow[])[0]);
+}
+
+export async function getOrCreateInstagramPublishState(post: SocialPostRecord) {
+  const existing = await getInstagramPublishState(post.id);
+  return existing ?? resetInstagramPublishState(post);
 }
 
 export async function saveInstagramPublishState(state: InstagramPublishState) {
