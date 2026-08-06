@@ -53,6 +53,21 @@ function text(value: string | undefined) {
   return value?.trim() ?? "";
 }
 
+function hasDatabaseConfiguration() {
+  return Boolean(
+    text(process.env.DATABASE_URL) ||
+      text(process.env.POSTGRES_URL) ||
+      text(process.env.NEON_DATABASE_URL),
+  );
+}
+
+function hasEncryptionConfiguration() {
+  return Boolean(
+    text(process.env.INSTAGRAM_TOKEN_ENCRYPTION_KEY) ||
+      text(process.env.META_APP_SECRET),
+  );
+}
+
 export function instagramOAuthConfiguration() {
   const siteUrl = text(process.env.NEXT_PUBLIC_SITE_URL).replace(/\/+$/, "");
   return {
@@ -68,14 +83,26 @@ export function instagramOAuthConfiguration() {
   };
 }
 
-export function isInstagramOAuthConfigured() {
+export function getInstagramOAuthMissingConfiguration() {
   const value = instagramOAuthConfiguration();
-  return Boolean(
-    value.appId &&
-      value.appSecret &&
-      value.apiVersion &&
-      value.redirectUri &&
-      isInstagramConnectionStoreConfigured(),
+  const missing: string[] = [];
+
+  if (!value.appId) missing.push("META_APP_ID");
+  if (!value.appSecret) missing.push("META_APP_SECRET");
+  if (!value.apiVersion) missing.push("META_GRAPH_API_VERSION");
+  if (!value.redirectUri) missing.push("INSTAGRAM_OAUTH_REDIRECT_URI");
+  if (!hasDatabaseConfiguration()) missing.push("DATABASE_URL");
+  if (!hasEncryptionConfiguration()) {
+    missing.push("INSTAGRAM_TOKEN_ENCRYPTION_KEY");
+  }
+
+  return missing;
+}
+
+export function isInstagramOAuthConfigured() {
+  return (
+    getInstagramOAuthMissingConfiguration().length === 0 &&
+    isInstagramConnectionStoreConfigured()
   );
 }
 
@@ -260,11 +287,14 @@ export async function connectInstagramWithAuthorizationCode(code: string) {
 }
 
 export async function getInstagramConnectionSummary() {
+  const missingConfiguration = getInstagramOAuthMissingConfiguration();
+
   try {
     const stored = await getStoredInstagramConnection();
     return {
       connected: Boolean(stored),
-      oauthConfigured: isInstagramOAuthConfigured(),
+      oauthConfigured: missingConfiguration.length === 0,
+      missingConfiguration,
       username: stored?.username ?? "",
       pageName: stored?.pageName ?? "",
       expiresAt: stored?.expiresAt ?? null,
@@ -273,7 +303,8 @@ export async function getInstagramConnectionSummary() {
     console.error("Unable to load Instagram connection summary", error);
     return {
       connected: false,
-      oauthConfigured: isInstagramOAuthConfigured(),
+      oauthConfigured: missingConfiguration.length === 0,
+      missingConfiguration,
       username: "",
       pageName: "",
       expiresAt: null,
