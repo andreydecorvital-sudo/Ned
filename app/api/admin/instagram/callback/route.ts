@@ -10,6 +10,20 @@ function contentUrl(status: string) {
   return new URL(`/admin/conteudo?instagram=${encodeURIComponent(status)}`, siteUrl);
 }
 
+function callbackStatus(error: unknown) {
+  if (!(error instanceof Error)) return "error";
+  if (error.message === "INSTAGRAM_PROFESSIONAL_ACCOUNT_NOT_FOUND") {
+    return "professional-account-required";
+  }
+  if (error.message.startsWith("INSTAGRAM_PERMISSIONS_MISSING:")) {
+    return "permissions-required";
+  }
+  if (error.message === "INSTAGRAM_OAUTH_NOT_CONFIGURED") {
+    return "missing-config";
+  }
+  return "error";
+}
+
 export async function GET(request: NextRequest) {
   const state = request.nextUrl.searchParams.get("state") ?? "";
   const expectedState = request.cookies.get(STATE_COOKIE)?.value ?? "";
@@ -32,11 +46,7 @@ export async function GET(request: NextRequest) {
       status = "connected";
     } catch (error) {
       console.error("Instagram OAuth callback failed", error);
-      status =
-        error instanceof Error &&
-        error.message === "INSTAGRAM_PROFESSIONAL_ACCOUNT_NOT_FOUND"
-          ? "professional-account-required"
-          : "error";
+      status = callbackStatus(error);
     }
   }
 
