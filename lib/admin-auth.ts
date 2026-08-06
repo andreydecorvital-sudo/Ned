@@ -76,7 +76,9 @@ export async function setAdminSession() {
   cookieStore.set(ADMIN_COOKIE, createSessionToken(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    // OAuth retorna por uma navegação GET de outro site. "lax" mantém a
+    // proteção contra POSTs cross-site e permite recuperar a sessão no callback.
+    sameSite: "lax",
     path: "/",
     maxAge: SESSION_SECONDS,
   });
@@ -87,7 +89,7 @@ export async function clearAdminSession() {
   cookieStore.set(ADMIN_COOKIE, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
     maxAge: 0,
   });
