@@ -7,6 +7,8 @@ import type {
 import { getStoredInstagramConnection } from "@/lib/instagram-connection";
 import {
   getOrCreateInstagramPublishState,
+  instagramPublishFingerprint,
+  resetInstagramPublishState,
   saveInstagramPublishState,
   type InstagramPublishState,
 } from "@/lib/instagram-publish-state";
@@ -331,6 +333,43 @@ async function publishContainer(containerId: string) {
 
 async function createPublishingSession(post: SocialPostRecord): Promise<PublishingSession> {
   let state = await getOrCreateInstagramPublishState(post);
+  const expectedFingerprint = instagramPublishFingerprint(post);
+
+  if (state.fingerprint !== expectedFingerprint) {
+    if (state.phase === "published" && state.publishedMediaId) {
+      console.warn(
+        "The social post changed after Instagram had already published the previous version. Reusing the published result to prevent duplication.",
+        { postId: post.id, containerId: state.containerId },
+      );
+    } else if (state.containerId) {
+      const status = await getContainerStatus(state.containerId);
+      if (status.code === "PUBLISHED") {
+        const recoveredWithoutMediaId = !state.publishedMediaId;
+        state = await saveInstagramPublishState({
+          ...state,
+          phase: "published",
+          publishedMediaId: state.publishedMediaId || state.containerId,
+          recoveredWithoutMediaId,
+          updatedAt: new Date().toISOString(),
+        });
+        console.warn(
+          "Instagram published the previous version before the post was edited. The existing container was recovered instead of publishing again.",
+          { postId: post.id, containerId: state.containerId },
+        );
+      } else {
+        const stateAge = Date.now() - new Date(state.updatedAt).getTime();
+        if (state.phase === "publishing" && stateAge < 10 * 60_000) {
+          throw new Error(
+            "A versão anterior ainda está aguardando confirmação do Instagram. Tente novamente mais tarde para evitar uma publicação duplicada.",
+          );
+        }
+        state = await resetInstagramPublishState(post);
+      }
+    } else {
+      state = await resetInstagramPublishState(post);
+    }
+  }
+
   return {
     current: () => state,
     checkpoint: async (patch) => {
@@ -385,6 +424,35 @@ async function recoverPublishedContainer(
   };
 }
 
+async function resolveAmbiguousPublishRequest(
+  session: PublishingSession,
+  containerId: string,
+) {
+  const current = session.current();
+  if (current.phase !== "publishing") return null;
+
+  const elapsed = Date.now() - new Date(current.updatedAt).getTime();
+  const gracePeriod = 120_000;
+  const checks = elapsed >= gracePeriod
+    ? 1
+    : Math.max(1, Math.min(10, Math.ceil((gracePeriod - elapsed) / 3000)));
+
+  for (let attempt = 0; attempt < checks; attempt += 1) {
+    const status = await getContainerStatus(containerId);
+    if (status.code === "PUBLISHED") {
+      return recoverPublishedContainer(session, containerId);
+    }
+    if (status.code === "ERROR" || status.code === "EXPIRED") {
+      throw new Error(status.message || `CONTAINER_${status.code}`);
+    }
+    if (attempt < checks - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  }
+
+  return null;
+}
+
 async function finalizeContainer(
   session: PublishingSession,
   containerId: string,
@@ -396,6 +464,9 @@ async function finalizeContainer(
       canPublishFirstComment: !current.recoveredWithoutMediaId,
     };
   }
+
+  const recovered = await resolveAmbiguousPublishRequest(session, containerId);
+  if (recovered) return recovered;
 
   const readyStatus = await waitUntilReady(containerId);
   if (readyStatus === "PUBLISHED") {
@@ -580,6 +651,16 @@ export async function publishInstagramPost(post: SocialPostRecord) {
   if (!post.media.length) throw new Error("A publicação não possui mídia.");
 
   const session = await createPublishingSession(post);
+  const existing = session.current();
+  if (existing.phase === "published" && existing.publishedMediaId) {
+    const result = {
+      mediaId: existing.publishedMediaId,
+      canPublishFirstComment: !existing.recoveredWithoutMediaId,
+    };
+    await publishFirstComment(post, result, session);
+    return result.mediaId;
+  }
+
   if (post.format === "feed") return publishFeed(post, session);
   if (post.format === "reel") return publishReel(post, session);
   if (post.format === "story") return publishStory(post, session);
