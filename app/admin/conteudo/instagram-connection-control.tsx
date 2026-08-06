@@ -7,6 +7,7 @@ import styles from "./instagram-connection-control.module.css";
 type ConnectionSummary = {
   connected: boolean;
   oauthConfigured: boolean;
+  missingConfiguration: string[];
   username: string;
   pageName: string;
   expiresAt: string | null;
@@ -21,10 +22,14 @@ const messages: Record<string, string> = {
     "Nenhuma conta profissional vinculada a uma Página do Facebook foi encontrada.",
   "permissions-required":
     "Autorize todas as permissões solicitadas para publicar, comentar e carregar a conta.",
-  "missing-config":
-    "Faltam as credenciais do aplicativo Meta nas variáveis da Vercel.",
+  "missing-config": "A configuração do Instagram ainda está incompleta.",
   error: "Não foi possível concluir a conexão com o Instagram.",
 };
+
+function missingConfigurationMessage(items: string[]) {
+  if (!items.length) return messages["missing-config"];
+  return `Falta configurar na Vercel: ${items.join(", ")}.`;
+}
 
 export default function InstagramConnectionControl({
   initial,
@@ -39,10 +44,14 @@ export default function InstagramConnectionControl({
     const url = new URL(window.location.href);
     const status = url.searchParams.get("instagram");
     if (!status) return;
-    setNotice(messages[status] ?? messages.error);
+    setNotice(
+      status === "missing-config"
+        ? missingConfigurationMessage(connection.missingConfiguration)
+        : messages[status] ?? messages.error,
+    );
     url.searchParams.delete("instagram");
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-  }, []);
+  }, [connection.missingConfiguration]);
 
   const disconnect = async () => {
     if (!window.confirm("Desconectar a conta do Instagram deste painel?")) return;
@@ -94,6 +103,9 @@ export default function InstagramConnectionControl({
             </small>
           </>
         )}
+        {!connection.connected && connection.missingConfiguration.length > 0 && (
+          <p>{missingConfigurationMessage(connection.missingConfiguration)}</p>
+        )}
         {notice && <p>{notice}</p>}
       </div>
       {connection.connected ? (
@@ -107,7 +119,7 @@ export default function InstagramConnectionControl({
           onClick={(event) => {
             if (connection.oauthConfigured) return;
             event.preventDefault();
-            setNotice(messages["missing-config"]);
+            setNotice(missingConfigurationMessage(connection.missingConfiguration));
           }}
         >
           <Link2 size={14} /> Conectar Instagram
