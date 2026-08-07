@@ -1,4 +1,4 @@
 Trigger de deploy da produção.
 Atualizado em 2026-08-06T16:12:00-03:00 para publicar o diagnóstico OAuth do Instagram na main.
 
-O PR 39 usa Instagram Login direto e permanece isolado em branch até o CI e o teste de autenticação passarem.
+PR 39: Instagram Login direto implementado em branch, incluindo autenticação, graph.instagram.com e bloqueio seguro de áudio da biblioteca no modo direto. Aguardando CI antes de merge.
