@@ -13,16 +13,31 @@ import {
   type InstagramPublishState,
 } from "@/lib/instagram-publish-state";
 
+type InstagramLoginMode = "facebook" | "instagram";
+
 type InstagramCredentials = {
   accessToken: string;
   userAccessToken: string;
   igUserId: string;
   apiVersion: string;
+  loginMode: InstagramLoginMode;
 };
 
 let credentialCache:
   | { expiresAt: number; value: InstagramCredentials }
   | null = null;
+
+function configuredLoginMode(): InstagramLoginMode {
+  return (process.env.INSTAGRAM_LOGIN_MODE ?? "").trim().toLowerCase() === "instagram"
+    ? "instagram"
+    : "facebook";
+}
+
+function storedLoginMode(scopes: string[]): InstagramLoginMode {
+  return scopes.some((scope) => scope.startsWith("instagram_business_"))
+    ? "instagram"
+    : "facebook";
+}
 
 function environmentCredentials(): InstagramCredentials {
   const accessToken = (process.env.INSTAGRAM_ACCESS_TOKEN ?? "").trim();
@@ -33,6 +48,7 @@ function environmentCredentials(): InstagramCredentials {
     ).trim(),
     igUserId: (process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID ?? "").trim(),
     apiVersion: (process.env.META_GRAPH_API_VERSION ?? "").trim(),
+    loginMode: configuredLoginMode(),
   };
 }
 
@@ -49,6 +65,7 @@ async function credentials() {
         userAccessToken: stored.userAccessToken,
         igUserId: stored.igUserId,
         apiVersion: fallback.apiVersion,
+        loginMode: storedLoginMode(stored.scopes),
       }
     : fallback;
 
@@ -67,7 +84,10 @@ export async function isInstagramPublishingConfigured() {
 export async function isInstagramAudioConfigured() {
   const value = await credentials();
   return Boolean(
-    value.userAccessToken && value.igUserId && value.apiVersion,
+    value.loginMode === "facebook" &&
+      value.userAccessToken &&
+      value.igUserId &&
+      value.apiVersion,
   );
 }
 
@@ -147,20 +167,41 @@ function graphError(data: GraphObject, status: number) {
   return new Error(friendlyGraphMessage(data, status));
 }
 
+function graphBaseUrl(loginMode: InstagramLoginMode, apiVersion: string) {
+  const host =
+    loginMode === "instagram"
+      ? "https://graph.instagram.com"
+      : "https://graph.facebook.com";
+  return `${host}/${apiVersion}`;
+}
+
 async function graphPost(
   path: string,
   params: Record<string, string | boolean | number>,
 ) {
-  const { accessToken, apiVersion } = await credentials();
-  const body = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => body.set(key, String(value)));
-  body.set("access_token", accessToken);
+  const { accessToken, apiVersion, loginMode } = await credentials();
+  const endpoint = `${graphBaseUrl(loginMode, apiVersion)}/${path}`;
 
-  const response = await fetch(`https://graph.facebook.com/${apiVersion}/${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
+  let response: Response;
+  if (loginMode === "instagram") {
+    const body = new FormData();
+    Object.entries(params).forEach(([key, value]) => body.set(key, String(value)));
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body,
+    });
+  } else {
+    const body = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => body.set(key, String(value)));
+    body.set("access_token", accessToken);
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
+  }
+
   const data = (await response.json()) as GraphObject;
   if (!response.ok || data.error) throw graphError(data, response.status);
   return data;
@@ -171,15 +212,25 @@ async function graphGet(
   params: Record<string, string>,
   tokenType: "page" | "user" = "page",
 ) {
-  const { accessToken, userAccessToken, apiVersion } = await credentials();
+  const {
+    accessToken,
+    userAccessToken,
+    apiVersion,
+    loginMode,
+  } = await credentials();
+  const token = tokenType === "user" ? userAccessToken : accessToken;
   const query = new URLSearchParams(params);
-  query.set(
-    "access_token",
-    tokenType === "user" ? userAccessToken : accessToken,
-  );
+  const headers: HeadersInit = {};
+
+  if (loginMode === "instagram") {
+    headers.Authorization = `Bearer ${token}`;
+  } else {
+    query.set("access_token", token);
+  }
+
   const response = await fetch(
-    `https://graph.facebook.com/${apiVersion}/${path}?${query.toString()}`,
-    { cache: "no-store" },
+    `${graphBaseUrl(loginMode, apiVersion)}/${path}?${query.toString()}`,
+    { cache: "no-store", headers },
   );
   const data = (await response.json()) as GraphObject;
   if (!response.ok || data.error) throw graphError(data, response.status);
@@ -247,10 +298,14 @@ export async function searchInstagramAudio(options: {
   type: SocialAudioType;
   limit?: number;
 }) {
+  const current = await credentials();
+  if (current.loginMode === "instagram") {
+    throw new Error("A busca de músicas da biblioteca exige Facebook Login. No Instagram Login direto, publique o Reel com o áudio já incorporado ao vídeo.");
+  }
   if (!(await isInstagramAudioConfigured())) {
     throw new Error("INSTAGRAM_NOT_CONFIGURED");
   }
-  const { igUserId } = await credentials();
+  const { igUserId } = current;
   const params: Record<string, string> = {
     audio_type: options.type,
     user_id: igUserId,
@@ -498,10 +553,11 @@ async function finalizeContainer(
 function commonPublishingParams(
   post: SocialPostRecord,
   allowCollaborators = false,
+  allowTaggingFeatures = true,
 ) {
   const params: Record<string, string | boolean | number> = {};
-  if (post.locationId) params.location_id = post.locationId;
-  if (allowCollaborators && post.collaborators.length) {
+  if (allowTaggingFeatures && post.locationId) params.location_id = post.locationId;
+  if (allowTaggingFeatures && allowCollaborators && post.collaborators.length) {
     params.collaborators = JSON.stringify(post.collaborators);
   }
   if (post.isAiGenerated) params.is_ai_generated = true;
@@ -537,11 +593,12 @@ async function publishFeed(post: SocialPostRecord, session: PublishingSession) {
   if (!asset || isVideo(asset)) {
     throw new Error("Feed precisa de uma imagem. Use Reel para vídeos.");
   }
+  const { loginMode } = await credentials();
   const containerId = await ensureMainContainer(session, {
     image_url: asset.url,
     caption: post.caption,
     ...(post.altText ? { alt_text: post.altText } : {}),
-    ...commonPublishingParams(post, true),
+    ...commonPublishingParams(post, true, loginMode === "facebook"),
   });
   const result = await finalizeContainer(session, containerId);
   await publishFirstComment(post, result, session);
@@ -551,12 +608,18 @@ async function publishFeed(post: SocialPostRecord, session: PublishingSession) {
 async function publishReel(post: SocialPostRecord, session: PublishingSession) {
   const asset = post.media[0];
   if (!asset || !isVideo(asset)) throw new Error("Reel precisa de um vídeo.");
+  const { loginMode } = await credentials();
+  if (loginMode === "instagram" && post.audio) {
+    throw new Error(
+      "A música da biblioteca do Instagram exige Facebook Login. No modo Instagram Login direto, envie o vídeo com o áudio já incorporado.",
+    );
+  }
   const params: Record<string, string | boolean | number> = {
     media_type: "REELS",
     video_url: asset.url,
     caption: post.caption,
     share_to_feed: post.shareToFeed,
-    ...commonPublishingParams(post, true),
+    ...commonPublishingParams(post, true, loginMode === "facebook"),
   };
   if (post.coverUrl) params.cover_url = post.coverUrl;
   if (post.audio) {
@@ -627,11 +690,12 @@ async function publishCarousel(post: SocialPostRecord, session: PublishingSessio
   let parentId = session.current().containerId;
   if (!parentId) {
     const childIds = await ensureCarouselChildren(post, session);
+    const { loginMode } = await credentials();
     parentId = await createMediaContainer({
       media_type: "CAROUSEL",
       children: childIds.join(","),
       caption: post.caption,
-      ...commonPublishingParams(post, false),
+      ...commonPublishingParams(post, false, loginMode === "facebook"),
     });
     await session.checkpoint({
       containerId: parentId,
