@@ -47,6 +47,7 @@ function connectionString() {
 function encryptionSecret() {
   return (
     process.env.INSTAGRAM_TOKEN_ENCRYPTION_KEY ??
+    process.env.INSTAGRAM_APP_SECRET ??
     process.env.META_APP_SECRET ??
     ""
   ).trim();
