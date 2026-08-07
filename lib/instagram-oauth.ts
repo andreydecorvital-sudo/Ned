@@ -5,7 +5,7 @@ import {
   saveInstagramConnection,
 } from "@/lib/instagram-connection";
 
-const INSTAGRAM_PERMISSIONS = [
+const FACEBOOK_LOGIN_PERMISSIONS = [
   "pages_show_list",
   "pages_read_engagement",
   "business_management",
@@ -13,6 +13,14 @@ const INSTAGRAM_PERMISSIONS = [
   "instagram_content_publish",
   "instagram_manage_comments",
 ] as const;
+
+const INSTAGRAM_LOGIN_PERMISSIONS = [
+  "instagram_business_basic",
+  "instagram_business_content_publish",
+  "instagram_business_manage_comments",
+] as const;
+
+type InstagramLoginMode = "facebook" | "instagram";
 
 type GraphError = {
   message?: string;
@@ -25,12 +33,25 @@ type OAuthTokenResponse = {
   access_token?: string;
   token_type?: string;
   expires_in?: number;
+  user_id?: string | number;
+  permissions?: string[];
   error?: GraphError;
+  error_type?: string;
+  error_message?: string;
+  code?: number;
 };
 
 type InstagramAccount = {
   id?: string;
   username?: string;
+};
+
+type InstagramProfileResponse = {
+  id?: string;
+  user_id?: string | number;
+  username?: string;
+  account_type?: string;
+  error?: GraphError;
 };
 
 type ManagedPage = {
@@ -55,7 +76,8 @@ type GraphStage =
   | "AUTHORIZATION_CODE"
   | "LONG_LIVED_TOKEN"
   | "PERMISSIONS"
-  | "MANAGED_PAGES";
+  | "MANAGED_PAGES"
+  | "INSTAGRAM_PROFILE";
 
 function text(value: string | undefined) {
   return value?.trim() ?? "";
@@ -72,15 +94,35 @@ function hasDatabaseConfiguration() {
 function hasEncryptionConfiguration() {
   return Boolean(
     text(process.env.INSTAGRAM_TOKEN_ENCRYPTION_KEY) ||
+      text(process.env.INSTAGRAM_APP_SECRET) ||
       text(process.env.META_APP_SECRET),
   );
 }
 
+function configuredLoginMode(): InstagramLoginMode {
+  const explicit = text(process.env.INSTAGRAM_LOGIN_MODE).toLowerCase();
+  if (explicit === "instagram") return "instagram";
+  if (explicit === "facebook") return "facebook";
+
+  if (text(process.env.INSTAGRAM_APP_ID) && text(process.env.INSTAGRAM_APP_SECRET)) {
+    return "instagram";
+  }
+  return "facebook";
+}
+
 export function instagramOAuthConfiguration() {
   const siteUrl = text(process.env.NEXT_PUBLIC_SITE_URL).replace(/\/+$/, "");
+  const mode = configuredLoginMode();
   return {
-    appId: text(process.env.META_APP_ID),
-    appSecret: text(process.env.META_APP_SECRET),
+    mode,
+    appId:
+      mode === "instagram"
+        ? text(process.env.INSTAGRAM_APP_ID)
+        : text(process.env.META_APP_ID),
+    appSecret:
+      mode === "instagram"
+        ? text(process.env.INSTAGRAM_APP_SECRET)
+        : text(process.env.META_APP_SECRET),
     apiVersion: text(process.env.META_GRAPH_API_VERSION),
     redirectUri:
       text(process.env.INSTAGRAM_OAUTH_REDIRECT_URI) ||
@@ -95,8 +137,14 @@ export function getInstagramOAuthMissingConfiguration() {
   const value = instagramOAuthConfiguration();
   const missing: string[] = [];
 
-  if (!value.appId) missing.push("META_APP_ID");
-  if (!value.appSecret) missing.push("META_APP_SECRET");
+  if (!value.appId) {
+    missing.push(value.mode === "instagram" ? "INSTAGRAM_APP_ID" : "META_APP_ID");
+  }
+  if (!value.appSecret) {
+    missing.push(
+      value.mode === "instagram" ? "INSTAGRAM_APP_SECRET" : "META_APP_SECRET",
+    );
+  }
   if (!value.apiVersion) missing.push("META_GRAPH_API_VERSION");
   if (!value.redirectUri) missing.push("INSTAGRAM_OAUTH_REDIRECT_URI");
   if (!hasDatabaseConfiguration()) missing.push("DATABASE_URL");
@@ -124,6 +172,18 @@ export function buildInstagramAuthorizationUrl(state: string) {
     throw new Error("INSTAGRAM_OAUTH_NOT_CONFIGURED");
   }
 
+  if (config.mode === "instagram") {
+    const url = new URL("https://www.instagram.com/oauth/authorize");
+    url.searchParams.set("client_id", config.appId);
+    url.searchParams.set("redirect_uri", config.redirectUri);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("state", state);
+    url.searchParams.set("scope", INSTAGRAM_LOGIN_PERMISSIONS.join(","));
+    url.searchParams.set("enable_fb_login", "0");
+    url.searchParams.set("force_authentication", "1");
+    return url.toString();
+  }
+
   const url = new URL(
     `https://www.facebook.com/${config.apiVersion}/dialog/oauth`,
   );
@@ -131,7 +191,7 @@ export function buildInstagramAuthorizationUrl(state: string) {
   url.searchParams.set("redirect_uri", config.redirectUri);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("state", state);
-  url.searchParams.set("scope", INSTAGRAM_PERMISSIONS.join(","));
+  url.searchParams.set("scope", FACEBOOK_LOGIN_PERMISSIONS.join(","));
   url.searchParams.set("auth_type", "rerequest");
   return url.toString();
 }
@@ -162,7 +222,39 @@ async function readGraphJson<T extends { error?: GraphError }>(
   return data;
 }
 
-async function exchangeAuthorizationCode(code: string) {
+async function exchangeInstagramAuthorizationCode(code: string) {
+  const config = instagramOAuthConfiguration();
+  const body = new FormData();
+  body.set("client_id", config.appId);
+  body.set("client_secret", config.appSecret);
+  body.set("grant_type", "authorization_code");
+  body.set("redirect_uri", config.redirectUri);
+  body.set("code", code);
+
+  const response = await fetch("https://api.instagram.com/oauth/access_token", {
+    method: "POST",
+    body,
+    cache: "no-store",
+  });
+  const data = (await response.json().catch(() => null)) as OAuthTokenResponse | null;
+  if (!data || !response.ok || data.error_message || data.error) {
+    console.error("Instagram direct OAuth code exchange failed", {
+      httpStatus: response.status,
+      code: data?.code ?? data?.error?.code,
+      errorType: data?.error_type ?? data?.error?.type,
+      message: data?.error_message ?? data?.error?.message,
+    });
+    throw new Error(
+      `INSTAGRAM_META_AUTHORIZATION_CODE_FAILED:${data?.code ?? data?.error?.code ?? response.status}`,
+    );
+  }
+  if (!data.access_token || !data.user_id) {
+    throw new Error("INSTAGRAM_AUTHORIZATION_TOKEN_MISSING");
+  }
+  return data;
+}
+
+async function exchangeFacebookAuthorizationCode(code: string) {
   const config = instagramOAuthConfiguration();
   const url = new URL(
     `https://graph.facebook.com/${config.apiVersion}/oauth/access_token`,
@@ -183,7 +275,25 @@ async function exchangeAuthorizationCode(code: string) {
   return data;
 }
 
-async function exchangeLongLivedToken(shortLivedToken: string) {
+async function exchangeInstagramLongLivedToken(shortLivedToken: string) {
+  const config = instagramOAuthConfiguration();
+  const url = new URL("https://graph.instagram.com/access_token");
+  url.searchParams.set("grant_type", "ig_exchange_token");
+  url.searchParams.set("client_secret", config.appSecret);
+  url.searchParams.set("access_token", shortLivedToken);
+
+  const response = await fetch(url, { cache: "no-store" });
+  const data = await readGraphJson<OAuthTokenResponse>(
+    response,
+    "LONG_LIVED_TOKEN",
+  );
+  if (!data.access_token) {
+    throw new Error("INSTAGRAM_LONG_LIVED_TOKEN_MISSING");
+  }
+  return data;
+}
+
+async function exchangeFacebookLongLivedToken(shortLivedToken: string) {
   const config = instagramOAuthConfiguration();
   const url = new URL(
     `https://graph.facebook.com/${config.apiVersion}/oauth/access_token`,
@@ -219,8 +329,8 @@ async function grantedPermissions(userAccessToken: string) {
     .filter(Boolean);
 }
 
-function assertRequiredPermissions(granted: string[]) {
-  const missing = INSTAGRAM_PERMISSIONS.filter(
+function assertFacebookPermissions(granted: string[]) {
+  const missing = FACEBOOK_LOGIN_PERMISSIONS.filter(
     (permission) => !granted.includes(permission),
   );
   if (missing.length) {
@@ -276,40 +386,110 @@ function chooseInstagramPage(pages: ManagedPage[]) {
   return available[0];
 }
 
-export async function connectInstagramWithAuthorizationCode(code: string) {
-  if (!isInstagramOAuthConfigured()) {
-    throw new Error("INSTAGRAM_OAUTH_NOT_CONFIGURED");
+async function instagramProfile(accessToken: string, fallbackId: string) {
+  const config = instagramOAuthConfiguration();
+  const url = new URL(`https://graph.instagram.com/${config.apiVersion}/me`);
+  url.searchParams.set("fields", "id,user_id,username,account_type");
+  url.searchParams.set("access_token", accessToken);
+
+  const response = await fetch(url, { cache: "no-store" });
+  try {
+    const data = await readGraphJson<InstagramProfileResponse>(
+      response,
+      "INSTAGRAM_PROFILE",
+    );
+    return {
+      id: String(data.id ?? data.user_id ?? fallbackId),
+      username: data.username ?? config.preferredUsername,
+    };
+  } catch (error) {
+    console.warn(
+      "Instagram profile lookup failed after a successful token exchange; using the OAuth user ID.",
+      error,
+    );
+    return {
+      id: fallbackId,
+      username: config.preferredUsername,
+    };
   }
+}
 
-  const shortLived = await exchangeAuthorizationCode(code);
-  const longLived = await exchangeLongLivedToken(shortLived.access_token!);
-  const permissions = await grantedPermissions(longLived.access_token!);
-  assertRequiredPermissions(permissions);
-
-  const pages = await managedPages(longLived.access_token!);
-  const page = chooseInstagramPage(pages);
-  const instagram = page.instagram_business_account!;
-
+async function connectWithInstagramLogin(code: string) {
+  const shortLived = await exchangeInstagramAuthorizationCode(code);
+  const longLived = await exchangeInstagramLongLivedToken(shortLived.access_token!);
+  const userId = String(shortLived.user_id);
+  const profile = await instagramProfile(longLived.access_token!, userId);
+  const permissions =
+    Array.isArray(shortLived.permissions) && shortLived.permissions.length
+      ? shortLived.permissions
+      : [...INSTAGRAM_LOGIN_PERMISSIONS];
   const expiresAt =
     typeof longLived.expires_in === "number"
       ? new Date(Date.now() + longLived.expires_in * 1000).toISOString()
       : null;
 
+  return saveInstagramConnection({
+    igUserId: profile.id,
+    username: profile.username ?? "",
+    pageId: "",
+    pageName: "Instagram Login direto",
+    accessToken: longLived.access_token!,
+    userAccessToken: longLived.access_token!,
+    expiresAt,
+    scopes: permissions,
+  });
+}
+
+async function connectWithFacebookLogin(code: string) {
+  const shortLived = await exchangeFacebookAuthorizationCode(code);
+  const longLived = await exchangeFacebookLongLivedToken(shortLived.access_token!);
+  const permissions = await grantedPermissions(longLived.access_token!);
+  assertFacebookPermissions(permissions);
+
+  const pages = await managedPages(longLived.access_token!);
+  const page = chooseInstagramPage(pages);
+  const instagram = page.instagram_business_account!;
+  const expiresAt =
+    typeof longLived.expires_in === "number"
+      ? new Date(Date.now() + longLived.expires_in * 1000).toISOString()
+      : null;
+
+  return saveInstagramConnection({
+    igUserId: instagram.id!,
+    username: instagram.username ?? "",
+    pageId: page.id!,
+    pageName: page.name ?? "",
+    accessToken: page.access_token!,
+    userAccessToken: longLived.access_token!,
+    expiresAt,
+    scopes: permissions,
+  });
+}
+
+export async function connectInstagramWithAuthorizationCode(code: string) {
+  if (!isInstagramOAuthConfigured()) {
+    throw new Error("INSTAGRAM_OAUTH_NOT_CONFIGURED");
+  }
+
   try {
-    const saved = await saveInstagramConnection({
-      igUserId: instagram.id!,
-      username: instagram.username ?? "",
-      pageId: page.id!,
-      pageName: page.name ?? "",
-      accessToken: page.access_token!,
-      userAccessToken: longLived.access_token!,
-      expiresAt,
-      scopes: permissions,
-    });
+    const saved =
+      instagramOAuthConfiguration().mode === "instagram"
+        ? await connectWithInstagramLogin(code)
+        : await connectWithFacebookLogin(code);
 
     if (!saved) throw new Error("INSTAGRAM_CONNECTION_NOT_SAVED");
     return saved;
   } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message.startsWith("INSTAGRAM_META_") ||
+        error.message.startsWith("INSTAGRAM_PERMISSIONS_MISSING:") ||
+        error.message === "INSTAGRAM_PROFESSIONAL_ACCOUNT_NOT_FOUND" ||
+        error.message === "INSTAGRAM_AUTHORIZATION_TOKEN_MISSING" ||
+        error.message === "INSTAGRAM_LONG_LIVED_TOKEN_MISSING")
+    ) {
+      throw error;
+    }
     console.error("Unable to persist Instagram connection", error);
     throw new Error("INSTAGRAM_CONNECTION_STORAGE_FAILED");
   }
